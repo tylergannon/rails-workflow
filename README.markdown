@@ -1,22 +1,14 @@
 What is workflow?
 -----------------
 
-This Gem is a fork of Vladimir Dobriakov's [Workflow Gem](http://github.com/geekq/workflow).  Credit goes to him for the core code.  Please read [the original README](http://github.com/geekq/workflow) for a full introduction,
-as this README skims through much of that content and focuses on new / changed features.
+This Gem is a fork of Vladimir Dobriakov's [Workflow Gem](http://github.com/geekq/workflow).  Credit goes to him for the inspiration, architecture and basic syntax.
 
 ## What's different in rails-workflow
 
-The primary difference here is the use of [ActiveSupport::Callbacks](http://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html)
+* Use of [ActiveSupport::Callbacks](http://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html)
 to enable a more flexible application of callbacks.
-You now have access to the same DSL you're used to from [ActionController Callbacks](http://guides.rubyonrails.org/action_controller_overview.html#filters),
-including the ability to wrap state transitions in an `around_transition`, to place
-conditional logic on application of callbacks, or to have callbacks run for only
-a set of state-change events.
-
-I've made `ActiveRecord` and `ActiveSupport` into runtime dependencies.
-
-You can also take advantage of ActiveRecord's conditional validation syntax,
-to apply validations only to specific state transitions.
+* Slightly terser syntax for event definition.
+* Cleaner support for using conditional ActiveRecord validations to validate state transitions.
 
 
 Installation
@@ -24,12 +16,25 @@ Installation
 
     gem install rails-workflow
 
+# Configuration
+
+No configuraion is required, but the following configurations can be placed inside an initializer:
+
+```ruby
+# config/initializers/workflow.rb
+Workflow.configure do |config|
+  #  Set false to avoid the extra call to the database, if you'll be saving the object after transition.
+  self.persist_workflow_state_immediately = true
+  #  Set true to also change the `:updated_at` during state transition.
+  self.touch_on_update_column = false
+end
+
+```
 
 Ruby Version
 --------
 
-I've only tested with Ruby 2.3.  ;)  Time to upgrade.
-
+I've only tested with Ruby 2.3.  ;)  
 
 # Basic workflow definition:
 
@@ -37,14 +42,14 @@ I've only tested with Ruby 2.3.  ;)  Time to upgrade.
       include Workflow
       workflow do
         state :new do
-          event :submit, :transitions_to => :awaiting_review
+          on :submit, to: :awaiting_review
         end
         state :awaiting_review do
-          event :review, :transitions_to => :being_reviewed
+          on :review, to: :being_reviewed
         end
         state :being_reviewed do
-          event :accept, :transitions_to => :accepted
-          event :reject, :transitions_to => :rejected
+          on :accept, to: :accepted
+          on :reject, to: :rejected
         end
         state :accepted
         state :rejected
@@ -55,10 +60,7 @@ Access an object representing the current state of the entity,
 including available events and transitions:
 
     article.current_state
-    => #<Workflow::State:0x7f1e3d6731f0 @events={
-      :submit=>#<Workflow::Event:0x7f1e3d6730d8 @action=nil,
-        @transitions_to=:awaiting_review, @name=:submit, @meta={}>},
-      name:new, meta{}
+    => <State name=:new events(1)=[<Event name=:submit transitions(1)=[<to=<State name=:awaiting_review events(1)=[<Event name=:review transitions(1)=...
 
 On Ruby 1.9 and above, you can check whether a state comes before or
 after another state (by the order they were defined):
@@ -78,18 +80,70 @@ Now we can call the submit event, which transitions to the
     article.submit!
     article.awaiting_review? # => true
 
+# Multiple Possible Targets For A Given Event
+
+The first matching condition will determine the target state.
+An error will be raised if none match, so a catchall at the end is a good idea.
+
+    class Article
+      include Workflow
+      workflow do
+        state :new do
+          on :submit do
+            to :awaiting_review, if: :today_is_wednesday?
+            to :being_reviewed, unless: "author.name == 'Foo Bar'"
+            to :accepted, if: -> {author.role == 'Admin'}
+            to :rejected, if: [:bad_hair_day?, :in_a_bad_mood?]
+            to :the_bad_place
+          end
+        end
+        state :awaiting_review do
+          on :review, to: :being_reviewed
+        end
+        state :being_reviewed do
+          on :accept, to: :accepted
+          on :reject, to: :rejected
+        end
+        state :accepted
+        state :rejected
+        state :the_bad_place
+      end
+    end
+
 
 Callbacks
 -------------------------
 
 The DSL syntax here is very much similar to ActionController or ActiveRecord callbacks.
 
-Callbacks with this strategy used the same as [ActionController Callbacks](http://guides.rubyonrails.org/action_controller_overview.html#filters).
+Three classes of callbacks:
 
-You can configure any number of `before`, `around`, or `after` transition callbacks.
+* :transition callbacks representing named events.
+  * `before_transition only: :submit`
+  * `after_transition except: :submit`
+* :exit callbacks that match on the state the transition leaves
+  * `before_exit only: :being_reviewed  #will run on the :accept or the :reject event`
+* :enter callbacks that match on the target state for the transition
+  * `before_enter only: :being_reviewed`  #will run on the :review event
 
-`before_transition` and `around_transition` are called in the order they are set,
-and `after_transition` callbacks are called in reverse order.
+Callbacks run in this order:
+
+* `before_transition`, `around_transition`
+  * `before_exit`, `around_exit`
+    * `before_enter`, `around_enter`
+      * **State Transition**
+    * `after_enter`
+  * `after_exit`
+* `after_transition`
+
+Within each group, the callbacks fire in the order they are set.
+
+### Halting callbacks
+Inside any `:before` callback, you can halt the callback chain:
+
+    before_enter do
+      throw :abort
+    end
 
 ## Around Transition
 
@@ -169,15 +223,25 @@ The callback will run `if` or `unless` the named method returns a truthy value.
 
     before_transition :do_something, if: :valid?
 
+    # Array conditions apply if all aggregated conditions apply.
+    before_transition :do_something, if: [:valid?, :kosher?]
+    before_transition :do_something, if: [:valid?, "title == 'Good Title'"]
+    before_transition :do_something, unless: [:valid?, -> {title == 'Good Title'}]
+
 ### only/except
 
-The callback will run `if` or `unless` the event being processed is in the list given
+The three callback classes accept `:only` and `:except` parameters, and treat them slightly differnetly.
 
-    #  Run this callback only on the `accept` and `publish` events.
-    before_transition :do_something, only: [:accept, :publish]
+    You can use `:only` and `:except` in conjunction with `:if` and `:unless`.
 
-    #  Run this callback on events other than the `accept` and `publish` events.
-    before_transition :do_something_else, except: [:accept, :publish]
+* **Transition Callbacks** match on the name of the event being executed.
+  * `before_transition only: :submit` will run when the `:submit` event is fired
+  * `before_transition except: [:submit, :reject]` will run on any event except the two named
+* **Exit Callbacks** match on the name of the state being exited
+  * `before_exit only: :new` will run when an event causes the object to leave the `:new` state.
+* **Enter Callbacks** match on the name of the state being entered
+  * `before_enter only: [:cancelled, :rejected]` will run when an event leaves the object `:cancelled` or `:rejected`.
+
 
 ## Conditional Validations
 
@@ -196,9 +260,14 @@ from `new` to `awaiting_review`.
 
     #  This will create a transition callback which will stop the event
     #  and return false if validations fail.
+
     halt_transition_unless_valid!
 
-    #  This is the same as
+    #  This is the same as doing
+
+    before_transition do
+      throw :abort unless valid?
+    end
 
 ### Checking A Transition
 
@@ -232,7 +301,7 @@ will help:
       workflow do
         event_args :reviewer, :reviewed_at
         state :new do
-          event :review, transitions_to: :reviewed
+          on :review, to: :reviewed
         end
         state :reviewed
       end
@@ -242,8 +311,7 @@ will help:
 Transition event handler
 ------------------------
 
-The best way is to use convention over configuration and to define a
-method with the same name as the event. Then it is automatically invoked
+You can define a method with the same name as the event. Then it is automatically invoked
 when event is raised. For the Article workflow defined earlier it would
 be:
 
@@ -258,12 +326,6 @@ be:
 ActiveRecord), invoke this user defined `reject` method and finally
 persist the `rejected` state.
 
-Note: on successful transition from one state to another the workflow
-gem immediately persists the new workflow state with `update_column()`,
-bypassing any ActiveRecord callbacks including `updated_at` update.
-This way it is possible to deal with the validation and to save the
-pending changes to a record at some later point instead of the moment
-when transition occurs.
 
 You can also define event handler accepting/requiring additional
 arguments:
@@ -333,37 +395,21 @@ the record:
 
     class Order < ActiveRecord::Base
       include Workflow
-      workflow transactional: true do
+
+      wrap_transition_in_transaction!
+      # which is the same as the following:
+
+      around_transition do |model, transition|
+        model.with_lock do
+          transition.call
+        end
+      end
+
+      workflow do
         state :approved
         state :pending
       end
     end
-
-Conditional event transitions
------------------------------
-
-Conditions can be a "method name symbol" with a corresponding instance method, a `proc` or `lambda` which are added to events, like so:
-
-    state :off
-      event :turn_on, :transition_to => :on,
-                      :if => :sufficient_battery_level?
-
-      event :turn_on, :transition_to => :low_battery,
-                      :if => proc { |device| device.battery_level > 0 }
-    end
-
-    # corresponding instance method
-    def sufficient_battery_level?
-      battery_level > 10
-    end
-
-When calling a `device.can_<fire_event>?` check, or attempting a `device.<event>!`, each event is checked in turn:
-
-* With no `:if` check, proceed as usual.
-* If an `:if` check is present, proceed if it evaluates to true, or drop to the next event.
-* If you've run out of events to check (eg. `battery_level == 0`), then the transition isn't possible.
-
-
 
 Accessing your workflow specification
 -------------------------------------
@@ -372,16 +418,12 @@ You can easily reflect on workflow specification programmatically - for
 the whole class or for the current object. Examples:
 
     article2.current_state.events # lists possible events from here
-    article2.current_state.events[:reject].transitions_to # => :rejected
 
-    Article.workflow_spec.states.keys
-    #=> [:rejected, :awaiting_review, :being_reviewed, :accepted, :new]
-
-    Article.workflow_spec.state_names
+    Article.workflow_spec.states.map &:name
     #=> [:rejected, :awaiting_review, :being_reviewed, :accepted, :new]
 
     # list all events for all states
-    Article.workflow_spec.states.values.collect &:events
+    Article.workflow_spec.states.map(&:events).flatten
 
 
 You can also store and later retrieve additional meta data for every
@@ -390,14 +432,13 @@ state and every event:
     class MyProcess
       include Workflow
       workflow do
-        state :main, :meta => {:importance => 8}
-        state :supplemental, :meta => {:importance => 1}
+        state :main, meta: {importance: 8} do
+          on :change, to: :supplemental, meta: {whatever: true}
+        end
+        state :supplemental, meta: {importance: 1}
       end
     end
-    puts MyProcess.workflow_spec.states[:supplemental].meta[:importance] # => 1
-
-The workflow library itself uses this feature to tweak the graphical
-representation of the workflow. See below.
+    puts MyProcess.workflow_spec.find_state(:supplemental).meta[:importance] # => 1
 
 
 Earlier versions

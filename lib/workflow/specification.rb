@@ -42,7 +42,7 @@ module Workflow
         state.events.each do |event|
           event.transitions.each do |transition|
             target_state = spec.find_state(transition.target_state)
-            unless target_state.present?
+            if target_state.nil?
               raise Workflow::Errors::WorkflowDefinitionError.new("Event #{event.name} transitions to #{transition.target_state} but there is no such state.")
             end
             transition.target_state = target_state
