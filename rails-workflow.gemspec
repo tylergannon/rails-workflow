@@ -32,13 +32,14 @@ Gem::Specification.new do |spec|
     "README.markdown"
   ]
 
-  spec.add_dependency 'activerecord'
-  spec.add_dependency 'activesupport'
+  spec.add_dependency 'activerecord', '~> 5.0'
+  spec.add_dependency 'activesupport', '~> 5.0'
 
   spec.add_development_dependency 'rdoc',    [">= 3.12"]
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'mocha'
   spec.add_development_dependency 'yard'
+  spec.add_development_dependency 'cancancan'
   spec.add_development_dependency 'redcarpet'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'test-unit'
