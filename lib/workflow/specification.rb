@@ -117,9 +117,9 @@ module Workflow
     # end
     #
     # a = Article.new
-    # a.process_event! :foo
+    # a.transition! :foo
     # a.current_state.name          # => :bax
-    # a.process_event! :revert_bar
+    # a.transition! :revert_bar
     # a.current_state.name          # => :foo
     #```
     def define_revert_events!

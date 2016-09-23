@@ -296,7 +296,7 @@ RSpec.describe "Callbacks" do
 
         before_transition block
       end
-      subject.process_event! :go, foo: :whatever, message: :you_rule
+      subject.transition! :go, foo: :whatever, message: :you_rule
       expect(subject.message).to eq :you_rule
     end
 
@@ -306,7 +306,7 @@ RSpec.describe "Callbacks" do
           obj.message = message
         end
       end
-      subject.process_event! :go, foo: :whatever, message: :you_rule
+      subject.transition! :go, foo: :whatever, message: :you_rule
       expect(subject.message).to eq :you_rule
     end
 
@@ -316,7 +316,7 @@ RSpec.describe "Callbacks" do
           self.message = message
         end
       end
-      subject.process_event! :go, foo: :whatever, message: :you_rule
+      subject.transition! :go, foo: :whatever, message: :you_rule
       expect(subject.message).to eq :you_rule
     end
 
@@ -326,7 +326,7 @@ RSpec.describe "Callbacks" do
           self.message = [sauce, message, the_rest]
         end
       end
-      subject.process_event! :go, 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
+      subject.transition! :go, 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
       expect(subject.message).to eq ["marmaduke", :you_rule, {:foo=>:whatever, :tight=>:dope}]
     end
 
@@ -337,7 +337,7 @@ RSpec.describe "Callbacks" do
           callbacks.call()
         end
       end
-      subject.process_event! :go, 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
+      subject.transition! :go, 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
       expect(subject.message).to eq ["marmaduke", :you_rule, {:foo=>:whatever, :tight=>:dope}]
       expect(subject).to be_done
     end

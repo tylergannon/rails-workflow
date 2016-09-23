@@ -51,7 +51,7 @@ module Workflow
     res || workflow_spec.initial_state
   end
 
-  # Deprecated.  Check for false return value from {#process_event!}
+  # Deprecated.  Check for false return value from {#transition!}
   # @return true if the last transition was halted by one of the transition callbacks.
   def halted?
     @halted
@@ -66,7 +66,7 @@ module Workflow
   # @param [Symbol] name name of event to initiate
   # @param [Mixed] *args Arguments passed to state transition. Available also to callbacks
   # @return [Type] description of returned object
-  def process_event!(name, *args, **attributes)
+  def transition!(name, *args, **attributes)
     name = name.to_sym
     event = current_state.find_event(name)
     raise NoTransitionAllowed.new(
@@ -264,7 +264,7 @@ module Workflow
           event_name = event.name
           module_eval do
             define_method "#{event_name}!".to_sym do |*args|
-              process_event!(event_name, *args)
+              transition!(event_name, *args)
             end
 
             define_method "can_#{event_name}?" do

@@ -60,7 +60,7 @@ end
 
 ## Invoking State Transitions
 
-You may call the method named for the event itself, or else the more generic `process_event!` method
+You may call the method named for the event itself, or else the more generic `transition!` method
 
 ```ruby
 a = Article.new
@@ -74,7 +74,7 @@ a.current_state.name
 
 ```ruby
 a = Article.new
-a.process_event! :submit
+a.transition! :submit
 a.current_state.name
 # => :awaiting_review
 ```
@@ -83,7 +83,7 @@ The transition will return a truthy value if it succeeds: either the return valu
 of the event-specific callback, if one is defined, or else the name of the new state
 
 ```ruby
-puts a.process_event!(:submit)
+puts a.transition!(:submit)
 # => :awaiting_review
 ```
 
@@ -297,7 +297,7 @@ The three callback classes accept `:only` and `:except` parameters, and treat th
 
 ## Parameterized Callbacks
 
-If you're passing parameters through the `process_event!` method, you can receive
+If you're passing parameters through the `transition!` method, you can receive
 them easily in your callbacks.  For example:
 
 ```ruby
@@ -315,7 +315,7 @@ class Article
   end
 end
 
-Article.last.process_event! :submit, reviewer: current_user
+Article.last.transition! :submit, reviewer: current_user
 ```
 
 If you don't like keyword arguments you can use standard arguments, but you
@@ -327,7 +327,7 @@ before_transition, only: :submit do |article, review_date, reviewer:|
   puts review_date
 end
 
-Article.last.process_event! :submit, Date.today, reviewer: current_user
+Article.last.transition! :submit, Date.today, reviewer: current_user
 
 ```
 

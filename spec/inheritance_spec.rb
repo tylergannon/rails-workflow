@@ -45,7 +45,7 @@ RSpec.describe "Workflow Class Inheritance" do
     end
 
     it "should have the following event processing methods" do
-      expect(bang_methods(subject)).to eq(Set.new [:birth!, :halt!, :process_event!])
+      expect(bang_methods(subject)).to eq(Set.new [:birth!, :halt!, :transition!])
     end
   end
 
@@ -60,7 +60,7 @@ RSpec.describe "Workflow Class Inheritance" do
       expect(states).to include(:upset)
     end
     it "should have the following event processing methods" do
-      expect(bang_methods(subject)).to eq(Set.new [:halt!, :process_event!, :scratch!])
+      expect(bang_methods(subject)).to eq(Set.new [:halt!, :transition!, :scratch!])
     end
 
     it "should not have a birth! method like Animal does" do
