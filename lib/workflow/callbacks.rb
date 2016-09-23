@@ -1,3 +1,5 @@
+require 'workflow/callbacks/callback'
+
 module Workflow
   module Callbacks
 
@@ -23,6 +25,42 @@ module Workflow
     end
 
     module ClassMethods
+      def ensure_after_transitions(name=nil, **opts, &block)
+        _ensure_procs  = [name, block].compact.map do |exe|
+          Callback.new(exe)
+        end
+
+        prepend_around_transition **opts do |obj, callbacks|
+          begin
+            callbacks.call()
+          ensure
+            _ensure_procs.each {|l| l.callback.call obj, ->{}}
+          end
+        end
+      end
+
+      def on_error(error_class=Exception, **opts, &block)
+        _error_procs  = [opts.delete(:rescue)].compact.map do |exe|
+          Callback.new(exe)
+        end
+
+        _ensure_procs = [opts.delete(:ensure)].compact.map do |exe|
+          Callback.new(exe)
+        end
+
+        prepend_around_transition **opts do |obj, callbacks|
+          begin
+            callbacks.call
+          rescue error_class => ex
+            self.instance_exec(ex, &block) if block_given?
+            # block.call(ex) if block_given?
+            _error_procs.each {|l| l.callback.call self, ->{}}
+          ensure
+            _ensure_procs.each {|l| l.callback.call self, ->{}}
+          end
+        end
+      end
+
       ##
       # @!method before_transition
       #

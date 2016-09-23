@@ -95,7 +95,7 @@ module Workflow
       run_all_callbacks do
         callback_value  = run_action_callback name, *args
         persist_value   = persist_workflow_state(target.name)
-        callback_value || persist_value
+        return_value    = callback_value || persist_value
       end
     ensure
       @transition_context = nil

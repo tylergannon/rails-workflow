@@ -22,6 +22,7 @@ module Workflow
               attrs[:updated_at] = DateTime.now
             end
             update_columns attrs
+            new_value
           else
             self[self.class.workflow_column] = new_value
           end
