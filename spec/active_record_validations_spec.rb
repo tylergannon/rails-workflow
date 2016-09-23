@@ -32,10 +32,31 @@ RSpec.describe "Active Record Validations" do
         expect(subject.can_transition?(:accept)).to be_falsey
       end
 
+      it "should clear the errors after running" do
+        subject.can_transition?(:accept)
+        expect(subject.errors).to be_empty
+      end
+
       it "should NOT succeed the transition" do
         expect(subject.accept!).to be_falsey
         subject.reload
         expect(subject).not_to be_accepted
+      end
+
+      it {is_expected.to be_valid}
+
+      it "should have the errors on the object" do
+        subject.accept!
+        expect(subject.errors).not_to be_empty
+        expect(subject).not_to be_valid
+      end
+
+      it "should re-validate the object after some manipulation." do
+        subject.accept!
+        expect(subject.errors).not_to be_empty
+        expect(subject).not_to be_valid
+        subject.body = subject.body
+        expect(subject).to be_valid
       end
     end
   end

@@ -5,6 +5,10 @@ module Workflow
     module ActiveRecordValidations
       extend ActiveSupport::Concern
 
+      included do
+        prepend RevalidateOnlyAfterAttributesChange
+      end
+
       ###
       #
       # Captures instance method calls of the form `:transitioning_from_<state_name>`
@@ -25,14 +29,6 @@ module Workflow
         end
       end
 
-      def valid?(context=nil)
-        if errors.any?
-          false
-        else
-          super
-        end
-      end
-
       def can_transition?(event_id)
         event = current_state.find_event(event_id)
         return false unless event
@@ -43,8 +39,10 @@ module Workflow
         return false unless to
 
         within_transition(from, to.name, event_id) do
-          valid?
+          return valid?
         end
+      ensure
+        errors.clear
       end
 
       ###
@@ -75,6 +73,37 @@ module Workflow
           return block.call()
         ensure
           @transition_context = nil
+        end
+      end
+
+      # Override for ActiveRecord::Validations#valid?
+      # Since we are validating inside of a transition,
+      # We need to be able to maintain the errors list for the object
+      # through future valid? calls or the list will be cleared
+      # next time valid? is called.
+      #
+      # Once any attributes have changed on the object, the following call to {#valid?}
+      # will cause revalidation.
+      #
+      # Note that a change on an association will not trigger a reset,
+      # meaning that one should call `errors.clear` before {#valid?} will
+      # trigger validations to run anew.
+      module RevalidateOnlyAfterAttributesChange
+        def valid?(context=nil)
+          if errors.any? && !@changed_since_validation
+            false
+          else
+            begin
+              return super
+            ensure
+              @changed_since_validation = false
+            end
+          end
+        end
+
+        def write_attribute(attr_name, value)
+          @changed_since_validation = true
+          super
         end
       end
 

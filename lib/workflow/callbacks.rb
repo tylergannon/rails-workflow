@@ -1,4 +1,5 @@
 require 'workflow/callbacks/callback'
+require 'workflow/callbacks/transition_callback_wrapper'
 
 module Workflow
   module Callbacks
@@ -245,13 +246,13 @@ module Workflow
         CALLBACK_MAP.each do |type, context_attribute|
           define_method "#{callback}_#{type}" do |*names, &blk|
             _insert_callbacks(names, context_attribute, blk) do |name, options|
-              set_callback(type, callback, name, options)
+              set_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name), options)
             end
           end
 
           define_method "prepend_#{callback}_#{type}" do |*names, &blk|
             _insert_callbacks(names, context_attribute, blk) do |name, options|
-              set_callback(type, callback, name, options.merge(prepend: true))
+              set_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name), options.merge(prepend: true))
             end
           end
 
@@ -259,12 +260,22 @@ module Workflow
           # for details on the allowed parameters.
           define_method "skip_#{callback}_#{type}" do |*names|
             _insert_callbacks(names, context_attribute) do |name, options|
-              skip_callback(type, callback, name, options)
+              skip_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name), options)
             end
           end
 
           # *_action is the same as append_*_action
           alias_method :"append_#{callback}_#{type}", :"#{callback}_#{type}"
+        end
+      end
+
+      def applicable_callback?(callback, procedure)
+        arity = procedure.arity
+        return true if arity < 0 || arity > 2
+        if [:key, :keyreq, :keyrest].include? procedure.parameters[-1][0]
+          return true
+        else
+          return false
         end
       end
 
@@ -297,6 +308,7 @@ module Workflow
     private
     #  TODO: Do something here.
     def halted_callback_hook(filter)
+      # byebug
     end
 
     def run_all_callbacks(&block)

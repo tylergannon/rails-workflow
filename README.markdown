@@ -295,6 +295,42 @@ The three callback classes accept `:only` and `:except` parameters, and treat th
 * **Enter Callbacks** match on the name of the state being entered
   * `before_enter only: [:cancelled, :rejected]` will run when an event leaves the object `:cancelled` or `:rejected`.
 
+## Parameterized Callbacks
+
+If you're passing parameters through the `process_event!` method, you can receive
+them easily in your callbacks.  For example:
+
+```ruby
+class Article
+  include Workflow
+  workflow do
+    event_args :review_date
+  end
+  before_transition do |reviewer:|
+    logger.debug reviewer.name
+  end
+  after_transition do |author:, **arguments|
+    logger.debug arguments[:reviewer].name
+    logger.debug author.name
+  end
+end
+
+Article.last.process_event! :submit, reviewer: current_user
+```
+
+If you don't like keyword arguments you can use standard arguments, but you
+need to receive the model as the first argument to your block, and you have to
+configure the `event_args` for the transition context, within your workflow definition.
+
+```ruby
+before_transition, only: :submit do |article, review_date, reviewer:|
+  puts review_date
+end
+
+Article.last.process_event! :submit, Date.today, reviewer: current_user
+
+```
+
 ## Catching Errors
 
 ```ruby
