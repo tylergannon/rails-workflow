@@ -27,6 +27,9 @@ module Workflow
         str = <<-EOF
           Proc.new do |target#{', callbacks' if around_callback?}|
             attributes = transition_context.attributes.dup
+            event_args = transition_context.event_args.dup
+            from, to, event, event_args, attributes = transition_context.values
+            name_proc  = Proc.new {|name|  case name when :to then to when :from then from when :event then event else (attributes.delete(name) || event_args.shift) end}
             target.instance_exec(#{arguments})
           end
         EOF
@@ -44,7 +47,7 @@ module Workflow
         names  = []
         names << 'target'   if params.shift
         (names << 'callbacks') && params.shift if around_callback?
-        names += params.map{|t| "transition_context.#{t}"}
+        names += params.map{|name| "name_proc.call(:#{name})"}
         return names.join(', ') if names.any?
       end
 
@@ -60,7 +63,7 @@ module Workflow
       end
 
       def rest_param_string
-        '*transition_context.event_args' if rest_param
+        '*event_args' if rest_param
       end
 
       def procedure_string

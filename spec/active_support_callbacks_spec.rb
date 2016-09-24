@@ -265,6 +265,48 @@ RSpec.describe "Callbacks" do
     end
   end
 
+  describe "named arguments" do
+    let(:workflow_class) do
+      new_workflow_class do
+        state :new do
+          on :go, to: :done
+        end
+        state :done
+      end
+    end
+    subject do
+      workflow_class.new
+    end
+
+    before do
+      workflow_class.class_eval do
+        attr_accessor :message
+      end
+    end
+
+    it "Collects the arguments correctly" do
+      workflow_class.class_eval do
+        before_transition do |obj, a, b, *c|
+          obj.message = {a: a, b: b, c: c}
+        end
+      end
+      subject.go! :what, :cool, :dope, :sauce, :whatever
+      expect(subject.message).to eq({a: :what, b: :cool, c: [:dope, :sauce, :whatever]})
+    end
+
+    it "Collects the arguments correctly, including (from, to, and event)" do
+      workflow_class.class_eval do
+        before_transition do |obj, a, b, from, to, event, *c|
+          obj.message = {a: a, b: b, c: c, from: from, to: to, event: event}
+        end
+      end
+      subject.go! :what, :cool, :dope, :sauce, :whatever
+      expect(subject.message).to eq({
+        a: :what, b: :cool, c: [:dope, :sauce, :whatever],
+        from: :new, to: :done, event: :go})
+    end
+  end
+
   describe "keyword arguments" do
     let(:workflow_class) do
       new_workflow_class do
@@ -296,7 +338,7 @@ RSpec.describe "Callbacks" do
 
         before_transition block
       end
-      subject.transition! :go, foo: :whatever, message: :you_rule
+      subject.go! foo: :whatever, message: :you_rule
       expect(subject.message).to eq :you_rule
     end
 
@@ -306,7 +348,7 @@ RSpec.describe "Callbacks" do
           obj.message = message
         end
       end
-      subject.transition! :go, foo: :whatever, message: :you_rule
+      subject.go! foo: :whatever, message: :you_rule
       expect(subject.message).to eq :you_rule
     end
 
@@ -316,28 +358,28 @@ RSpec.describe "Callbacks" do
           self.message = message
         end
       end
-      subject.transition! :go, foo: :whatever, message: :you_rule
+      subject.go! foo: :whatever, message: :you_rule
       expect(subject.message).to eq :you_rule
     end
 
     it "Does it 2" do
       workflow_class.class_eval do
-        before_transition do |obj, sauce, message:, **the_rest|
+        before_transition do |obj, dope, sauce, message:, **the_rest|
           self.message = [sauce, message, the_rest]
         end
       end
-      subject.transition! :go, 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
+      subject.go! 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
       expect(subject.message).to eq ["marmaduke", :you_rule, {:foo=>:whatever, :tight=>:dope}]
     end
 
     it "On around transitions" do
       workflow_class.class_eval do
-        around_transition do |obj, callbacks, sauce, message:, **the_rest|
+        around_transition do |obj, callbacks, dope, sauce, message:, **the_rest|
           self.message = [sauce, message, the_rest]
           callbacks.call()
         end
       end
-      subject.transition! :go, 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
+      subject.go! 'tight', 'marmaduke', foo: :whatever, message: :you_rule, tight: :dope
       expect(subject.message).to eq ["marmaduke", :you_rule, {:foo=>:whatever, :tight=>:dope}]
       expect(subject).to be_done
     end

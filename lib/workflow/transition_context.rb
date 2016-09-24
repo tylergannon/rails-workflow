@@ -40,7 +40,11 @@ module Workflow
     end
 
     def values
-      [from, to, event, event_args]
+      [from, to, event, event_args.dup, attributes.dup]
+    end
+
+    def respond_to?(method)
+      named_arguments.key?(method) || super
     end
 
     def method_missing(method, *args)
