@@ -1,3 +1,3 @@
 module Workflow
-  VERSION = "1.4.1.2"
+  VERSION = "1.4.3.4"
 end
