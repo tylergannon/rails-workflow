@@ -80,26 +80,27 @@ RSpec.describe "Nested Callbacks" do
       before do
         workflow_class.class_eval do
           def abort_callback
-            # raise "Shitbag"
+            raise "Abort!  Does Not Compute!"
           end
-          # skip_before_exit :abort_callback, only: :somewhere_else
+          skip_before_exit :abort_callback, only: :somewhere_else
           before_exit :abort_callback, only: :somewhere_else, unless: "something.nil?"
         end
       end
       it "should succeed the transition" do
-        skip "This shit don't work"
         expect(subject).not_to receive(:abort_callback)
         subject.start!
         expect(subject.something).to be_nil
         subject.goto_final!
         expect(subject).to be_final
       end
+
       describe "If the new string condition is met" do
         it "should fail the transition" do
-          skip "This shit don't work"
           subject.start!
           subject.something = "anything"
-          subject.goto_final!
+          expect {
+            subject.goto_final!
+          }.to raise_error(RuntimeError)
           expect(subject).to be_somewhere_else
         end
       end

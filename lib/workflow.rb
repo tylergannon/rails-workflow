@@ -18,6 +18,29 @@ module Workflow
   include Callbacks
   include Errors
 
+  module ComputeIdentifier
+    private
+    def make_lambda(filter)
+      if filter.kind_of? Workflow::Callbacks::TransitionCallbackWrapper
+        super(filter.wrapper)
+      else
+        super
+      end
+    end
+
+    def compute_identifier(filter)
+      if filter.kind_of? Workflow::Callbacks::TransitionCallbackWrapper
+        super(filter.raw_proc)
+      else
+        super
+      end
+    end
+  end
+
+  class ::ActiveSupport::Callbacks::Callback
+    prepend ComputeIdentifier
+  end
+
   def self.configure(&block)
     block.call(config) if block_given?
   end

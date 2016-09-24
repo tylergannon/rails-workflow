@@ -13,7 +13,7 @@ module Workflow
         if raw_proc.kind_of? ::Proc
           new(callback_type, raw_proc, calling_class).wrapper
         elsif raw_proc.kind_of? ::Symbol
-          TransitionCallbackMethodWrapper.new(callback_type, raw_proc, calling_class).wrapper
+          TransitionCallbackMethodWrapper.new(callback_type, raw_proc, calling_class)
         else
           raw_proc
         end
