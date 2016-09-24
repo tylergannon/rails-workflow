@@ -1,5 +1,6 @@
 require 'workflow/callbacks/callback'
 require 'workflow/callbacks/transition_callback_wrapper'
+require 'workflow/callbacks/transition_callback_method_wrapper'
 
 module Workflow
   module Callbacks
@@ -246,13 +247,13 @@ module Workflow
         CALLBACK_MAP.each do |type, context_attribute|
           define_method "#{callback}_#{type}" do |*names, &blk|
             _insert_callbacks(names, context_attribute, blk) do |name, options|
-              set_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name), options)
+              set_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name, self), options)
             end
           end
 
           define_method "prepend_#{callback}_#{type}" do |*names, &blk|
             _insert_callbacks(names, context_attribute, blk) do |name, options|
-              set_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name), options.merge(prepend: true))
+              set_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name, self), options.merge(prepend: true))
             end
           end
 
@@ -260,7 +261,7 @@ module Workflow
           # for details on the allowed parameters.
           define_method "skip_#{callback}_#{type}" do |*names|
             _insert_callbacks(names, context_attribute) do |name, options|
-              skip_callback(type, callback, TransitionCallbackWrapper.build_wrapper(callback, name), options)
+              skip_callback(type, callback, name, options)
             end
           end
 

@@ -1,15 +1,19 @@
+
 module Workflow
   module Callbacks
     class TransitionCallbackWrapper
       attr_reader :callback_type, :raw_proc
-      def initialize(callback_type, raw_proc)
+      def initialize(callback_type, raw_proc, calling_class)
         @callback_type = callback_type
         @raw_proc      = raw_proc
+        @calling_class = calling_class
       end
 
-      def self.build_wrapper(callback_type, raw_proc)
+      def self.build_wrapper(callback_type, raw_proc, calling_class)
         if raw_proc.kind_of? ::Proc
-          new(callback_type, raw_proc).wrapper
+          new(callback_type, raw_proc, calling_class).wrapper
+        elsif raw_proc.kind_of? ::Symbol
+          TransitionCallbackMethodWrapper.new(callback_type, raw_proc, calling_class).wrapper
         else
           raw_proc
         end
@@ -24,19 +28,28 @@ module Workflow
           procedure_string].compact.join(', ')
 
         raw_proc = self.raw_proc
-        str = <<-EOF
-          Proc.new do |target#{', callbacks' if around_callback?}|
-            attributes = transition_context.attributes.dup
-            event_args = transition_context.event_args.dup
-            from, to, event, event_args, attributes = transition_context.values
-            name_proc  = Proc.new {|name|  case name when :to then to when :from then from when :event then event else (attributes.delete(name) || event_args.shift) end}
-            target.instance_exec(#{arguments})
-          end
-        EOF
+        str = build_proc("target.instance_exec(#{arguments})")
         eval(str)
       end
 
-      private
+      protected
+
+      def build_proc(proc_body)
+        <<-EOF
+          Proc.new do |target#{', callbacks' if around_callback?}|
+            from, to, event, event_args, attributes = transition_context.values
+            name_proc  = Proc.new {|name|
+              case name
+              when :to then to
+              when :from then from
+              when :event then event
+              else (attributes.delete(name) || event_args.shift)
+              end
+            }
+            #{proc_body}
+          end
+        EOF
+      end
 
       def around_callback?
         callback_type == :around
@@ -95,6 +108,7 @@ module Workflow
       def parameters
         raw_proc.parameters
       end
+
       def arity
         raw_proc.arity
       end
