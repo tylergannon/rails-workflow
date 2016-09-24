@@ -298,24 +298,78 @@ The three callback classes accept `:only` and `:except` parameters, and treat th
 ## Parameterized Callbacks
 
 If you're passing parameters through the `transition!` method, you can receive
-them easily in your callbacks.  For example:
+them easily in your callbacks.  Workflow::Callbacks will inspect the parameters of
+your block or method and pass just the ones you ask for.
+
+Three magic names apply to parameter names defined on callbacks:
+
+* `event` will be set to the name of the event being processed.
+* `to` will be set to the name of the destination state.
+* `from` will be set to the name of the state being exited.
+
+Other parameters will be `shift`ed from what you pass in, so they should be taken
+back in order.  As in:
 
 ```ruby
-class Article
-  include Workflow
-  workflow do
-    event_args :review_date
+  def my_after_submit(from, cool, *args)
+    logger.warn [from, cool, args]
   end
+  after_transition :my_after_submit, only: :submit
+
+  an_article.submit! :rad, 1, 2, 3
+  # => [:submit, :rad, [1, 2, 3]]
+```
+
+You can also use keyword arguments:
+
+```ruby
+  def my_after_submit(to, hype:, **args)
+    logger.warn [to, hype, args]
+  end
+  after_transition :my_after_submit, only: :submit
+
+  an_article.submit! a: 1, b: 2, hype: 4.5, c: 3
+  # => [:awaiting_review, 4.5, {a: 1, b: 2, c: 3}]
+```
+
+Around callbacks should be sure to yield the block given:
+
+```ruby
+after_transition :my_after_submit, only: :submit
+
+def my_after_submit(to, hype:, **args)
+  logger.warn [to, hype, args]
+  yield
+end
+
+def my_after_submit(to, hype:, **args, &bloci)
+  logger.warn [to, hype, args]
+  block.call
+end
+
+```
+
+Note that in order to use block-style callbacks with special arguments, unless you
+use strictly keyword arguments, the first
+parameters to your block must be the object and callback block (for around callbacks):
+
+```ruby
   before_transition do |reviewer:|
     logger.debug reviewer.name
   end
-  after_transition do |author:, **arguments|
-    logger.debug arguments[:reviewer].name
-    logger.debug author.name
-  end
-end
+  Article.last.transition! :submit, reviewer: current_user
 
-Article.last.transition! :submit, reviewer: current_user
+  before_transition do |obj, reviewer|
+    logger.debug reviewer.name
+  end
+  Article.last.transition! :submit, current_user
+
+  around_transition do |obj, callbacks, reviewer|
+    logger.debug reviewer.name
+    callbacks.call
+  end
+  Article.last.transition! :submit, current_user
+
 ```
 
 If you don't like keyword arguments you can use standard arguments, but you
