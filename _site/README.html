@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Rails Workflow</title>
+  <meta name="description" content="Rails Workflow began as a fork of the [Workflow](https://github.com/geekq/workflow) gem by [Vladimir Dobriakov](http://www.mobile-web-consulting.de). It is a...">
+
+  
+  
+  <link rel="stylesheet" href="http://localhost:4000/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/README.html">
+  <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="http://localhost:4000/feed.xml">
+  
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    
+    
+    <a class="site-title" href="http://localhost:4000/">Rails Workflow</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="http://localhost:4000/GETTING_STARTED/">Getting Started</a>
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="http://localhost:4000/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="http://localhost:4000/topics/">Topics</a>
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <h2 id="what-is-workflow">What is workflow?</h2>
+
+<p>Workflow is a tool for describing and managing state transitions in Ruby objects, particularly ActiveModel entities.  The present gem is a fork of Vladimir Dobriakov’s <a href="http://github.com/geekq/workflow">Workflow Gem</a>.    Credit goes to him for the inspiration, architecture and basic syntax.</p>
+
+<h2 id="whats-different-in-rails-workflow">What’s different in rails-workflow</h2>
+
+<ul>
+  <li>Use of <a href="http://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html">ActiveSupport::Callbacks</a>
+to enable a more flexible application of callbacks.</li>
+  <li>Slightly terser syntax for event definition.</li>
+  <li>Cleaner support for using conditional ActiveRecord validations to validate state transitions.</li>
+</ul>
+
+<h2 id="installation">Installation</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>gem install rails-workflow
+</code></pre>
+</div>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>No configuraion is required, but the following configurations can be placed inside an initializer:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="c1"># config/initializers/workflow.rb</span>
+<span class="no">Workflow</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="c1">#  Set false to avoid the extra call to the database, if you'll be saving the object after transition.</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">persist_workflow_state_immediately</span> <span class="o">=</span> <span class="kp">true</span>
+  <span class="c1">#  Set true to also change the `:updated_at` during state transition.</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">touch_on_update_column</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="k">end</span>
+
+</code></pre>
+</div>
+
+<h2 id="ruby-version">Ruby Version</h2>
+
+<p>I’ve only tested with Ruby 2.3.  ;)</p>
+
+<h1 id="basic-workflow-definition">Basic workflow definition:</h1>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">state</span> <span class="ss">:new</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:submit</span><span class="p">,</span> <span class="ss">to: :awaiting_review</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:awaiting_review</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:review</span><span class="p">,</span> <span class="ss">to: :being_reviewed</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:being_reviewed</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:accept</span><span class="p">,</span> <span class="ss">to: :accepted</span>
+      <span class="n">on</span> <span class="ss">:reject</span><span class="p">,</span> <span class="ss">to: :rejected</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:accepted</span>
+    <span class="n">state</span> <span class="ss">:rejected</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+</code></pre>
+</div>
+
+<h2 id="invoking-state-transitions">Invoking State Transitions</h2>
+
+<p>You may call the method named for the event itself, or else the more generic <code class="highlighter-rouge">transition!</code> method</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="no">Article</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">name</span>
+<span class="c1"># =&gt; :new</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">submit!</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">name</span>
+<span class="c1"># =&gt; :awaiting_review</span>
+<span class="c1"># ... etc</span>
+</code></pre>
+</div>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="no">Article</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:submit</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">name</span>
+<span class="c1"># =&gt; :awaiting_review</span>
+</code></pre>
+</div>
+
+<p>The transition will return a truthy value if it succeeds: either the return value
+of the event-specific callback, if one is defined, or else the name of the new state</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="nb">puts</span> <span class="n">a</span><span class="p">.</span><span class="nf">transition!</span><span class="p">(</span><span class="ss">:submit</span><span class="p">)</span>
+<span class="c1"># =&gt; :awaiting_review</span>
+</code></pre>
+</div>
+
+<p>If the transition does not finish and no exception is raised, the method returns <code class="highlighter-rouge">false</code>.</p>
+
+<p>Generally this would be because of a validation failure, so checking the model for errors
+would be the next course of action.</p>
+
+<p>You can also pass arguments to the event, though nothing will happen with them except
+as you’ve defined in your callbacks (described below)</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">a</span><span class="p">.</span><span class="nf">submit!</span><span class="p">(</span><span class="ss">author: </span><span class="s1">'Fanny Schmittenbauer'</span><span class="p">,</span> <span class="ss">awesomeness: </span><span class="mi">29</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Access an object representing the current state of the entity,
+including available events and transitions:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">article</span><span class="p">.</span><span class="nf">current_state</span>
+<span class="c1"># =&gt; &lt;State name=:new events(1)=[&lt;Event name=:submit transitions(1)=[&lt;to=&lt;State name=:awaiting_review events(1)=[&lt;Event name=:review transitions(1)=...</span>
+</code></pre>
+</div>
+
+<p>On Ruby 1.9 and above, you can check whether a state comes before or
+after another state (by the order they were defined):</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">article</span><span class="p">.</span><span class="nf">current_state</span>
+<span class="c1"># =&gt; being_reviewed</span>
+<span class="n">article</span><span class="p">.</span><span class="nf">current_state</span> <span class="o">&lt;</span> <span class="ss">:accepted</span>
+<span class="c1"># =&gt; true</span>
+<span class="n">article</span><span class="p">.</span><span class="nf">current_state</span> <span class="o">&gt;=</span> <span class="ss">:accepted</span>
+<span class="c1"># =&gt; false</span>
+<span class="n">article</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">between?</span> <span class="ss">:awaiting_review</span><span class="p">,</span> <span class="ss">:rejected</span>
+<span class="c1"># =&gt; true</span>
+</code></pre>
+</div>
+<p>Now we can call the submit event, which transitions to the
+<tt>:awaiting_review</tt> state:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>article.submit!
+article.awaiting_review? # =&gt; true
+</code></pre>
+</div>
+
+<h1 id="multiple-possible-targets-for-a-given-event">Multiple Possible Targets For A Given Event</h1>
+
+<p>The first matching condition will determine the target state.
+An error will be raised if none match, so a catchall at the end is a good idea.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">state</span> <span class="ss">:new</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:submit</span> <span class="k">do</span>
+        <span class="n">to</span> <span class="ss">:awaiting_review</span><span class="p">,</span> <span class="ss">if: :today_is_wednesday?</span>
+        <span class="n">to</span> <span class="ss">:being_reviewed</span><span class="p">,</span> <span class="ss">unless: </span><span class="s2">"author.name == 'Foo Bar'"</span>
+        <span class="n">to</span> <span class="ss">:accepted</span><span class="p">,</span> <span class="ss">if: </span><span class="o">-&gt;</span> <span class="p">{</span><span class="n">author</span><span class="p">.</span><span class="nf">role</span> <span class="o">==</span> <span class="s1">'Admin'</span><span class="p">}</span>
+        <span class="n">to</span> <span class="ss">:rejected</span><span class="p">,</span> <span class="ss">if: </span><span class="p">[</span><span class="ss">:bad_hair_day?</span><span class="p">,</span> <span class="ss">:in_a_bad_mood?</span><span class="p">]</span>
+        <span class="n">to</span> <span class="ss">:the_bad_place</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:awaiting_review</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:review</span><span class="p">,</span> <span class="ss">to: :being_reviewed</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:being_reviewed</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:accept</span><span class="p">,</span> <span class="ss">to: :accepted</span>
+      <span class="n">on</span> <span class="ss">:reject</span><span class="p">,</span> <span class="ss">to: :rejected</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:accepted</span>
+    <span class="n">state</span> <span class="ss">:rejected</span>
+    <span class="n">state</span> <span class="ss">:the_bad_place</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="callbacks">Callbacks</h2>
+
+<p>The DSL syntax here is very much similar to ActionController or ActiveRecord callbacks.</p>
+
+<p>Three classes of callbacks:</p>
+
+<ul>
+  <li>:transition callbacks representing named events.
+    <ul>
+      <li><code class="highlighter-rouge">before_transition only: :submit</code></li>
+      <li><code class="highlighter-rouge">after_transition except: :submit</code></li>
+    </ul>
+  </li>
+  <li>:exit callbacks that match on the state the transition leaves
+    <ul>
+      <li><code class="highlighter-rouge">before_exit only: :being_reviewed  #will run on the :accept or the :reject event</code></li>
+    </ul>
+  </li>
+  <li>:enter callbacks that match on the target state for the transition
+    <ul>
+      <li><code class="highlighter-rouge">before_enter only: :being_reviewed</code>  #will run on the :review event</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Callbacks run in this order:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">before_transition</code>, <code class="highlighter-rouge">around_transition</code>
+    <ul>
+      <li><code class="highlighter-rouge">before_exit</code>, <code class="highlighter-rouge">around_exit</code>
+        <ul>
+          <li><code class="highlighter-rouge">before_enter</code>, <code class="highlighter-rouge">around_enter</code>
+            <ul>
+              <li><strong>State Transition</strong></li>
+            </ul>
+          </li>
+          <li><code class="highlighter-rouge">after_enter</code></li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">after_exit</code></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">after_transition</code></li>
+</ul>
+
+<p>Within each group, the callbacks fire in the order they are set.</p>
+
+<h3 id="halting-callbacks">Halting callbacks</h3>
+<p>Inside any <code class="highlighter-rouge">:before</code> callback, you can halt the callback chain:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_enter</span> <span class="k">do</span>
+  <span class="kp">throw</span> <span class="ss">:abort</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Note that this will halt the callback chain without an error,
+so you won’t get an exception in your <code class="highlighter-rouge">on_error</code> block, if you have one.</p>
+
+<h2 id="around-transition">Around Transition</h2>
+
+<p>Allows you to run code surrounding the state transition.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">around_transition</span> <span class="ss">:wrap_in_transaction</span>
+
+<span class="k">def</span> <span class="nf">wrap_in_transaction</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+  <span class="no">Article</span><span class="p">.</span><span class="nf">transaction</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>You can also define the callback using a block:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">around_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">object</span><span class="p">,</span> <span class="n">transition</span><span class="o">|</span>
+  <span class="n">object</span><span class="p">.</span><span class="nf">with_lock</span> <span class="k">do</span>
+    <span class="n">transition</span><span class="p">.</span><span class="nf">call</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="beforetransition">before_transition</h2>
+
+<p>Allows you to run code prior to the state transition.
+If you <code class="highlighter-rouge">halt</code> or <code class="highlighter-rouge">throw :abort</code> within a <code class="highlighter-rouge">before_transition</code>, the callback chain
+will be halted, the transition will be canceled and the event action
+will return false.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="n">before_transition</span> <span class="ss">:check_title</span>
+
+    <span class="k">def</span> <span class="nf">check_title</span>
+      <span class="n">halt</span><span class="p">(</span><span class="s1">'Title was bad.'</span><span class="p">)</span> <span class="k">unless</span> <span class="n">title</span> <span class="o">==</span> <span class="s2">"Good Title"</span>
+    <span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Or again, in block expression:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>    <span class="n">before_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">article</span><span class="o">|</span>
+      <span class="kp">throw</span> <span class="ss">:abort</span> <span class="k">unless</span> <span class="n">article</span><span class="p">.</span><span class="nf">title</span> <span class="o">==</span> <span class="s2">"Good Title"</span>
+    <span class="k">end</span>
+</code></pre>
+</div>
+<h2 id="after-transition">After Transition</h2>
+
+<p>Runs code after the transition.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>    <span class="n">after_transition</span> <span class="ss">:check_title</span>
+</code></pre>
+</div>
+
+<h2 id="prepend-transitions">Prepend Transitions</h2>
+
+<p>To add a callback to the beginning of the sequence:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">prepend_before_transition</span> <span class="ss">:some_before_transition</span>
+<span class="n">prepend_around_transition</span> <span class="ss">:some_around_transition</span>
+<span class="n">prepend_after_transition</span> <span class="ss">:some_after_transition</span>
+</code></pre>
+</div>
+
+<h2 id="skip-transitions">Skip Transitions</h2>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>    <span class="n">skip_before_transition</span> <span class="ss">:some_before_transition</span>
+</code></pre>
+</div>
+
+<h2 id="conditions">Conditions</h2>
+
+<h3 id="ifunless">if/unless</h3>
+
+<p>The callback will run <code class="highlighter-rouge">if</code> or <code class="highlighter-rouge">unless</code> the named method returns a truthy value.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">if: :valid?</span>
+
+<span class="c1"># Array conditions apply if all aggregated conditions apply.</span>
+<span class="n">before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">if: </span><span class="p">[</span><span class="ss">:valid?</span><span class="p">,</span> <span class="ss">:kosher?</span><span class="p">]</span>
+<span class="n">before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">if: </span><span class="p">[</span><span class="ss">:valid?</span><span class="p">,</span> <span class="s2">"title == 'Good Title'"</span><span class="p">]</span>
+<span class="n">before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">unless: </span><span class="p">[</span><span class="ss">:valid?</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="p">{</span><span class="n">title</span> <span class="o">==</span> <span class="s1">'Good Title'</span><span class="p">}]</span>
+</code></pre>
+</div>
+
+<h3 id="onlyexcept">only/except</h3>
+
+<p>The three callback classes accept <code class="highlighter-rouge">:only</code> and <code class="highlighter-rouge">:except</code> parameters, and treat them slightly differnetly.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>You can use `:only` and `:except` in conjunction with `:if` and `:unless`.
+</code></pre>
+</div>
+
+<ul>
+  <li><strong>Transition Callbacks</strong> match on the name of the event being executed.
+    <ul>
+      <li><code class="highlighter-rouge">before_transition only: :submit</code> will run when the <code class="highlighter-rouge">:submit</code> event is fired</li>
+      <li><code class="highlighter-rouge">before_transition except: [:submit, :reject]</code> will run on any event except the two named</li>
+    </ul>
+  </li>
+  <li><strong>Exit Callbacks</strong> match on the name of the state being exited
+    <ul>
+      <li><code class="highlighter-rouge">before_exit only: :new</code> will run when an event causes the object to leave the <code class="highlighter-rouge">:new</code> state.</li>
+    </ul>
+  </li>
+  <li><strong>Enter Callbacks</strong> match on the name of the state being entered
+    <ul>
+      <li><code class="highlighter-rouge">before_enter only: [:cancelled, :rejected]</code> will run when an event leaves the object <code class="highlighter-rouge">:cancelled</code> or <code class="highlighter-rouge">:rejected</code>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="parameterized-callbacks">Parameterized Callbacks</h2>
+
+<p>If you’re passing parameters through the <code class="highlighter-rouge">transition!</code> method, you can receive
+them easily in your callbacks.  Workflow::Callbacks will inspect the parameters of
+your block or method and pass just the ones you ask for.</p>
+
+<p>Three magic names apply to parameter names defined on callbacks:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">event</code> will be set to the name of the event being processed.</li>
+  <li><code class="highlighter-rouge">to</code> will be set to the name of the destination state.</li>
+  <li><code class="highlighter-rouge">from</code> will be set to the name of the state being exited.</li>
+</ul>
+
+<p>Other parameters will be <code class="highlighter-rouge">shift</code>ed from what you pass in, so they should be taken
+back in order.  As in:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">my_after_submit</span><span class="p">(</span><span class="n">from</span><span class="p">,</span> <span class="n">cool</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">warn</span> <span class="p">[</span><span class="n">from</span><span class="p">,</span> <span class="n">cool</span><span class="p">,</span> <span class="n">args</span><span class="p">]</span>
+  <span class="k">end</span>
+  <span class="n">after_transition</span> <span class="ss">:my_after_submit</span><span class="p">,</span> <span class="ss">only: :submit</span>
+
+  <span class="n">an_article</span><span class="p">.</span><span class="nf">submit!</span> <span class="ss">:rad</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span>
+  <span class="c1"># =&gt; [:submit, :rad, [1, 2, 3]]</span>
+</code></pre>
+</div>
+
+<p>You can also use keyword arguments:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">my_after_submit</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">hype</span><span class="p">:,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">warn</span> <span class="p">[</span><span class="n">to</span><span class="p">,</span> <span class="n">hype</span><span class="p">,</span> <span class="n">args</span><span class="p">]</span>
+  <span class="k">end</span>
+  <span class="n">after_transition</span> <span class="ss">:my_after_submit</span><span class="p">,</span> <span class="ss">only: :submit</span>
+
+  <span class="n">an_article</span><span class="p">.</span><span class="nf">submit!</span> <span class="ss">a: </span><span class="mi">1</span><span class="p">,</span> <span class="ss">b: </span><span class="mi">2</span><span class="p">,</span> <span class="ss">hype: </span><span class="mi">4</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="ss">c: </span><span class="mi">3</span>
+  <span class="c1"># =&gt; [:awaiting_review, 4.5, {a: 1, b: 2, c: 3}]</span>
+</code></pre>
+</div>
+
+<p>Around callbacks should be sure to yield the block given:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">after_transition</span> <span class="ss">:my_after_submit</span><span class="p">,</span> <span class="ss">only: :submit</span>
+
+<span class="k">def</span> <span class="nf">my_after_submit</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">hype</span><span class="p">:,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+  <span class="n">logger</span><span class="p">.</span><span class="nf">warn</span> <span class="p">[</span><span class="n">to</span><span class="p">,</span> <span class="n">hype</span><span class="p">,</span> <span class="n">args</span><span class="p">]</span>
+  <span class="k">yield</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">my_after_submit</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">hype</span><span class="p">:,</span> <span class="o">**</span><span class="n">args</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bloci</span><span class="p">)</span>
+  <span class="n">logger</span><span class="p">.</span><span class="nf">warn</span> <span class="p">[</span><span class="n">to</span><span class="p">,</span> <span class="n">hype</span><span class="p">,</span> <span class="n">args</span><span class="p">]</span>
+  <span class="n">block</span><span class="p">.</span><span class="nf">call</span>
+<span class="k">end</span>
+
+</code></pre>
+</div>
+
+<p>Note that in order to use block-style callbacks with special arguments, unless you
+use strictly keyword arguments, the first
+parameters to your block must be the object and callback block (for around callbacks):</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>  <span class="n">before_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">reviewer</span><span class="ss">:|</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span> <span class="n">reviewer</span><span class="p">.</span><span class="nf">name</span>
+  <span class="k">end</span>
+  <span class="no">Article</span><span class="p">.</span><span class="nf">last</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:submit</span><span class="p">,</span> <span class="ss">reviewer: </span><span class="n">current_user</span>
+
+  <span class="n">before_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">obj</span><span class="p">,</span> <span class="n">reviewer</span><span class="o">|</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span> <span class="n">reviewer</span><span class="p">.</span><span class="nf">name</span>
+  <span class="k">end</span>
+  <span class="no">Article</span><span class="p">.</span><span class="nf">last</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:submit</span><span class="p">,</span> <span class="n">current_user</span>
+
+  <span class="n">around_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">obj</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">,</span> <span class="n">reviewer</span><span class="o">|</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span> <span class="n">reviewer</span><span class="p">.</span><span class="nf">name</span>
+    <span class="n">callbacks</span><span class="p">.</span><span class="nf">call</span>
+  <span class="k">end</span>
+  <span class="no">Article</span><span class="p">.</span><span class="nf">last</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:submit</span><span class="p">,</span> <span class="n">current_user</span>
+
+</code></pre>
+</div>
+
+<p>If you don’t like keyword arguments you can use standard arguments, but you
+need to receive the model as the first argument to your block, and you have to
+configure the <code class="highlighter-rouge">event_args</code> for the transition context, within your workflow definition.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span><span class="p">,</span> <span class="ss">only: :submit</span> <span class="k">do</span> <span class="o">|</span><span class="n">article</span><span class="p">,</span> <span class="n">review_date</span><span class="p">,</span> <span class="n">reviewer</span><span class="ss">:|</span>
+  <span class="nb">puts</span> <span class="n">review_date</span>
+<span class="k">end</span>
+
+<span class="no">Article</span><span class="p">.</span><span class="nf">last</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:submit</span><span class="p">,</span> <span class="no">Date</span><span class="p">.</span><span class="nf">today</span><span class="p">,</span> <span class="ss">reviewer: </span><span class="n">current_user</span>
+
+</code></pre>
+</div>
+
+<h2 id="catching-errors">Catching Errors</h2>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">WorkflowModel</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+
+  <span class="c1">#  Some possibilities:</span>
+  <span class="n">on_error</span> <span class="no">StandardError</span><span class="p">,</span> <span class="ss">rescue: </span><span class="s2">"self.errors &lt;&lt; 'oops!'"</span>
+  <span class="n">on_error</span> <span class="no">StandardError</span><span class="p">,</span> <span class="ss">rescue: :notify_error_service!</span>
+
+  <span class="c1">#  Default error class is Exception</span>
+  <span class="n">on_error</span> <span class="ss">unless: </span><span class="s2">"logger.nil?"</span> <span class="k">do</span> <span class="o">|</span><span class="n">ex</span><span class="o">|</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">warn</span> <span class="n">ex</span><span class="p">.</span><span class="nf">message</span>
+    <span class="k">raise</span> <span class="no">ApplicationError</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'Whoopsies!'</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">on_error</span> <span class="ss">ensure: </span><span class="o">-&gt;</span><span class="p">{</span><span class="nb">self</span><span class="p">.</span><span class="nf">always_run_this!</span><span class="p">},</span> <span class="ss">only: :process</span>
+
+  <span class="n">on_error</span> <span class="no">SomeAppError</span><span class="p">,</span> <span class="ss">ensure: </span><span class="o">-&gt;</span><span class="p">{</span><span class="nb">self</span><span class="p">.</span><span class="nf">always_run_this!</span><span class="p">}</span> <span class="k">do</span> <span class="o">|</span><span class="n">ex</span><span class="o">|</span>
+    <span class="c1"># SomeAppError and its subclasses will be rescued and this block will run.</span>
+    <span class="c1"># The ensure proc will be run in the ensure block.</span>
+    <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span> <span class="s2">"Couldn't complete transition: </span><span class="si">#{</span><span class="n">transition_context</span><span class="p">.</span><span class="nf">event</span><span class="si">}</span><span class="s2"> because: </span><span class="si">#{</span><span class="n">ex</span><span class="p">.</span><span class="nf">message</span><span class="si">}</span><span class="s2">"</span>  
+  <span class="k">end</span>
+
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">state</span> <span class="ss">:initial</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:process</span><span class="p">,</span> <span class="ss">to: :processing</span>
+      <span class="n">on</span> <span class="ss">:different_process</span><span class="p">,</span> <span class="ss">to: :processing</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:processing</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:finish</span><span class="p">,</span> <span class="ss">to: :done</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:done</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="ensuring-code-will-run">Ensuring code will run</h2>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code>
+<span class="c1">#  This will happen no matter what, whenever the process! event is run.</span>
+<span class="n">ensure_after_transitions</span> <span class="ss">only: :process</span> <span class="k">do</span>
+  <span class="nb">self</span><span class="p">.</span><span class="nf">messages</span> <span class="o">&lt;&lt;</span> <span class="ss">:foo</span>
+<span class="k">end</span>
+
+<span class="n">ensure_after_transitions</span> <span class="ss">:clean_up_resources!</span>
+
+</code></pre>
+</div>
+
+<h2 id="conditional-validations">Conditional Validations</h2>
+
+<p>If you are using <code class="highlighter-rouge">ActiveRecord</code>, you’ll have access to a set of methods which
+describe the current transition underway.</p>
+
+<p>Inside the same Article class which was begun above, the following three
+validations would all run when the <code class="highlighter-rouge">submit</code> event is used to transition
+from <code class="highlighter-rouge">new</code> to <code class="highlighter-rouge">awaiting_review</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">validates</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">if: :transitioning_to_awaiting_review?</span>
+<span class="n">validates</span> <span class="ss">:body</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">if: :transitioning_from_new?</span>
+<span class="n">validates</span> <span class="ss">:author</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">if: :transitioning_via_event_submit?</span>
+</code></pre>
+</div>
+
+<h3 id="halting-if-validations-fail">Halting if validations fail</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#  This will create a transition callback which will stop the event
+#  and return false if validations fail.
+
+halt_transition_unless_valid!
+
+#  This is the same as doing
+
+before_transition do
+  throw :abort unless valid?
+end
+</code></pre>
+</div>
+
+<h3 id="checking-a-transition">Checking A Transition</h3>
+
+<p>Call <code class="highlighter-rouge">can_transition?</code> to determine whether the validations would pass if a
+given event was called:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">article</span><span class="p">.</span><span class="nf">can_transition?</span><span class="p">(</span><span class="ss">:submit</span><span class="p">)</span>
+  <span class="c1">#  Do something interesting</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h1 id="transition-context">Transition Context</h1>
+
+<p>During transition you can refer to the <code class="highlighter-rouge">transition_context</code> object on your model,
+for information about the current transition.  See [Workflow::TransitionContext].</p>
+
+<h2 id="naming-event-arguments">Naming Event Arguments</h2>
+
+<p>If you will normally call each of your events with the same arguments, the following
+will help:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+
+  <span class="n">before_transition</span> <span class="ss">:check_reviewer</span>
+
+  <span class="k">def</span> <span class="nf">check_reviewer</span>
+    <span class="c1"># Ability is a class from the cancan gem: https://github.com/CanCanCommunity/cancancan</span>
+    <span class="n">halt</span><span class="p">(</span><span class="s1">'Access denied'</span><span class="p">)</span> <span class="k">unless</span> <span class="no">Ability</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">transition_context</span><span class="p">.</span><span class="nf">reviewer</span><span class="p">).</span><span class="nf">can?</span><span class="p">(</span><span class="ss">:review</span><span class="p">,</span> <span class="nb">self</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">event_args</span> <span class="ss">:reviewer</span><span class="p">,</span> <span class="ss">:reviewed_at</span>
+    <span class="n">state</span> <span class="ss">:new</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:review</span><span class="p">,</span> <span class="ss">to: :reviewed</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:reviewed</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="transition-event-handler">Transition event handler</h2>
+
+<p>You can define a method with the same name as the event. Then it is automatically invoked
+when event is raised. For the Article workflow defined earlier it would
+be:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+  <span class="k">def</span> <span class="nf">reject</span>
+    <span class="nb">puts</span> <span class="s1">'sending email to the author explaining the reason...'</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">article.review!; article.reject!</code> will cause state transition to
+<code class="highlighter-rouge">being_reviewed</code> state, persist the new state (if integrated with
+ActiveRecord), invoke this user defined <code class="highlighter-rouge">reject</code> method and finally
+persist the <code class="highlighter-rouge">rejected</code> state.</p>
+
+<p>You can also define event handler accepting/requiring additional
+arguments:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+  <span class="k">def</span> <span class="nf">review</span><span class="p">(</span><span class="n">reviewer</span> <span class="o">=</span> <span class="s1">''</span><span class="p">)</span>
+    <span class="nb">puts</span> <span class="s2">"[</span><span class="si">#{</span><span class="n">reviewer</span><span class="si">}</span><span class="s2">] is now reviewing the article"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">article2</span> <span class="o">=</span> <span class="no">Article</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">article2</span><span class="p">.</span><span class="nf">submit!</span>
+<span class="n">article2</span><span class="p">.</span><span class="nf">review!</span><span class="p">(</span><span class="s1">'Homer Simpson'</span><span class="p">)</span> <span class="c1"># =&gt; [Homer Simpson] is now reviewing the article</span>
+</code></pre>
+</div>
+
+<h2 id="integration-with-activerecord">Integration with ActiveRecord</h2>
+
+<p>Workflow library can handle the state persistence fully automatically. You
+only need to define a string field on the table called <code class="highlighter-rouge">workflow_state</code>
+and include the workflow mixin in your model class as usual:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Order</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="c1"># list states and transitions here</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>On a database record loading all the state check methods e.g.
+<code class="highlighter-rouge">article.state</code>, <code class="highlighter-rouge">article.awaiting_review?</code> are immediately available.
+For new records or if the <code class="highlighter-rouge">workflow_state</code> field is not set the state
+defaults to the first state declared in the workflow specification. In
+our example it is <code class="highlighter-rouge">:new</code>, so <code class="highlighter-rouge">Article.new.new?</code> returns true and
+<code class="highlighter-rouge">Article.new.approved?</code> returns false.</p>
+
+<p>At the end of a successful state transition like <code class="highlighter-rouge">article.approve!</code> the
+new state is immediately saved in the database.</p>
+
+<p>You can change this behaviour by overriding <code class="highlighter-rouge">persist_workflow_state</code>
+method.</p>
+
+<h3 id="scopes">Scopes</h3>
+
+<p>Workflow library also adds automatically generated scopes with names based on
+states names:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Order</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">state</span> <span class="ss">:approved</span>
+    <span class="n">state</span> <span class="ss">:pending</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c1"># returns all orders with `approved` state</span>
+<span class="no">Order</span><span class="p">.</span><span class="nf">with_approved_state</span>
+
+<span class="c1"># returns all orders with `pending` state</span>
+<span class="no">Order</span><span class="p">.</span><span class="nf">with_pending_state</span>
+</code></pre>
+</div>
+
+<h3 id="wrap-state-transition-in-a-locking-transaction">Wrap State Transition in a locking transaction</h3>
+
+<p>Wrap your transition in a locking transaction to ensure that any exceptions
+raised later in the transition sequence will roll back earlier changes made to
+the record:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Order</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+
+  <span class="n">wrap_transition_in_transaction!</span>
+  <span class="c1"># which is the same as the following:</span>
+
+  <span class="n">around_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">model</span><span class="p">,</span> <span class="n">transition</span><span class="o">|</span>
+    <span class="n">model</span><span class="p">.</span><span class="nf">with_lock</span> <span class="k">do</span>
+      <span class="n">transition</span><span class="p">.</span><span class="nf">call</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">state</span> <span class="ss">:approved</span>
+    <span class="n">state</span> <span class="ss">:pending</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="accessing-your-workflow-specification">Accessing your workflow specification</h2>
+
+<p>You can easily reflect on workflow specification programmatically - for
+the whole class or for the current object. Examples:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">article2</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">events</span> <span class="c1"># lists possible events from here</span>
+
+<span class="no">Article</span><span class="p">.</span><span class="nf">workflow_spec</span><span class="p">.</span><span class="nf">states</span><span class="p">.</span><span class="nf">map</span> <span class="o">&amp;</span><span class="ss">:name</span>
+<span class="c1">#=&gt; [:rejected, :awaiting_review, :being_reviewed, :accepted, :new]</span>
+
+<span class="c1"># list all events for all states</span>
+<span class="no">Article</span><span class="p">.</span><span class="nf">workflow_spec</span><span class="p">.</span><span class="nf">states</span><span class="p">.</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:events</span><span class="p">).</span><span class="nf">flatten</span>
+</code></pre>
+</div>
+
+<p>You can also store and later retrieve additional meta data for every
+state and every event:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyProcess</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">state</span> <span class="ss">:main</span><span class="p">,</span> <span class="ss">meta: </span><span class="p">{</span><span class="ss">importance: </span><span class="mi">8</span><span class="p">}</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:change</span><span class="p">,</span> <span class="ss">to: :supplemental</span><span class="p">,</span> <span class="ss">meta: </span><span class="p">{</span><span class="ss">whatever: </span><span class="kp">true</span><span class="p">}</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:supplemental</span><span class="p">,</span> <span class="ss">meta: </span><span class="p">{</span><span class="ss">importance: </span><span class="mi">1</span><span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+<span class="nb">puts</span> <span class="no">MyProcess</span><span class="p">.</span><span class="nf">workflow_spec</span><span class="p">.</span><span class="nf">find_state</span><span class="p">(</span><span class="ss">:supplemental</span><span class="p">).</span><span class="nf">meta</span><span class="p">[</span><span class="ss">:importance</span><span class="p">]</span> <span class="c1"># =&gt; 1</span>
+</code></pre>
+</div>
+
+<h2 id="earlier-versions">Earlier versions</h2>
+
+<p>The <code class="highlighter-rouge">workflow</code> gem is the work of Vladimir Dobriakov, <a href="http://www.mobile-web-consulting.de">http://www.mobile-web-consulting.de</a>, <a href="http://blog.geekq.net/">http://blog.geekq.net/</a>.</p>
+
+<p>This project is a fork of his work, and the bulk of the workflow specification code
+and DSL are virtually unchanged.</p>
+
+<h2 id="about">About</h2>
+<p>Author: Tyler Gannon [https://github.com/tylergannon]</p>
+
+<p>Original Author: Vladimir Dobriakov, <a href="http://www.mobile-web-consulting.de">http://www.mobile-web-consulting.de</a>, <a href="http://blog.geekq.net/">http://blog.geekq.net/</a></p>
+
+<p>Copyright (c) 2010-2014 Vladimir Dobriakov, www.mobile-web-consulting.de</p>
+
+<p>Copyright (c) 2008-2009 Vodafone</p>
+
+<p>Copyright (c) 2007-2008 Ryan Allen, FlashDen Pty Ltd</p>
+
+<p>Based on the work of Ryan Allen and Scott Barron</p>
+
+<p>Licensed under MIT license, see the MIT-LICENSE file.</p>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Rails Workflow</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              Rails Workflow
+            
+            </li>
+          <li><a href="mailto:tyler@aprilseven.co">tyler@aprilseven.co</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/tylergannon"><span class="icon icon--github"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">tylergannon</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Rails Workflow began as a fork of the [Workflow](https://github.com/geekq/workflow) gem by [Vladimir Dobriakov](http://www.mobile-web-consulting.de).  It is a nearly total rewrite but maintains the same core architecture.  It is released under the [MIT License](/license).
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

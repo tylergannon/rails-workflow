@@ -4,12 +4,13 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+Rails Workflow began as a fork of the [Workflow](https://github.com/geekq/workflow) gem by
+[Vladimir Dobriakov](http://www.mobile-web-consulting.de).  It is a nearly total
+rewrite but maintains the same core architecture.  It is released under the [MIT License](/license).
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jekyll" %} /
-[minima](https://github.com/jekyll/minima)
+## What's different
 
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+* Use of [ActiveSupport::Callbacks](http://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html)
+to enable a more flexible application of callbacks.
+* Slightly terser syntax for event definition.
+* A clean way to use ActiveRecord Conditional Validation for validating whether an object is fit for the requested state transition.
