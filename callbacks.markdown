@@ -1,6 +1,7 @@
 ---
 layout: page
 permalink: /callbacks/
+toc: true
 ---
 
 # Callback Registration

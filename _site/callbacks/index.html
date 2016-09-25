@@ -91,11 +91,25 @@
   </header>
 
   <div class="post-content">
-    <h1 id="callback-registration">Callback Registration</h1>
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#callback-registration">Callback Registration</a></li>
+<li class="toc-entry toc-h1"><a href="#available-callbacks">Available Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#callback-conditions">Callback Conditions</a></li>
+<li class="toc-entry toc-h2"><a href="#selecting-transitions">Selecting Transitions</a></li>
+<li class="toc-entry toc-h3"><a href="#on-transition-callbacks">On Transition Callbacks</a></li>
+<li class="toc-entry toc-h3"><a href="#on-enter-callbacks">On Enter Callbacks</a></li>
+<li class="toc-entry toc-h3"><a href="#on-exit-callbacks">On Exit Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#callback-arguments">Callback Arguments</a></li>
+<li class="toc-entry toc-h1"><a href="#around-callbacks">Around Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#prepending-callbacks">Prepending Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#skipping-callbacks">Skipping Callbacks</a></li>
+</ul><h1 id="callback-registration">
+<a id="callback-registration" class="anchor" href="#callback-registration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Callback Registration</h1>
 
 <p>The basic expression is the same as you expect for <a href="http://guides.rubyonrails.org/active_record_callbacks.html#callback-registration">ActiveRecord Callbacks</a>.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="n">before_transition</span> <span class="ss">:set_requesting_user</span>
 
   <span class="n">workflow</span> <span class="k">do</span>
@@ -112,7 +126,8 @@
 
 <p>You can also do the same thing with a block:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="n">before_transition</span> <span class="k">do</span>
     <span class="nb">self</span><span class="p">.</span><span class="nf">transition_requested_by</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">first</span>
   <span class="k">end</span>
@@ -124,7 +139,8 @@
 </code></pre>
 </div>
 
-<h1 id="available-callbacks">Available Callbacks</h1>
+<h1 id="available-callbacks">
+<a id="available-callbacks" class="anchor" href="#available-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Available Callbacks</h1>
 
 <p>The following callback types are available and they run in the order shown:</p>
 
@@ -137,12 +153,14 @@
   <li>after_transition</li>
 </ul>
 
-<h1 id="callback-conditions">Callback Conditions</h1>
+<h1 id="callback-conditions">
+<a id="callback-conditions" class="anchor" href="#callback-conditions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Callback Conditions</h1>
 
 <p>Each callback can be made to run under particular conditions using the <code class="highlighter-rouge">:if</code> and
 <code class="highlighter-rouge">:unless</code> options.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">if: :should_do_something?</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">if: :should_do_something?</span>
 <span class="n">before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">unless: :shouldnt_do_that?</span>
 </code></pre>
 </div>
@@ -150,44 +168,53 @@
 <p><code class="highlighter-rouge">:if</code> and <code class="highlighter-rouge">:unless</code> can be a string, proc or method (which will be evaluated in the context
   of the object), or else a mixed array of these.</p>
 
-<h2 id="selecting-transitions">Selecting Transitions</h2>
+<h2 id="selecting-transitions">
+<a id="selecting-transitions" class="anchor" href="#selecting-transitions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Selecting Transitions</h2>
 
 <p>Each transition class has a set of arguments that determine when it will run.</p>
 
-<h3 id="on-transition-callbacks">On Transition Callbacks</h3>
+<h3 id="on-transition-callbacks">
+<a id="on-transition-callbacks" class="anchor" href="#on-transition-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>On Transition Callbacks</h3>
 
 <p>Use <code class="highlighter-rouge">:only</code> and <code class="highlighter-rouge">:except</code> on <code class="highlighter-rouge">before_transition</code> to cause a callback to run only for events whose
 names match (or don’t match):</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:notify_user</span><span class="p">,</span> <span class="ss">only: :submit</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:notify_user</span><span class="p">,</span> <span class="ss">only: :submit</span>
 <span class="n">before_transition</span> <span class="ss">:notify_admins</span><span class="p">,</span> <span class="ss">only: </span><span class="p">[</span><span class="ss">:reject</span><span class="p">,</span> <span class="ss">:report_issue</span><span class="p">]</span>
 <span class="n">after_transition</span> <span class="ss">:compile_markdown</span><span class="p">,</span> <span class="ss">except: :reject</span>
 </code></pre>
 </div>
 
-<h3 id="on-enter-callbacks">On Enter Callbacks</h3>
+<h3 id="on-enter-callbacks">
+<a id="on-enter-callbacks" class="anchor" href="#on-enter-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>On Enter Callbacks</h3>
 
 <p>Here, <code class="highlighter-rouge">:only</code> and <code class="highlighter-rouge">:except</code> refer to the target state name for transitions.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_enter</span> <span class="ss">:notify_user</span><span class="p">,</span> <span class="ss">only: :submitted</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="n">before_enter</span> <span class="ss">:notify_user</span><span class="p">,</span> <span class="ss">only: :submitted</span>
 </code></pre>
 </div>
 
-<h3 id="on-exit-callbacks">On Exit Callbacks</h3>
+<h3 id="on-exit-callbacks">
+<a id="on-exit-callbacks" class="anchor" href="#on-exit-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>On Exit Callbacks</h3>
 
 <p><code class="highlighter-rouge">:only</code> and <code class="highlighter-rouge">:except</code> refer here to the name of the state being exited.</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">after_exit</span> <span class="ss">:notify_admins</span><span class="p">,</span> <span class="ss">only: :created</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="n">after_exit</span> <span class="ss">:notify_admins</span><span class="p">,</span> <span class="ss">only: :created</span>
 </code></pre>
 </div>
 
-<h1 id="callback-arguments">Callback Arguments</h1>
+<h1 id="callback-arguments">
+<a id="callback-arguments" class="anchor" href="#callback-arguments" aria-hidden="true"><span class="octicon octicon-link"></span></a>Callback Arguments</h1>
 
 <p>This example leaves something to be desired.  How would the model know which user
 requested the transition?  We have an answer for that.  Just give your method or block
 a parameter and then pass the user as an argument to the transition:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="n">before_transition</span> <span class="ss">:set_requesting_user</span>
 
   <span class="n">workflow</span> <span class="k">do</span>
@@ -209,11 +236,13 @@ a parameter and then pass the user as an argument to the transition:</p>
 <p>See <a href="/callback_arguments">Callback Arguments</a> for more on how to pass information to
 your callbacks.</p>
 
-<h1 id="around-callbacks">Around Callbacks</h1>
+<h1 id="around-callbacks">
+<a id="around-callbacks" class="anchor" href="#around-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Around Callbacks</h1>
 
 <p>Around callbacks allow you to create a context around the rest of the callback chain:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">around_transition</span> <span class="ss">:wrap_in_transaction</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="n">around_transition</span> <span class="ss">:wrap_in_transaction</span>
 
 <span class="c1"># Or,</span>
 <span class="n">around_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">object</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">|</span>
@@ -231,17 +260,20 @@ your callbacks.</p>
 </code></pre>
 </div>
 
-<h1 id="prepending-callbacks">Prepending Callbacks</h1>
+<h1 id="prepending-callbacks">
+<a id="prepending-callbacks" class="anchor" href="#prepending-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prepending Callbacks</h1>
 
 <p>To put a callback at the front of the chain:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">prepend_before_transition</span> <span class="ss">:do_something</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="n">prepend_before_transition</span> <span class="ss">:do_something</span>
 </code></pre>
 </div>
 
 <p>Prepended callbacks run in the reverse order that they were registered in.</p>
 
-<h1 id="skipping-callbacks">Skipping Callbacks</h1>
+<h1 id="skipping-callbacks">
+<a id="skipping-callbacks" class="anchor" href="#skipping-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Skipping Callbacks</h1>
 
 <ul>
   <li>skip_before_transition</li>
@@ -249,7 +281,8 @@ your callbacks.</p>
   <li>etc…</li>
 </ul>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:do_something</span>
+<div class="language-ruby highlighter-rouge">
+<pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:do_something</span>
 <span class="n">skip_before_transition</span> <span class="ss">:do_something</span><span class="p">,</span> <span class="ss">if: :shouldnt_do_something?</span>
 </code></pre>
 </div>

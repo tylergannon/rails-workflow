@@ -27,3 +27,5 @@ github_username:  tylergannon
 # Build settings
 markdown: kramdown
 theme: minima
+gems:
+  - jekyll-toc
