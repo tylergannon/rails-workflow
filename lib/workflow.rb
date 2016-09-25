@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'active_support/concern'
+require 'active_support/callbacks'
 require 'workflow/version'
 require 'workflow/configuration'
 require 'workflow/specification'
@@ -8,6 +9,8 @@ require 'workflow/adapters/active_record'
 require 'workflow/adapters/remodel'
 require 'workflow/adapters/active_record_validations'
 require 'workflow/transition_context'
+require 'active_support/overloads'
+
 
 # See also README.markdown for documentation
 module Workflow
@@ -17,29 +20,6 @@ module Workflow
   extend ActiveSupport::Concern
   include Callbacks
   include Errors
-
-  module ComputeIdentifier
-    private
-    def make_lambda(filter)
-      if filter.kind_of? Workflow::Callbacks::TransitionCallback
-        super(filter.wrapper)
-      else
-        super
-      end
-    end
-
-    def compute_identifier(filter)
-      if filter.kind_of? Workflow::Callbacks::TransitionCallback
-        super(filter.raw_proc)
-      else
-        super
-      end
-    end
-  end
-
-  class ::ActiveSupport::Callbacks::Callback
-    prepend ComputeIdentifier
-  end
 
   def self.configure(&block)
     block.call(config) if block_given?

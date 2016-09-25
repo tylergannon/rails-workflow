@@ -1,7 +1,6 @@
 require 'workflow/state'
 require 'workflow/event'
 require 'workflow/errors'
-require 'active_support/callbacks'
 
 module Workflow
   # Metadata object describing available states and state transitions.
