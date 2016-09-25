@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{A finite-state-machine-inspired API for managing state changes in ActiveModel objects.  Based on Vladimir Dobriakov's Workflow gem (https://github.com/geekq/workflow)}
   spec.description   = %q{Workflow specifically for ActiveModel objects.}
-  spec.homepage      = "https://github.com/tylergannon/rails-workflow"
+  spec.homepage      = "https://tylergannon.github.io/rails-workflow/"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
