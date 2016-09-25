@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Rails Workflow</title>
-    <description>Rails Workflow began as a fork of the [Workflow](https://github.com/geekq/workflow) gem by [Vladimir Dobriakov](http://www.mobile-web-consulting.de).  It is a nearly total rewrite but maintains the same core architecture.  It is released under the [MIT License](/license).
+    <description>Rails Workflow began as a fork of the Workflow gem by Vladimir Dobriakov. It is a nearly total rewrite but maintains the same core architecture. It is released under the MIT License.
 </description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 25 Sep 2016 18:37:05 +0800</pubDate>
-    <lastBuildDate>Sun, 25 Sep 2016 18:37:05 +0800</lastBuildDate>
+    <link>https://tylergannon.github.io/rails-workflow//</link>
+    <atom:link href="https://tylergannon.github.io/rails-workflow//feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 25 Sep 2016 18:39:35 +0800</pubDate>
+    <lastBuildDate>Sun, 25 Sep 2016 18:39:35 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
@@ -16,8 +16,8 @@
 
 </description>
         <pubDate>Sun, 25 Sep 2016 15:51:02 +0800</pubDate>
-        <link>http://localhost:4000/update/2016/09/25/welcome-to-rails-workflow.html</link>
-        <guid isPermaLink="true">http://localhost:4000/update/2016/09/25/welcome-to-rails-workflow.html</guid>
+        <link>https://tylergannon.github.io/rails-workflow//update/2016/09/25/welcome-to-rails-workflow.html</link>
+        <guid isPermaLink="true">https://tylergannon.github.io/rails-workflow//update/2016/09/25/welcome-to-rails-workflow.html</guid>
         
         
         <category>update</category>
