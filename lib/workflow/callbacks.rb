@@ -20,7 +20,6 @@ module Workflow
     #   @return [TransitionContext] representation of current state transition
     #
     included do
-      attr_reader :transition_context
       CALLBACK_MAP.keys.each do |type|
         define_callbacks type,
           skip_after_callbacks_if_terminated: true

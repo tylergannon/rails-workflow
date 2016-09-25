@@ -21,12 +21,16 @@ module Workflow
   include Callbacks
   include Errors
 
-  def self.configure(&block)
-    block.call(config) if block_given?
-  end
+  # The application-wide Workflow configuration object
+  CONFIGURATION = Configuration.new
 
-  def self.config
-    @@configuration ||= Configuration.new
+  # Helper method for setting configuration options on {Workflow.config}
+  #
+  # @yield [Workflow::Configuration] config {Configuration} object to be manipulated.
+  # @return [nil]
+  def self.config(&block)
+    block.call(CONFIGURATION) if block_given?
+    return CONFIGURATION
   end
 
   included do
@@ -55,7 +59,7 @@ module Workflow
   end
 
   # Deprecated.  Check for false return value from {#transition!}
-  # @return true if the last transition was halted by one of the transition callbacks.
+  # @return [Boolean] true if the last transition was halted by one of the transition callbacks.
   def halted?
     @halted
   end
@@ -64,11 +68,21 @@ module Workflow
   # @return [String] The reason the transition was aborted.
   attr_reader :halted_because
 
+  # @api private
+  # @return [Workflow::TransitionContext] During transition, or nil if no transition is underway.
+  # During a state transition, contains transition-specific information:
+  # * The name of the {Workflow::State} being exited,
+  # * The name of the {Workflow::State} being entered,
+  # * The name of the {Workflow::Event} that was fired,
+  # * And whatever arguments were passed to the {Workflow#transition!} method.
+  attr_reader :transition_context
+
   # Initiates state transition via the named event
   #
   # @param [Symbol] name name of event to initiate
-  # @param [Mixed] *args Arguments passed to state transition. Available also to callbacks
-  # @return [Type] description of returned object
+  # @param [Array] args State transition arguments.
+  # @return [Symbol] The name of the new state, or `false` if the transition failed.
+  # TODO: connect args to documentation on how arguments are accessed during state transitions.
   def transition!(name, *args, **attributes)
     name = name.to_sym
     event = current_state.find_event(name)
@@ -108,8 +122,8 @@ module Workflow
 
   # Stop the current transition and set the reason for the abort.
   #
-  # @param optional [String] reason Reason for halting transition.
-  # @return [void]
+  # @param [String] reason Optional reason for halting transition.
+  # @return [nil]
   def halt(reason = nil)
     @halted_because = reason
     @halted = true
@@ -118,8 +132,8 @@ module Workflow
 
   # Sets halt reason and raises [TransitionHaltedError] error.
   #
-  # @param optional [String] reason Reason for halting
-  # @return [void]
+  # @param [String] reason Optional reason for halting
+  # @return [nil]
   def halt!(reason = nil)
     @halted_because = reason
     @halted = true
@@ -194,8 +208,8 @@ module Workflow
 
     # Instructs Workflow which column to use to persist workflow state.
     #
-    # @param optional [Symbol] column_name name of column on table
-    # @return [void]
+    # @param [Symbol] column_name If provided, will set a new workflow column name.
+    # @return [Symbol] The current (or new) name for the workflow column on this class.
     def workflow_column(column_name=nil)
       if column_name
         @workflow_state_column_name = column_name.to_sym

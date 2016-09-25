@@ -50,12 +50,13 @@ module Workflow
       end
     end
 
+    # Find the state with the given name.
+    #
+    # @param [Symbol] name Name of state to find.
+    # @return [Workflow::State] The state with the given name.
     def find_state(name)
       states.find{|t| t.name == name.to_sym}
     end
-
-
-
 
     # @api private
     #
@@ -78,7 +79,7 @@ module Workflow
     # @return [nil]
     def state(name, meta: {}, &events)
       name = name.to_sym
-      new_state = Workflow::State.new(name, self, meta)
+      new_state = Workflow::State.new(name, @states.length, meta: meta)
       @initial_state ||= new_state
       @states << new_state
       new_state.instance_eval(&events) if block_given?
@@ -109,7 +110,7 @@ module Workflow
     #   workflow do
     #     define_revert_events!
     #     state :foo do
-    #       event :bar, transitions_to: :bax
+    #       on :bar, to: :bax
     #     end
     #     state :bax
     #   end

@@ -1,7 +1,7 @@
 What is workflow?
 -----------------
 
-This Gem is a fork of Vladimir Dobriakov's [Workflow Gem](http://github.com/geekq/workflow).  Credit goes to him for the inspiration, architecture and basic syntax.
+Workflow is a tool for describing and managing state transitions in Ruby objects, particularly ActiveModel entities.  The present gem is a fork of Vladimir Dobriakov's [Workflow Gem](http://github.com/geekq/workflow).    Credit goes to him for the inspiration, architecture and basic syntax.
 
 ## What's different in rails-workflow
 

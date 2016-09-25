@@ -2,7 +2,11 @@
 module Workflow
   module Callbacks
     module TransitionCallbacks
+      # A {Workflow::Callbacks::TransitionCallback} that wraps a callback proc.
       class ProcWrapper < ::Workflow::Callbacks::TransitionCallback
+        # Builds a proc object that will correctly call the {#raw_proc}
+        # by inspecting its parameters and pulling arguments from the {Workflow::TransitionContext}
+        # object for the transition.
         def wrapper
           arguments = [
             name_arguments_string,
