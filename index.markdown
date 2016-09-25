@@ -22,4 +22,4 @@ to enable a more flexible application of callbacks.
 * [Conditional State Transitions](/conditional_transitions)
 * [Transition Callbacks](/callbacks)
 * [Callback Arguments](/callback_arguments)
-* [Full API Documentation](/docs)
+* [Full API Documentation]({{ "/docs" | prepend: site.baseurl }})
