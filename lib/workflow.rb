@@ -21,7 +21,7 @@ module Workflow
   module ComputeIdentifier
     private
     def make_lambda(filter)
-      if filter.kind_of? Workflow::Callbacks::TransitionCallbackWrapper
+      if filter.kind_of? Workflow::Callbacks::TransitionCallback
         super(filter.wrapper)
       else
         super
@@ -29,7 +29,7 @@ module Workflow
     end
 
     def compute_identifier(filter)
-      if filter.kind_of? Workflow::Callbacks::TransitionCallbackWrapper
+      if filter.kind_of? Workflow::Callbacks::TransitionCallback
         super(filter.raw_proc)
       else
         super

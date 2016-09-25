@@ -1,8 +1,8 @@
 
 module Workflow
   module Callbacks
-    class TransitionCallbackWrapper
-      attr_reader :callback_type, :raw_proc
+    class TransitionCallback
+      attr_reader :callback_type, :raw_proc, :calling_class
       def initialize(callback_type, raw_proc, calling_class)
         @callback_type = callback_type
         @raw_proc      = raw_proc
@@ -11,25 +11,16 @@ module Workflow
 
       def self.build_wrapper(callback_type, raw_proc, calling_class)
         if raw_proc.kind_of? ::Proc
-          new(callback_type, raw_proc, calling_class).wrapper
+          TransitionCallbacks::ProcWrapper.new(callback_type, raw_proc, calling_class).wrapper
         elsif raw_proc.kind_of? ::Symbol
-          TransitionCallbackMethodWrapper.new(callback_type, raw_proc, calling_class)
+          TransitionCallbacks::MethodWrapper.new(callback_type, raw_proc, calling_class)
         else
           raw_proc
         end
       end
 
       def wrapper
-        arguments = [
-          name_arguments_string,
-          rest_param_string,
-          kw_arguments_string,
-          keyrest_string,
-          procedure_string].compact.join(', ')
-
-        raw_proc = self.raw_proc
-        str = build_proc("target.instance_exec(#{arguments})")
-        eval(str)
+        raise NotImplementedError.new "Abstract Method Called"
       end
 
       protected
@@ -56,12 +47,7 @@ module Workflow
       end
 
       def name_arguments_string
-        params = name_params
-        names  = []
-        names << 'target'   if params.shift
-        (names << 'callbacks') && params.shift if around_callback?
-        names += params.map{|name| "name_proc.call(:#{name})"}
-        return names.join(', ') if names.any?
+        raise NotImplementedError.new "Abstract Method Called"
       end
 
       def kw_arguments_string
@@ -80,7 +66,7 @@ module Workflow
       end
 
       def procedure_string
-        '&raw_proc'
+        raise NotImplementedError.new "Abstract Method Called"
       end
 
       def name_params
@@ -106,11 +92,11 @@ module Workflow
       end
 
       def parameters
-        raw_proc.parameters
+        raise NotImplementedError.new "Abstract Method Called"
       end
 
       def arity
-        raw_proc.arity
+        raise NotImplementedError.new "Abstract Method Called"
       end
     end
   end
