@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Workflow
+  
+    &mdash; Documentation by YARD 0.9.5
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Workflow";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (W)</a> &raquo;
+    
+    
+    <span class="title">Workflow</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <iframe id="search_frame" src="class_list.html"></iframe>
+
+      <div id="content"><h1>Module: Workflow
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  <dl>
+      <dt>Extended by:</dt>
+      <dd>ActiveSupport::Concern</dd>
+  </dl>
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Workflow/Callbacks.html" title="Workflow::Callbacks (module)">Callbacks</a></span>, <span class='object_link'><a href="Workflow/Errors.html" title="Workflow::Errors (module)">Errors</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/workflow.rb<span class="defines">,<br />
+  lib/workflow/draw.rb,<br /> lib/workflow/state.rb,<br /> lib/workflow/event.rb,<br /> lib/workflow/errors.rb,<br /> lib/workflow/version.rb,<br /> lib/workflow/callbacks.rb,<br /> lib/workflow/specification.rb,<br /> lib/workflow/configuration.rb,<br /> lib/workflow/adapters/remodel.rb,<br /> lib/workflow/transition_context.rb,<br /> lib/workflow/callbacks/callback.rb,<br /> lib/workflow/adapters/active_record.rb,<br /> lib/workflow/callbacks/transition_callback.rb,<br /> lib/workflow/adapters/active_record_validations.rb,<br /> lib/workflow/callbacks/transition_callbacks/proc_wrapper.rb,<br /> lib/workflow/callbacks/transition_callbacks/method_wrapper.rb</span>
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>See also README.markdown for documentation</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Workflow/Adapter.html" title="Workflow::Adapter (module)">Adapter</a></span>, <span class='object_link'><a href="Workflow/Callbacks.html" title="Workflow::Callbacks (module)">Callbacks</a></span>, <span class='object_link'><a href="Workflow/ClassMethods.html" title="Workflow::ClassMethods (module)">ClassMethods</a></span>, <span class='object_link'><a href="Workflow/Draw.html" title="Workflow::Draw (module)">Draw</a></span>, <span class='object_link'><a href="Workflow/Errors.html" title="Workflow::Errors (module)">Errors</a></span>
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Workflow/Configuration.html" title="Workflow::Configuration (class)">Configuration</a></span>, <span class='object_link'><a href="Workflow/Event.html" title="Workflow::Event (class)">Event</a></span>, <span class='object_link'><a href="Workflow/Specification.html" title="Workflow::Specification (class)">Specification</a></span>, <span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span>, <span class='object_link'><a href="Workflow/TransitionContext.html" title="Workflow::TransitionContext (class)">TransitionContext</a></span>
+    
+  
+</p>
+
+  <h2>Constant Summary</h2>
+  <dl class="constants">
+    
+      <dt id="CONFIGURATION-constant" class="">CONFIGURATION =
+        <div class="docstring">
+  <div class="discussion">
+    <p>The application-wide Workflow configuration object</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+      </dt>
+      <dd><pre class="code"><span class='const'>Configuration</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span></pre></dd>
+    
+      <dt id="VERSION-constant" class="">VERSION =
+        
+      </dt>
+      <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1.4.4.4</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+    
+  </dl>
+
+
+
+  
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="Workflow/Callbacks.html" title="Workflow::Callbacks (module)">Callbacks</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Workflow/Callbacks.html#CALLBACK_MAP-constant" title="Workflow::Callbacks::CALLBACK_MAP (constant)">Callbacks::CALLBACK_MAP</a></span></p>
+
+  
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="ActiveSupport/Callbacks.html" title="ActiveSupport::Callbacks (module)">ActiveSupport::Callbacks</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="ActiveSupport/Callbacks.html#CALLBACK_FILTER_TYPES-constant" title="ActiveSupport::Callbacks::CALLBACK_FILTER_TYPES (constant)">ActiveSupport::Callbacks::CALLBACK_FILTER_TYPES</a></span></p>
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#halted_because-instance_method" title="#halted_because (instance method)">#<strong>halted_because</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the reason given to a call to <span class='object_link'><a href="#halt-instance_method" title="Workflow#halt (method)">#halt</a></span> or <span class='object_link'><a href="#halt%21-instance_method" title="Workflow#halt! (method)">#halt!</a></span>, if any.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#transition_context-instance_method" title="#transition_context (instance method)">#<strong>transition_context</strong>  &#x21d2; Workflow::TransitionContext </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>During a state transition, contains transition-specific information: * The name of the <span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span> being exited, * The name of the <span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span> being entered, * The name of the <span class='object_link'><a href="Workflow/Event.html" title="Workflow::Event (class)">Event</a></span> that was fired, * And whatever arguments were passed to the <span class='object_link'><a href="#transition%21-instance_method" title="Workflow#transition! (method)">#transition!</a></span> method.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#config-class_method" title="config (class method)">.<strong>config</strong> {|Workflow::Configuration| ... } &#x21d2; nil </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Helper method for setting configuration options on <span class='object_link'><a href="#config-class_method" title="Workflow.config (method)">Workflow.config</a></span>.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#current_state-instance_method" title="#current_state (instance method)">#<strong>current_state</strong>  &#x21d2; State </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns a state object representing the current workflow state.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#halt-instance_method" title="#halt (instance method)">#<strong>halt</strong>(reason = nil)  &#x21d2; nil </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Stop the current transition and set the reason for the abort.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#halt%21-instance_method" title="#halt! (instance method)">#<strong>halt!</strong>(reason = nil)  &#x21d2; nil </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Sets halt reason and raises [TransitionHaltedError] error.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#halted%3F-instance_method" title="#halted? (instance method)">#<strong>halted?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Deprecated.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#transition%21-instance_method" title="#transition! (instance method)">#<strong>transition!</strong>(name, *args, **attributes)  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initiates state transition via the named event.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#workflow_spec-instance_method" title="#workflow_spec (instance method)">#<strong>workflow_spec</strong>  &#x21d2; Specification </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The specification for this object.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="ActiveSupport/Callbacks.html" title="ActiveSupport::Callbacks (module)">ActiveSupport::Callbacks</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="ActiveSupport/Callbacks.html#run_callbacks-instance_method" title="ActiveSupport::Callbacks#run_callbacks (method)">#run_callbacks</a></span></p>
+
+  
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="halted_because-instance_method">
+  
+    #<strong>halted_because</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the reason given to a call to <span class='object_link'><a href="#halt-instance_method" title="Workflow#halt (method)">#halt</a></span> or <span class='object_link'><a href="#halt%21-instance_method" title="Workflow#halt! (method)">#halt!</a></span>, if any.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The reason the transition was aborted.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+69
+70
+71</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 69</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_halted_because'>halted_because</span>
+  <span class='ivar'>@halted_because</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="transition_context-instance_method">
+  
+    #<strong>transition_context</strong>  &#x21d2; <tt><span class='object_link'><a href="Workflow/TransitionContext.html" title="Workflow::TransitionContext (class)">Workflow::TransitionContext</a></span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>During a state transition, contains transition-specific information:</p>
+
+<ul>
+<li>The name of the <span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span> being exited,</li>
+<li>The name of the <span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span> being entered,</li>
+<li>The name of the <span class='object_link'><a href="Workflow/Event.html" title="Workflow::Event (class)">Event</a></span> that was fired,</li>
+<li>And whatever arguments were passed to the <span class='object_link'><a href="#transition%21-instance_method" title="Workflow#transition! (method)">#transition!</a></span> method.</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Workflow/TransitionContext.html" title="Workflow::TransitionContext (class)">Workflow::TransitionContext</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>During transition, or nil if no transition is underway.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+78
+79
+80</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 78</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_transition_context'>transition_context</span>
+  <span class='ivar'>@transition_context</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="config-class_method">
+  
+    .<strong>config</strong> {|Workflow::Configuration| ... } &#x21d2; <tt>nil</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Helper method for setting configuration options on <span class='object_link'><a href="#config-class_method" title="Workflow.config (method)">config</a></span></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Workflow/Configuration.html" title="Workflow::Configuration (class)">Workflow::Configuration</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>config <span class='object_link'><a href="Workflow/Configuration.html" title="Workflow::Configuration (class)">Configuration</a></span> object to be manipulated.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33
+34</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='const'>CONFIGURATION</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+  <span class='kw'>return</span> <span class='const'>CONFIGURATION</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="current_state-instance_method">
+  
+    #<strong>current_state</strong>  &#x21d2; <tt><span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a state object representing the current workflow state.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Current workflow state</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55
+56
+57
+58
+59</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_current_state'>current_state</span>
+  <span class='id identifier rubyid_loaded_state'>loaded_state</span> <span class='op'>=</span> <span class='id identifier rubyid_load_workflow_state'>load_workflow_state</span>
+  <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='op'>==</span><span class='id identifier rubyid_loaded_state'>loaded_state</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_loaded_state'>loaded_state</span>
+  <span class='id identifier rubyid_res'>res</span> <span class='op'>||</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_initial_state'>initial_state</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="halt-instance_method">
+  
+    #<strong>halt</strong>(reason = nil)  &#x21d2; <tt>nil</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Stop the current transition and set the reason for the abort.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>reason</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional reason for halting transition.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+127
+128
+129
+130
+131</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 127</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_halt'>halt</span><span class='lparen'>(</span><span class='id identifier rubyid_reason'>reason</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='ivar'>@halted_because</span> <span class='op'>=</span> <span class='id identifier rubyid_reason'>reason</span>
+  <span class='ivar'>@halted</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='id identifier rubyid_throw'>throw</span> <span class='symbol'>:abort</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="halt!-instance_method">
+  
+    #<strong>halt!</strong>(reason = nil)  &#x21d2; <tt>nil</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Sets halt reason and raises [TransitionHaltedError] error.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>reason</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional reason for halting</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Workflow/Errors/TransitionHaltedError.html" title="Workflow::Errors::TransitionHaltedError (class)">TransitionHaltedError</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+137
+138
+139
+140
+141</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 137</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_halt!'>halt!</span><span class='lparen'>(</span><span class='id identifier rubyid_reason'>reason</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='ivar'>@halted_because</span> <span class='op'>=</span> <span class='id identifier rubyid_reason'>reason</span>
+  <span class='ivar'>@halted</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>TransitionHaltedError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_reason'>reason</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="halted?-instance_method">
+  
+    #<strong>halted?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Deprecated.  Check for false return value from <span class='object_link'><a href="#transition%21-instance_method" title="Workflow#transition! (method)">#transition!</a></span></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if the last transition was halted by one of the transition callbacks.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_halted?'>halted?</span>
+  <span class='ivar'>@halted</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="transition!-instance_method">
+  
+    #<strong>transition!</strong>(name, *args, **attributes)  &#x21d2; <tt>Symbol</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initiates state transition via the named event</p>
+
+<p>TODO: connect args to documentation on how arguments are accessed during state transitions.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>name of event to initiate</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>args</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>State transition arguments.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The name of the new state, or <code>false</code> if the transition failed.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Workflow/Errors/NoTransitionAllowed.html" title="Workflow::Errors::NoTransitionAllowed (class)">NoTransitionAllowed</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 86</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_transition!'>transition!</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_attributes'>attributes</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='id identifier rubyid_event'>event</span> <span class='op'>=</span> <span class='id identifier rubyid_current_state'>current_state</span><span class='period'>.</span><span class='id identifier rubyid_find_event'>find_event</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NoTransitionAllowed</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>There is no event </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> defined for the </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_current_state'>current_state</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> state</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> \
+    <span class='kw'>if</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='ivar'>@halted_because</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='ivar'>@halted</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+  <span class='id identifier rubyid_target'>target</span> <span class='op'>=</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_evaluate'>evaluate</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_target'>target</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NoMatchingTransitionError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No matching transition found on </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> for target </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_target'>target</span><span class='embexpr_end'>}</span><span class='tstring_content'>.  Consider adding a catchall transition.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_from'>from</span> <span class='op'>=</span> <span class='id identifier rubyid_current_state'>current_state</span>
+  <span class='id identifier rubyid_return_value'>return_value</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='kw'>begin</span>
+    <span class='ivar'>@transition_context</span> <span class='op'>=</span> <span class='const'>TransitionContext</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> \
+      <span class='label'>from:</span> <span class='id identifier rubyid_from'>from</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+      <span class='label'>to:</span> <span class='id identifier rubyid_target'>target</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+      <span class='label'>event:</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+      <span class='label'>event_args:</span> <span class='id identifier rubyid_args'>args</span><span class='comma'>,</span>
+      <span class='label'>attributes:</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='comma'>,</span>
+      <span class='label'>named_arguments:</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_named_arguments'>named_arguments</span>
+
+    <span class='id identifier rubyid_run_all_callbacks'>run_all_callbacks</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_callback_value'>callback_value</span>  <span class='op'>=</span> <span class='id identifier rubyid_run_action_callback'>run_action_callback</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span>
+      <span class='id identifier rubyid_persist_value'>persist_value</span>   <span class='op'>=</span> <span class='id identifier rubyid_persist_workflow_state'>persist_workflow_state</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_return_value'>return_value</span>    <span class='op'>=</span> <span class='id identifier rubyid_callback_value'>callback_value</span> <span class='op'>||</span> <span class='id identifier rubyid_persist_value'>persist_value</span>
+    <span class='kw'>end</span>
+  <span class='kw'>ensure</span>
+    <span class='ivar'>@transition_context</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_return_value'>return_value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="workflow_spec-instance_method">
+  
+    #<strong>workflow_spec</strong>  &#x21d2; <tt><span class='object_link'><a href="Workflow/Specification.html" title="Workflow::Specification (class)">Specification</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The specification for this object.
+  Could be set on a singleton for the object, on the object&#39;s class,
+  Or else on a superclass of the object.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Workflow/Specification.html" title="Workflow::Specification (class)">Specification</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The Specification that applies to this object.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 147</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span>
+  <span class='comment'># check the singleton class first
+</span>  <span class='kw'>class</span> <span class='op'>&lt;&lt;</span> <span class='kw'>self</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span> <span class='kw'>if</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_c'>c</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span>
+  <span class='comment'># using a simple loop instead of class_inheritable_accessor to avoid
+</span>  <span class='comment'># dependency on Rails&#39; ActiveSupport
+</span>  <span class='kw'>until</span> <span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_workflow_spec'>workflow_spec</span> <span class='op'>||</span> <span class='op'>!</span><span class='lparen'>(</span><span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span> <span class='const'>Workflow</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_c'>c</span> <span class='op'>=</span> <span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_superclass'>superclass</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_workflow_spec'>workflow_spec</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun Sep 25 15:32:35 2016 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.5 (ruby-2.3.1).
+</div>
+
+    </div>
+  </body>
+</html>
