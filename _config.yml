@@ -19,8 +19,8 @@ description: > # this means to ignore newlines until "baseurl:"
   Rails Workflow began as a fork of the Workflow gem by Vladimir Dobriakov.
   It is a nearly total rewrite but maintains the same core architecture.
   It is released under the MIT License.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://tylergannon.github.io/rails-workflow/" # the base hostname & protocol for your site
+baseurl: "/rails-workflow" # the subpath of your site, e.g. /blog
+url: "https://tylergannon.github.io" # the base hostname & protocol for your site
 twitter_username:
 github_username:  tylergannon
 

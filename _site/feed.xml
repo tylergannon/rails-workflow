@@ -4,10 +4,10 @@
     <title>Rails Workflow</title>
     <description>Rails Workflow began as a fork of the Workflow gem by Vladimir Dobriakov. It is a nearly total rewrite but maintains the same core architecture. It is released under the MIT License.
 </description>
-    <link>https://tylergannon.github.io/rails-workflow//</link>
-    <atom:link href="https://tylergannon.github.io/rails-workflow//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 25 Sep 2016 18:39:35 +0800</pubDate>
-    <lastBuildDate>Sun, 25 Sep 2016 18:39:35 +0800</lastBuildDate>
+    <link>https://tylergannon.github.io/rails-workflow/</link>
+    <atom:link href="https://tylergannon.github.io/rails-workflow/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 25 Sep 2016 18:48:30 +0800</pubDate>
+    <lastBuildDate>Sun, 25 Sep 2016 18:48:30 +0800</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
     
       <item>
@@ -16,8 +16,8 @@
 
 </description>
         <pubDate>Sun, 25 Sep 2016 15:51:02 +0800</pubDate>
-        <link>https://tylergannon.github.io/rails-workflow//update/2016/09/25/welcome-to-rails-workflow.html</link>
-        <guid isPermaLink="true">https://tylergannon.github.io/rails-workflow//update/2016/09/25/welcome-to-rails-workflow.html</guid>
+        <link>https://tylergannon.github.io/rails-workflow/update/2016/09/25/welcome-to-rails-workflow.html</link>
+        <guid isPermaLink="true">https://tylergannon.github.io/rails-workflow/update/2016/09/25/welcome-to-rails-workflow.html</guid>
         
         
         <category>update</category>
