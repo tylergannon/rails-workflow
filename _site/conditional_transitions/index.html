@@ -12,7 +12,7 @@
   
   
   <link rel="stylesheet" href="http://localhost:4000/css/main.css">
-  <link rel="canonical" href="http://localhost:4000/license/">
+  <link rel="canonical" href="http://localhost:4000/conditional_transitions/">
   <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="http://localhost:4000/feed.xml">
   
   
@@ -84,27 +84,37 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <p>MIT License</p>
+        <h1 id="multiple-possible-targets-for-a-given-event">Multiple Possible Targets For A Given Event</h1>
 
-<p>Copyright (c) 2016 Tyler Gannon</p>
+<p>The first matching condition will determine the target state.
+An error will be raised if none match, so a catchall at the end is a good idea.</p>
 
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the “Software”), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:</p>
-
-<p>The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.</p>
-
-<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</p>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+  <span class="n">workflow</span> <span class="k">do</span>
+    <span class="n">state</span> <span class="ss">:new</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:submit</span> <span class="k">do</span>
+        <span class="n">to</span> <span class="ss">:awaiting_review</span><span class="p">,</span> <span class="ss">if: :today_is_wednesday?</span>
+        <span class="n">to</span> <span class="ss">:being_reviewed</span><span class="p">,</span> <span class="ss">unless: </span><span class="s2">"author.name == 'Foo Bar'"</span>
+        <span class="n">to</span> <span class="ss">:accepted</span><span class="p">,</span> <span class="ss">if: </span><span class="o">-&gt;</span> <span class="p">{</span><span class="n">author</span><span class="p">.</span><span class="nf">role</span> <span class="o">==</span> <span class="s1">'Admin'</span><span class="p">}</span>
+        <span class="n">to</span> <span class="ss">:rejected</span><span class="p">,</span> <span class="ss">if: </span><span class="p">[</span><span class="ss">:bad_hair_day?</span><span class="p">,</span> <span class="ss">:in_a_bad_mood?</span><span class="p">]</span>
+        <span class="n">to</span> <span class="ss">:the_bad_place</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:awaiting_review</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:review</span><span class="p">,</span> <span class="ss">to: :being_reviewed</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:being_reviewed</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:accept</span><span class="p">,</span> <span class="ss">to: :accepted</span>
+      <span class="n">on</span> <span class="ss">:reject</span><span class="p">,</span> <span class="ss">to: :rejected</span>
+    <span class="k">end</span>
+    <span class="n">state</span> <span class="ss">:accepted</span>
+    <span class="n">state</span> <span class="ss">:rejected</span>
+    <span class="n">state</span> <span class="ss">:the_bad_place</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre>
+</div>
 
       </div>
     </main>

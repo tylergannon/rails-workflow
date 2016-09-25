@@ -450,3 +450,11 @@ pre {
     color: #008080; }
   .highlight .il {
     color: #099; }
+
+article .post-content h1 {
+  border-bottom: 1px solid gray;
+  font-size: 33.6px; }
+article .post-content h2 {
+  font-size: 31.2px; }
+article .post-content h3 {
+  font-size: 24px; }
