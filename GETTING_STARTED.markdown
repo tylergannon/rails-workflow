@@ -2,7 +2,7 @@
 layout: default
 title: Getting Started
 categories: documentation
-permalink: /GETTING_STARTED/
+permalink: /getting_started/
 ---
 # Install
 

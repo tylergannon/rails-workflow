@@ -18,8 +18,8 @@ to enable a more flexible application of callbacks.
 
 # Documentation Topics
 
-* [Getting Started](/GETTING_STARTED)
-* [Conditional State Transitions](/conditional_transitions)
-* [Transition Callbacks](/callbacks)
-* [Callback Arguments](/callback_arguments)
-* [Full API Documentation]({{ "/docs" | prepend: site.baseurl }})
+* [Getting Started]({{site.baseurl}}/getting_started)
+* [Conditional State Transitions]({{ site.baseurl }}/conditional_transitions)
+* [Transition Callbacks]({{ site.baseurl }}/callbacks)
+* [Callback Arguments]({{ site.baseurl }}/callback_arguments)
+* [Full API Documentation]({{ site.baseurl }}/docs)
