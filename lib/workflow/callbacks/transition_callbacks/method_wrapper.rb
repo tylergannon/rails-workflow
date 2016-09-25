@@ -20,28 +20,29 @@ module Workflow
           return overload_equality_operator(p)
         end
 
-        # protected
+        private
 
         def overload_equality_operator(outer_proc)
-          raw_proc = raw_proc
-          def outer_proc.raw_proc
-            raw_proc
+          method_name = raw_proc
+          def outer_proc.method_name
+            method_name
           end
           def outer_proc.==(other)
             if other.kind_of?(::Proc)
               if other.respond_to?(:raw_proc)
-                self.raw_proc == other.raw_proc
+                self.method_name == other.method_name
               else
                 self == other
               end
             elsif other.kind_of?(Symbol)
-              self.raw_proc == other
+              self.method_name == other
             else
               false
             end
           end
           return outer_proc
         end
+        
         def name_arguments_string
           name_params.map{|name| "name_proc.call(:#{name})"} if name_params.any?
         end

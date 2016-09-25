@@ -16,7 +16,7 @@ module Workflow
           eval(str)
         end
 
-        protected
+        private
 
         def name_arguments_string
           params = name_params
