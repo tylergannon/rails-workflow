@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.5
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <iframe id="search_frame" src="class_list.html"></iframe>
+
+      <div id="content"><div id='filecontents'><h2>What is workflow?</h2>
+
+<p>Workflow is a tool for describing and managing state transitions in Ruby objects, particularly ActiveModel entities.  The present gem is a fork of Vladimir Dobriakov&#39;s <a href="http://github.com/geekq/workflow">Workflow Gem</a>.    Credit goes to him for the inspiration, architecture and basic syntax.</p>
+
+<h2>What&#39;s different in rails-workflow</h2>
+
+<ul>
+<li>Use of <a href="http://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html">ActiveSupport::Callbacks</a>
+to enable a more flexible application of callbacks.</li>
+<li>Slightly terser syntax for event definition.</li>
+<li>Cleaner support for using conditional ActiveRecord validations to validate state transitions.</li>
+</ul>
+
+<h2>Installation</h2>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_gem'>gem</span> <span class='id identifier rubyid_install'>install</span> <span class='id identifier rubyid_rails'>rails</span><span class='op'>-</span><span class='id identifier rubyid_workflow'>workflow</span>
+</code></pre>
+
+<h2>Configuration</h2>
+
+<p>No configuraion is required, but the following configurations can be placed inside an initializer:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># config/initializers/workflow.rb
+</span><span class='const'>Workflow</span><span class='period'>.</span><span class='id identifier rubyid_configure'>configure</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_config'>config</span><span class='op'>|</span>
+  <span class='comment'>#  Set false to avoid the extra call to the database, if you&#39;ll be saving the object after transition.
+</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_persist_workflow_state_immediately'>persist_workflow_state_immediately</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='comment'>#  Set true to also change the `:updated_at` during state transition.
+</span>  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_touch_on_update_column'>touch_on_update_column</span> <span class='op'>=</span> <span class='kw'>false</span>
+<span class='kw'>end</span>
+
+</code></pre>
+
+<h2>Ruby Version</h2>
+
+<p>I&#39;ve only tested with Ruby 2.3.  ;)  </p>
+
+<h1>Basic workflow definition:</h1>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:new</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:submit</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:awaiting_review</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:awaiting_review</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:review</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:being_reviewed</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:being_reviewed</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:accept</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:accepted</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:reject</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:rejected</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:accepted</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:rejected</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+</code></pre>
+
+<h2>Invoking State Transitions</h2>
+
+<p>You may call the method named for the event itself, or else the more generic <code>transition!</code> method</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_a'>a</span> <span class='op'>=</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+<span class='comment'># =&gt; :new
+</span><span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_submit!'>submit!</span>
+<span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+<span class='comment'># =&gt; :awaiting_review
+</span><span class='comment'># ... etc
+</span></code></pre>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_a'>a</span> <span class='op'>=</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_transition!'>transition!</span> <span class='symbol'>:submit</span>
+<span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+<span class='comment'># =&gt; :awaiting_review
+</span></code></pre>
+
+<p>The transition will return a truthy value if it succeeds: either the return value
+of the event-specific callback, if one is defined, or else the name of the new state</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_transition!'>transition!</span><span class='lparen'>(</span><span class='symbol'>:submit</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; :awaiting_review
+</span></code></pre>
+
+<p>If the transition does not finish and no exception is raised, the method returns <code>false</code>.</p>
+
+<p>Generally this would be because of a validation failure, so checking the model for errors
+would be the next course of action.</p>
+
+<p>You can also pass arguments to the event, though nothing will happen with them except
+as you&#39;ve defined in your callbacks (described below)</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_submit!'>submit!</span><span class='lparen'>(</span><span class='label'>author:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Fanny Schmittenbauer</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>awesomeness:</span> <span class='int'>29</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>Access an object representing the current state of the entity,
+including available events and transitions:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span>
+<span class='comment'># =&gt; &lt;State name=:new events(1)=[&lt;Event name=:submit transitions(1)=[&lt;to=&lt;State name=:awaiting_review events(1)=[&lt;Event name=:review transitions(1)=...
+</span></code></pre>
+
+<p>On Ruby 1.9 and above, you can check whether a state comes before or
+after another state (by the order they were defined):</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span>
+<span class='comment'># =&gt; being_reviewed
+</span><span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span> <span class='op'>&lt;</span> <span class='symbol'>:accepted</span>
+<span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span> <span class='op'>&gt;=</span> <span class='symbol'>:accepted</span>
+<span class='comment'># =&gt; false
+</span><span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span><span class='period'>.</span><span class='id identifier rubyid_between?'>between?</span> <span class='symbol'>:awaiting_review</span><span class='comma'>,</span> <span class='symbol'>:rejected</span>
+<span class='comment'># =&gt; true
+</span></code></pre>
+
+<p>Now we can call the submit event, which transitions to the
+<tt>:awaiting_review</tt> state:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_submit!'>submit!</span>
+<span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_awaiting_review?'>awaiting_review?</span> <span class='comment'># =&gt; true
+</span></code></pre>
+
+<h1>Multiple Possible Targets For A Given Event</h1>
+
+<p>The first matching condition will determine the target state.
+An error will be raised if none match, so a catchall at the end is a good idea.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:new</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:submit</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_to'>to</span> <span class='symbol'>:awaiting_review</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='symbol'>:today_is_wednesday?</span>
+        <span class='id identifier rubyid_to'>to</span> <span class='symbol'>:being_reviewed</span><span class='comma'>,</span> <span class='label'>unless:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>author.name == &#39;Foo Bar&#39;</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_to'>to</span> <span class='symbol'>:accepted</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span><span class='id identifier rubyid_author'>author</span><span class='period'>.</span><span class='id identifier rubyid_role'>role</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Admin</span><span class='tstring_end'>&#39;</span></span><span class='rbrace'>}</span>
+        <span class='id identifier rubyid_to'>to</span> <span class='symbol'>:rejected</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='lbracket'>[</span><span class='symbol'>:bad_hair_day?</span><span class='comma'>,</span> <span class='symbol'>:in_a_bad_mood?</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_to'>to</span> <span class='symbol'>:the_bad_place</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:awaiting_review</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:review</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:being_reviewed</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:being_reviewed</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:accept</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:accepted</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:reject</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:rejected</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:accepted</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:rejected</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:the_bad_place</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h2>Callbacks</h2>
+
+<p>The DSL syntax here is very much similar to ActionController or ActiveRecord callbacks.</p>
+
+<p>Three classes of callbacks:</p>
+
+<ul>
+<li>:transition callbacks representing named events.
+
+<ul>
+<li><code>before_transition only: :submit</code></li>
+<li><code>after_transition except: :submit</code></li>
+</ul></li>
+<li>:exit callbacks that match on the state the transition leaves
+
+<ul>
+<li><code>before_exit only: :being_reviewed  #will run on the :accept or the :reject event</code></li>
+</ul></li>
+<li>:enter callbacks that match on the target state for the transition
+
+<ul>
+<li><code>before_enter only: :being_reviewed</code>  #will run on the :review event</li>
+</ul></li>
+</ul>
+
+<p>Callbacks run in this order:</p>
+
+<ul>
+<li><code>before_transition</code>, <code>around_transition</code>
+
+<ul>
+<li><code>before_exit</code>, <code>around_exit</code></li>
+<li><code>before_enter</code>, <code>around_enter</code>
+
+<ul>
+<li><strong>State Transition</strong></li>
+</ul></li>
+<li><code>after_enter</code></li>
+<li><code>after_exit</code></li>
+</ul></li>
+<li><code>after_transition</code></li>
+</ul>
+
+<p>Within each group, the callbacks fire in the order they are set.</p>
+
+<h3>Halting callbacks</h3>
+
+<p>Inside any <code>:before</code> callback, you can halt the callback chain:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_before_enter'>before_enter</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_throw'>throw</span> <span class='symbol'>:abort</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>Note that this will halt the callback chain without an error,
+so you won&#39;t get an exception in your <code>on_error</code> block, if you have one.</p>
+
+<h2>Around Transition</h2>
+
+<p>Allows you to run code surrounding the state transition.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_around_transition'>around_transition</span> <span class='symbol'>:wrap_in_transaction</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_wrap_in_transaction'>wrap_in_transaction</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>You can also define the callback using a block:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_around_transition'>around_transition</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_object'>object</span><span class='comma'>,</span> <span class='id identifier rubyid_transition'>transition</span><span class='op'>|</span>
+  <span class='id identifier rubyid_object'>object</span><span class='period'>.</span><span class='id identifier rubyid_with_lock'>with_lock</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_transition'>transition</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h2>before_transition</h2>
+
+<p>Allows you to run code prior to the state transition.
+If you <code>halt</code> or <code>throw :abort</code> within a <code>before_transition</code>, the callback chain
+will be halted, the transition will be canceled and the event action
+will return false.</p>
+
+<pre class="code ruby"><code class="ruby">  <span class='id identifier rubyid_before_transition'>before_transition</span> <span class='symbol'>:check_title</span>
+
+    <span class='kw'>def</span> <span class='id identifier rubyid_check_title'>check_title</span>
+      <span class='id identifier rubyid_halt'>halt</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Title was bad.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_title'>title</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Good Title</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<p>Or again, in block expression:</p>
+
+<pre class="code ruby"><code class="ruby">    <span class='id identifier rubyid_before_transition'>before_transition</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_article'>article</span><span class='op'>|</span>
+      <span class='id identifier rubyid_throw'>throw</span> <span class='symbol'>:abort</span> <span class='kw'>unless</span> <span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Good Title</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+</code></pre>
+
+<h2>After Transition</h2>
+
+<p>Runs code after the transition.</p>
+
+<pre class="code ruby"><code class="ruby">    <span class='id identifier rubyid_after_transition'>after_transition</span> <span class='symbol'>:check_title</span>
+</code></pre>
+
+<h2>Prepend Transitions</h2>
+
+<p>To add a callback to the beginning of the sequence:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_prepend_before_transition'>prepend_before_transition</span> <span class='symbol'>:some_before_transition</span>
+<span class='id identifier rubyid_prepend_around_transition'>prepend_around_transition</span> <span class='symbol'>:some_around_transition</span>
+<span class='id identifier rubyid_prepend_after_transition'>prepend_after_transition</span> <span class='symbol'>:some_after_transition</span>
+</code></pre>
+
+<h2>Skip Transitions</h2>
+
+<pre class="code ruby"><code class="ruby">    <span class='id identifier rubyid_skip_before_transition'>skip_before_transition</span> <span class='symbol'>:some_before_transition</span>
+</code></pre>
+
+<h2>Conditions</h2>
+
+<h3>if/unless</h3>
+
+<p>The callback will run <code>if</code> or <code>unless</code> the named method returns a truthy value.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_before_transition'>before_transition</span> <span class='symbol'>:do_something</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='symbol'>:valid?</span>
+
+<span class='comment'># Array conditions apply if all aggregated conditions apply.
+</span><span class='id identifier rubyid_before_transition'>before_transition</span> <span class='symbol'>:do_something</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='lbracket'>[</span><span class='symbol'>:valid?</span><span class='comma'>,</span> <span class='symbol'>:kosher?</span><span class='rbracket'>]</span>
+<span class='id identifier rubyid_before_transition'>before_transition</span> <span class='symbol'>:do_something</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='lbracket'>[</span><span class='symbol'>:valid?</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>title == &#39;Good Title&#39;</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+<span class='id identifier rubyid_before_transition'>before_transition</span> <span class='symbol'>:do_something</span><span class='comma'>,</span> <span class='label'>unless:</span> <span class='lbracket'>[</span><span class='symbol'>:valid?</span><span class='comma'>,</span> <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span><span class='id identifier rubyid_title'>title</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Good Title</span><span class='tstring_end'>&#39;</span></span><span class='rbrace'>}</span><span class='rbracket'>]</span>
+</code></pre>
+
+<h3>only/except</h3>
+
+<p>The three callback classes accept <code>:only</code> and <code>:except</code> parameters, and treat them slightly differnetly.</p>
+
+<pre class="code ruby"><code class="ruby">You can use `:only` and `:except` in conjunction with `:if` and `:unless`.
+</code></pre>
+
+<ul>
+<li><strong>Transition Callbacks</strong> match on the name of the event being executed.
+
+<ul>
+<li><code>before_transition only: :submit</code> will run when the <code>:submit</code> event is fired</li>
+<li><code>before_transition except: [:submit, :reject]</code> will run on any event except the two named</li>
+</ul></li>
+<li><strong>Exit Callbacks</strong> match on the name of the state being exited
+
+<ul>
+<li><code>before_exit only: :new</code> will run when an event causes the object to leave the <code>:new</code> state.</li>
+</ul></li>
+<li><strong>Enter Callbacks</strong> match on the name of the state being entered
+
+<ul>
+<li><code>before_enter only: [:cancelled, :rejected]</code> will run when an event leaves the object <code>:cancelled</code> or <code>:rejected</code>.</li>
+</ul></li>
+</ul>
+
+<h2>Parameterized Callbacks</h2>
+
+<p>If you&#39;re passing parameters through the <code>transition!</code> method, you can receive
+them easily in your callbacks.  Workflow::Callbacks will inspect the parameters of
+your block or method and pass just the ones you ask for.</p>
+
+<p>Three magic names apply to parameter names defined on callbacks:</p>
+
+<ul>
+<li><code>event</code> will be set to the name of the event being processed.</li>
+<li><code>to</code> will be set to the name of the destination state.</li>
+<li><code>from</code> will be set to the name of the state being exited.</li>
+</ul>
+
+<p>Other parameters will be <code>shift</code>ed from what you pass in, so they should be taken
+back in order.  As in:</p>
+
+<pre class="code ruby"><code class="ruby">  <span class='kw'>def</span> <span class='id identifier rubyid_my_after_submit'>my_after_submit</span><span class='lparen'>(</span><span class='id identifier rubyid_from'>from</span><span class='comma'>,</span> <span class='id identifier rubyid_cool'>cool</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='lbracket'>[</span><span class='id identifier rubyid_from'>from</span><span class='comma'>,</span> <span class='id identifier rubyid_cool'>cool</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_after_transition'>after_transition</span> <span class='symbol'>:my_after_submit</span><span class='comma'>,</span> <span class='label'>only:</span> <span class='symbol'>:submit</span>
+
+  <span class='id identifier rubyid_an_article'>an_article</span><span class='period'>.</span><span class='id identifier rubyid_submit!'>submit!</span> <span class='symbol'>:rad</span><span class='comma'>,</span> <span class='int'>1</span><span class='comma'>,</span> <span class='int'>2</span><span class='comma'>,</span> <span class='int'>3</span>
+  <span class='comment'># =&gt; [:submit, :rad, [1, 2, 3]]
+</span></code></pre>
+
+<p>You can also use keyword arguments:</p>
+
+<pre class="code ruby"><code class="ruby">  <span class='kw'>def</span> <span class='id identifier rubyid_my_after_submit'>my_after_submit</span><span class='lparen'>(</span><span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='label'>hype:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='lbracket'>[</span><span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='id identifier rubyid_hype'>hype</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_after_transition'>after_transition</span> <span class='symbol'>:my_after_submit</span><span class='comma'>,</span> <span class='label'>only:</span> <span class='symbol'>:submit</span>
+
+  <span class='id identifier rubyid_an_article'>an_article</span><span class='period'>.</span><span class='id identifier rubyid_submit!'>submit!</span> <span class='label'>a:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>b:</span> <span class='int'>2</span><span class='comma'>,</span> <span class='label'>hype:</span> <span class='float'>4.5</span><span class='comma'>,</span> <span class='label'>c:</span> <span class='int'>3</span>
+  <span class='comment'># =&gt; [:awaiting_review, 4.5, {a: 1, b: 2, c: 3}]
+</span></code></pre>
+
+<p>Around callbacks should be sure to yield the block given:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_after_transition'>after_transition</span> <span class='symbol'>:my_after_submit</span><span class='comma'>,</span> <span class='label'>only:</span> <span class='symbol'>:submit</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_my_after_submit'>my_after_submit</span><span class='lparen'>(</span><span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='label'>hype:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='lbracket'>[</span><span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='id identifier rubyid_hype'>hype</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='rbracket'>]</span>
+  <span class='kw'>yield</span>
+<span class='kw'>end</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_my_after_submit'>my_after_submit</span><span class='lparen'>(</span><span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='label'>hype:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_bloci'>bloci</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='lbracket'>[</span><span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='id identifier rubyid_hype'>hype</span><span class='comma'>,</span> <span class='id identifier rubyid_args'>args</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
+<span class='kw'>end</span>
+
+</code></pre>
+
+<p>Note that in order to use block-style callbacks with special arguments, unless you
+use strictly keyword arguments, the first
+parameters to your block must be the object and callback block (for around callbacks):</p>
+
+<pre class="code ruby"><code class="ruby">  <span class='id identifier rubyid_before_transition'>before_transition</span> <span class='kw'>do</span> <span class='op'>|</span><span class='label'>reviewer:</span><span class='op'>|</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='id identifier rubyid_reviewer'>reviewer</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='kw'>end</span>
+  <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_transition!'>transition!</span> <span class='symbol'>:submit</span><span class='comma'>,</span> <span class='label'>reviewer:</span> <span class='id identifier rubyid_current_user'>current_user</span>
+
+  <span class='id identifier rubyid_before_transition'>before_transition</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_obj'>obj</span><span class='comma'>,</span> <span class='id identifier rubyid_reviewer'>reviewer</span><span class='op'>|</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='id identifier rubyid_reviewer'>reviewer</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+  <span class='kw'>end</span>
+  <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_transition!'>transition!</span> <span class='symbol'>:submit</span><span class='comma'>,</span> <span class='id identifier rubyid_current_user'>current_user</span>
+
+  <span class='id identifier rubyid_around_transition'>around_transition</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_obj'>obj</span><span class='comma'>,</span> <span class='id identifier rubyid_callbacks'>callbacks</span><span class='comma'>,</span> <span class='id identifier rubyid_reviewer'>reviewer</span><span class='op'>|</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='id identifier rubyid_reviewer'>reviewer</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
+    <span class='id identifier rubyid_callbacks'>callbacks</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
+  <span class='kw'>end</span>
+  <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_transition!'>transition!</span> <span class='symbol'>:submit</span><span class='comma'>,</span> <span class='id identifier rubyid_current_user'>current_user</span>
+
+</code></pre>
+
+<p>If you don&#39;t like keyword arguments you can use standard arguments, but you
+need to receive the model as the first argument to your block, and you have to
+configure the <code>event_args</code> for the transition context, within your workflow definition.</p>
+
+<pre class="code ruby"><code class="ruby">before_transition, only: :submit do |article, review_date, reviewer:|
+  puts review_date
+end
+
+Article.last.transition! :submit, Date.today, reviewer: current_user
+
+</code></pre>
+
+<h2>Catching Errors</h2>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>WorkflowModel</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+
+  <span class='comment'>#  Some possibilities:
+</span>  <span class='id identifier rubyid_on_error'>on_error</span> <span class='const'>StandardError</span><span class='comma'>,</span> <span class='label'>rescue:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>self.errors &lt;&lt; &#39;oops!&#39;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_on_error'>on_error</span> <span class='const'>StandardError</span><span class='comma'>,</span> <span class='label'>rescue:</span> <span class='symbol'>:notify_error_service!</span>
+
+  <span class='comment'>#  Default error class is Exception
+</span>  <span class='id identifier rubyid_on_error'>on_error</span> <span class='label'>unless:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>logger.nil?</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_ex'>ex</span><span class='op'>|</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='id identifier rubyid_ex'>ex</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ApplicationError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Whoopsies!</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_on_error'>on_error</span> <span class='label'>ensure:</span> <span class='tlambda'>-&gt;</span><span class='tlambeg'>{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_always_run_this!'>always_run_this!</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>only:</span> <span class='symbol'>:process</span>
+
+  <span class='id identifier rubyid_on_error'>on_error</span> <span class='const'>SomeAppError</span><span class='comma'>,</span> <span class='label'>ensure:</span> <span class='tlambda'>-&gt;</span><span class='tlambeg'>{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_always_run_this!'>always_run_this!</span><span class='rbrace'>}</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_ex'>ex</span><span class='op'>|</span>
+    <span class='comment'># SomeAppError and its subclasses will be rescued and this block will run.
+</span>    <span class='comment'># The ensure proc will be run in the ensure block.
+</span>    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Couldn&#39;t complete transition: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_transition_context'>transition_context</span><span class='period'>.</span><span class='id identifier rubyid_event'>event</span><span class='embexpr_end'>}</span><span class='tstring_content'> because: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ex'>ex</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>  
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:initial</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:process</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:processing</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:different_process</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:processing</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:processing</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:finish</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:done</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:done</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h2>Ensuring code will run</h2>
+
+<pre class="code ruby"><code class="ruby">
+<span class='comment'>#  This will happen no matter what, whenever the process! event is run.
+</span><span class='id identifier rubyid_ensure_after_transitions'>ensure_after_transitions</span> <span class='label'>only:</span> <span class='symbol'>:process</span> <span class='kw'>do</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_messages'>messages</span> <span class='op'>&lt;&lt;</span> <span class='symbol'>:foo</span>
+<span class='kw'>end</span>
+
+<span class='id identifier rubyid_ensure_after_transitions'>ensure_after_transitions</span> <span class='symbol'>:clean_up_resources!</span>
+
+</code></pre>
+
+<h2>Conditional Validations</h2>
+
+<p>If you are using <code>ActiveRecord</code>, you&#39;ll have access to a set of methods which
+describe the current transition underway.</p>
+
+<p>Inside the same Article class which was begun above, the following three
+validations would all run when the <code>submit</code> event is used to transition
+from <code>new</code> to <code>awaiting_review</code>.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_validates'>validates</span> <span class='symbol'>:title</span><span class='comma'>,</span> <span class='label'>presence:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='symbol'>:transitioning_to_awaiting_review?</span>
+<span class='id identifier rubyid_validates'>validates</span> <span class='symbol'>:body</span><span class='comma'>,</span> <span class='label'>presence:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='symbol'>:transitioning_from_new?</span>
+<span class='id identifier rubyid_validates'>validates</span> <span class='symbol'>:author</span><span class='comma'>,</span> <span class='label'>presence:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='symbol'>:transitioning_via_event_submit?</span>
+</code></pre>
+
+<h3>Halting if validations fail</h3>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'>#  This will create a transition callback which will stop the event
+</span><span class='comment'>#  and return false if validations fail.
+</span>
+<span class='id identifier rubyid_halt_transition_unless_valid!'>halt_transition_unless_valid!</span>
+
+<span class='comment'>#  This is the same as doing
+</span>
+<span class='id identifier rubyid_before_transition'>before_transition</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_throw'>throw</span> <span class='symbol'>:abort</span> <span class='kw'>unless</span> <span class='id identifier rubyid_valid?'>valid?</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h3>Checking A Transition</h3>
+
+<p>Call <code>can_transition?</code> to determine whether the validations would pass if a
+given event was called:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>if</span> <span class='id identifier rubyid_article'>article</span><span class='period'>.</span><span class='id identifier rubyid_can_transition?'>can_transition?</span><span class='lparen'>(</span><span class='symbol'>:submit</span><span class='rparen'>)</span>
+  <span class='comment'>#  Do something interesting
+</span><span class='kw'>end</span>
+</code></pre>
+
+<h1>Transition Context</h1>
+
+<p>During transition you can refer to the <code>transition_context</code> object on your model,
+for information about the current transition.  See [Workflow::TransitionContext].</p>
+
+<h2>Naming Event Arguments</h2>
+
+<p>If you will normally call each of your events with the same arguments, the following
+will help:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ApplicationRecord</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+
+  <span class='id identifier rubyid_before_transition'>before_transition</span> <span class='symbol'>:check_reviewer</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_check_reviewer'>check_reviewer</span>
+    <span class='comment'># Ability is a class from the cancan gem: https://github.com/CanCanCommunity/cancancan
+</span>    <span class='id identifier rubyid_halt'>halt</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Access denied</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='const'>Ability</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_transition_context'>transition_context</span><span class='period'>.</span><span class='id identifier rubyid_reviewer'>reviewer</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_can?'>can?</span><span class='lparen'>(</span><span class='symbol'>:review</span><span class='comma'>,</span> <span class='kw'>self</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_event_args'>event_args</span> <span class='symbol'>:reviewer</span><span class='comma'>,</span> <span class='symbol'>:reviewed_at</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:new</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:review</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:reviewed</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:reviewed</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h2>Transition event handler</h2>
+
+<p>You can define a method with the same name as the event. Then it is automatically invoked
+when event is raised. For the Article workflow defined earlier it would
+be:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='kw'>def</span> <span class='id identifier rubyid_reject'>reject</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>sending email to the author explaining the reason...</span><span class='tstring_end'>&#39;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p><code>article.review!; article.reject!</code> will cause state transition to
+<code>being_reviewed</code> state, persist the new state (if integrated with
+ActiveRecord), invoke this user defined <code>reject</code> method and finally
+persist the <code>rejected</code> state.</p>
+
+<p>You can also define event handler accepting/requiring additional
+arguments:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Article</span>
+  <span class='kw'>def</span> <span class='id identifier rubyid_review'>review</span><span class='lparen'>(</span><span class='id identifier rubyid_reviewer'>reviewer</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>[</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_reviewer'>reviewer</span><span class='embexpr_end'>}</span><span class='tstring_content'>] is now reviewing the article</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+<span class='id identifier rubyid_article2'>article2</span> <span class='op'>=</span> <span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_article2'>article2</span><span class='period'>.</span><span class='id identifier rubyid_submit!'>submit!</span>
+<span class='id identifier rubyid_article2'>article2</span><span class='period'>.</span><span class='id identifier rubyid_review!'>review!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Homer Simpson</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='comment'># =&gt; [Homer Simpson] is now reviewing the article
+</span></code></pre>
+
+<h2>Integration with ActiveRecord</h2>
+
+<p>Workflow library can handle the state persistence fully automatically. You
+only need to define a string field on the table called <code>workflow_state</code>
+and include the workflow mixin in your model class as usual:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Order</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='comment'># list states and transitions here
+</span>  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<p>On a database record loading all the state check methods e.g.
+<code>article.state</code>, <code>article.awaiting_review?</code> are immediately available.
+For new records or if the <code>workflow_state</code> field is not set the state
+defaults to the first state declared in the workflow specification. In
+our example it is <code>:new</code>, so <code>Article.new.new?</code> returns true and
+<code>Article.new.approved?</code> returns false.</p>
+
+<p>At the end of a successful state transition like <code>article.approve!</code> the
+new state is immediately saved in the database.</p>
+
+<p>You can change this behaviour by overriding <code>persist_workflow_state</code>
+method.</p>
+
+<h3>Scopes</h3>
+
+<p>Workflow library also adds automatically generated scopes with names based on
+states names:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Order</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:approved</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:pending</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+<span class='comment'># returns all orders with `approved` state
+</span><span class='const'>Order</span><span class='period'>.</span><span class='id identifier rubyid_with_approved_state'>with_approved_state</span>
+
+<span class='comment'># returns all orders with `pending` state
+</span><span class='const'>Order</span><span class='period'>.</span><span class='id identifier rubyid_with_pending_state'>with_pending_state</span>
+</code></pre>
+
+<h3>Wrap State Transition in a locking transaction</h3>
+
+<p>Wrap your transition in a locking transaction to ensure that any exceptions
+raised later in the transition sequence will roll back earlier changes made to
+the record:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Order</span> <span class='op'>&lt;</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>Base</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+
+  <span class='id identifier rubyid_wrap_transition_in_transaction!'>wrap_transition_in_transaction!</span>
+  <span class='comment'># which is the same as the following:
+</span>
+  <span class='id identifier rubyid_around_transition'>around_transition</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_model'>model</span><span class='comma'>,</span> <span class='id identifier rubyid_transition'>transition</span><span class='op'>|</span>
+    <span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_with_lock'>with_lock</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_transition'>transition</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:approved</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:pending</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h2>Accessing your workflow specification</h2>
+
+<p>You can easily reflect on workflow specification programmatically - for
+the whole class or for the current object. Examples:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_article2'>article2</span><span class='period'>.</span><span class='id identifier rubyid_current_state'>current_state</span><span class='period'>.</span><span class='id identifier rubyid_events'>events</span> <span class='comment'># lists possible events from here
+</span>
+<span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='op'>&amp;</span><span class='symbol'>:name</span>
+<span class='comment'>#=&gt; [:rejected, :awaiting_review, :being_reviewed, :accepted, :new]
+</span>
+<span class='comment'># list all events for all states
+</span><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:events</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span>
+</code></pre>
+
+<p>You can also store and later retrieve additional meta data for every
+state and every event:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>MyProcess</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+  <span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:main</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='lbrace'>{</span><span class='label'>importance:</span> <span class='int'>8</span><span class='rbrace'>}</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:change</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:supplemental</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='lbrace'>{</span><span class='label'>whatever:</span> <span class='kw'>true</span><span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:supplemental</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='lbrace'>{</span><span class='label'>importance:</span> <span class='int'>1</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='const'>MyProcess</span><span class='period'>.</span><span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_find_state'>find_state</span><span class='lparen'>(</span><span class='symbol'>:supplemental</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_meta'>meta</span><span class='lbracket'>[</span><span class='symbol'>:importance</span><span class='rbracket'>]</span> <span class='comment'># =&gt; 1
+</span></code></pre>
+
+<h2>Earlier versions</h2>
+
+<p>The <code>workflow</code> gem is the work of Vladimir Dobriakov, <a href="http://www.mobile-web-consulting.de">http://www.mobile-web-consulting.de</a>, <a href="http://blog.geekq.net/">http://blog.geekq.net/</a>.</p>
+
+<p>This project is a fork of his work, and the bulk of the workflow specification code
+and DSL are virtually unchanged.</p>
+
+<h2>About</h2>
+
+<p>Author: Tyler Gannon [<a href="https://github.com/tylergannon">https://github.com/tylergannon</a>]</p>
+
+<p>Original Author: Vladimir Dobriakov, <a href="http://www.mobile-web-consulting.de">http://www.mobile-web-consulting.de</a>, <a href="http://blog.geekq.net/">http://blog.geekq.net/</a></p>
+
+<p>Copyright (c) 2010-2014 Vladimir Dobriakov, <a href="http://www.mobile-web-consulting.de">www.mobile-web-consulting.de</a></p>
+
+<p>Copyright (c) 2008-2009 Vodafone</p>
+
+<p>Copyright (c) 2007-2008 Ryan Allen, FlashDen Pty Ltd</p>
+
+<p>Based on the work of Ryan Allen and Scott Barron</p>
+
+<p>Licensed under MIT license, see the MIT-LICENSE file.</p>
+</div></div>
+
+      <div id="footer">
+  Generated on Sun Sep 25 16:38:03 2016 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.5 (ruby-2.3.1).
+</div>
+
+    </div>
+  </body>
+</html>
