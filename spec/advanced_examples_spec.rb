@@ -55,22 +55,12 @@ RSpec.describe 'Advanced Examples' do
 
   describe '#92 - Load ad-hoc workflow specification' do
     let(:adhoc_class) do
-      c = Class.new
-      c.send :include, Workflow
-      c
-    end
-
-    let(:workflow_spec) do
-      Workflow::Specification.new do
+      new_workflow_class do
         state :one do
           on :dynamic_transition, to: :one_a
         end
         state :one_a
       end
-    end
-
-    before do
-      adhoc_class.send :assign_workflow, workflow_spec
     end
 
     subject { adhoc_class.new }
@@ -89,8 +79,8 @@ RSpec.describe 'Advanced Examples' do
     end
 
     describe 'unless you want revert events' do
-      let(:workflow_spec) do
-        Workflow::Specification.new do
+      let(:adhoc_class) do
+        new_workflow_class do
           define_revert_events!
           state :one do
             on :dynamic_transition, to: :one_a
@@ -100,7 +90,7 @@ RSpec.describe 'Advanced Examples' do
       end
 
       it 'should have revert events' do
-        states = adhoc_class.workflow_spec.states.collect(&:events).flatten.collect(&:name).flatten.uniq.map(&:to_s)
+        states = adhoc_class.workflow_spec.unique_event_names.map(&:to_s)
         expect(states.select { |t| t =~ /^revert/ }).not_to be_empty
       end
     end

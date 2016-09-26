@@ -6,6 +6,7 @@ require 'workflow/version'
 require 'workflow/configuration'
 require 'workflow/specification'
 require 'workflow/callbacks'
+require 'workflow/helper_method_configurator'
 require 'workflow/adapters/active_record'
 require 'workflow/adapters/remodel'
 require 'workflow/adapters/active_record_validations'
@@ -243,59 +244,8 @@ module Workflow
     # ~~~
     #
     def workflow(&specification)
-      assign_workflow Specification.new({}, &specification)
-    end
-
-    private
-
-    # Creates the convinience methods like `my_transition!`
-    def assign_workflow(specification_object)
-      # Merging two workflow specifications can **not** be done automically, so
-      # just make the latest specification win. Same for inheritance -
-      # definition in the subclass wins.
-      if superclass.respond_to?(:workflow_spec, true) && superclass.workflow_spec
-        undefine_methods_defined_by_workflow_spec superclass.workflow_spec
-      end
-
-      @workflow_spec = specification_object
-      @workflow_spec.states.each do |state|
-        state_name = state.name
-        module_eval do
-          define_method "#{state_name}?" do
-            state_name == current_state.name
-          end
-        end
-
-        state.events.each do |event|
-          event_name = event.name
-          module_eval do
-            define_method "#{event_name}!".to_sym do |*args|
-              transition!(event_name, *args)
-            end
-
-            define_method "can_#{event_name}?" do
-              return !!current_state.find_event(event_name)&.evaluate(self)
-            end
-          end
-        end
-      end
-    end
-
-    def undefine_methods_defined_by_workflow_spec(inherited_workflow_spec)
-      inherited_workflow_spec.states.each do |state|
-        state_name = state.name
-        module_eval do
-          undef_method "#{state_name}?"
-        end
-
-        state.events.each do |event|
-          event_name = event.name
-          module_eval do
-            undef_method "#{event_name}!".to_sym
-            undef_method "can_#{event_name}?"
-          end
-        end
-      end
+      @workflow_spec = Specification.new({}, &specification)
+      HelperMethodConfigurator.new(@workflow_spec, self).configure!
     end
   end
 end

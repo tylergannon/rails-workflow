@@ -124,6 +124,10 @@ module Workflow
       @define_revert_events = true
     end
 
+    def unique_event_names
+      states.collect(&:events).flatten.collect(&:name).flatten.uniq
+    end
+
     private
 
     def define_revert_events?
