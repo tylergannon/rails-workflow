@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 RSpec.describe Workflow::Event do
@@ -49,9 +50,9 @@ RSpec.describe Workflow::Event do
 
       state :proc_conditions do
         on :submit do
-          to :state1, if: ->(){title=='foobar'}
-          to :state2, if: ->(){title == 'Foobaz'}
-          to :state3, unless: ->(){title == 'PLEASE'}
+          to :state1, if: ->() { title == 'foobar' }
+          to :state2, if: ->() { title == 'Foobaz' }
+          to :state3, unless: ->() { title == 'PLEASE' }
           to :state4
         end
       end
@@ -67,8 +68,8 @@ RSpec.describe Workflow::Event do
 
       state :array_conditions do
         on :submit do
-          to :state1, if: [:title_equals_foobaz?, "false"]
-          to :state2, if: [:title_equals_foobaz?, "true"]
+          to :state1, if: [:title_equals_foobaz?, 'false']
+          to :state2, if: [:title_equals_foobaz?, 'true']
           to :state3, unless: [:title_equals_please?, :title_still_equals_please?]
           to :state4
         end
@@ -76,10 +77,10 @@ RSpec.describe Workflow::Event do
 
       state :mixed_conditions do
         on :submit do
-          to :state1, if: [:title_equals_foobaz?, "true"] do
+          to :state1, if: [:title_equals_foobaz?, 'true'] do
             false
           end
-          to :state2, if: "true" do
+          to :state2, if: 'true' do
             title_equals_foobaz?
           end
           to :state3, unless: :title_equals_please? do
@@ -105,47 +106,47 @@ RSpec.describe Workflow::Event do
     end
   end
 
-  RSpec.shared_examples "Conditional Evaluation" do |workflow_state|
-    subject {NewWorldOrder.create workflow_state: workflow_state}
+  RSpec.shared_examples 'Conditional Evaluation' do |workflow_state|
+    subject { NewWorldOrder.create workflow_state: workflow_state }
 
-    it "Catches the correct :if condition" do
+    it 'Catches the correct :if condition' do
       subject.title = 'Foobaz'
       subject.submit!
       expect(subject).to be_state2
     end
-    it "Catches the :unless condition" do
+    it 'Catches the :unless condition' do
       subject.title = 'Random'
       subject.submit!
       expect(subject).to be_state3
     end
-    it "Falls through to the catchall condition" do
+    it 'Falls through to the catchall condition' do
       subject.title = 'PLEASE'
       subject.submit!
       expect(subject).to be_state4
     end
   end
 
-  describe "Block conditions" do
-    it_has_the_behavior_of "Conditional Evaluation", 'block_conditions'
+  describe 'Block conditions' do
+    it_has_the_behavior_of 'Conditional Evaluation', 'block_conditions'
   end
 
-  describe "String Conditions" do
-    it_has_the_behavior_of "Conditional Evaluation", 'string_conditions'
+  describe 'String Conditions' do
+    it_has_the_behavior_of 'Conditional Evaluation', 'string_conditions'
   end
 
-  describe "Proc Conditions" do
-    it_has_the_behavior_of "Conditional Evaluation", 'proc_conditions'
+  describe 'Proc Conditions' do
+    it_has_the_behavior_of 'Conditional Evaluation', 'proc_conditions'
   end
 
-  describe "Method Conditions" do
-    it_has_the_behavior_of "Conditional Evaluation", 'method_conditions'
+  describe 'Method Conditions' do
+    it_has_the_behavior_of 'Conditional Evaluation', 'method_conditions'
   end
 
-  describe "Array Conditions" do
-    it_has_the_behavior_of "Conditional Evaluation", 'array_conditions'
+  describe 'Array Conditions' do
+    it_has_the_behavior_of 'Conditional Evaluation', 'array_conditions'
   end
 
-  describe "Mixed Conditions" do
-    it_has_the_behavior_of "Conditional Evaluation", 'mixed_conditions'
+  describe 'Mixed Conditions' do
+    it_has_the_behavior_of 'Conditional Evaluation', 'mixed_conditions'
   end
 end

@@ -1,5 +1,5 @@
-RSpec.shared_context "Shared Helpers", :shared_context => :metadata do
-  def new_workflow_class(superklass=Object, &block)
+RSpec.shared_context 'Shared Helpers', shared_context: :metadata do
+  def new_workflow_class(superklass = Object, &block)
     k = Class.new(superklass)
     k.class_eval do
       include Workflow
@@ -22,5 +22,4 @@ RSpec.shared_context "Shared Helpers", :shared_context => :metadata do
   # after do
   #   ActiveRecord::Base.connection.disconnect!
   # end
-
 end

@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe "Advanced Examples" do
+RSpec.describe 'Advanced Examples' do
   class AdvancedExample
     include Workflow
     workflow do
@@ -22,73 +23,73 @@ RSpec.describe "Advanced Examples" do
     end
   end
 
-  describe "#63 Undoing Events" do
-    subject {AdvancedExample.new}
-    it {is_expected.to be_new}
-    it "should be able to progress as normal" do
-      expect {
+  describe '#63 Undoing Events' do
+    subject { AdvancedExample.new }
+    it { is_expected.to be_new }
+    it 'should be able to progress as normal' do
+      expect do
         subject.submit!
-      }.to change {
+      end.to change {
         subject.current_state.name
       }.from(:new).to(:awaiting_review)
     end
 
-    describe "Reversion events" do
+    describe 'Reversion events' do
       before do
         subject.submit!
       end
-      it "should have an additional event for reverting the submit" do
+      it 'should have an additional event for reverting the submit' do
         expect(subject.current_state.events.map(&:name)).to include(:revert_submit)
         expect(subject.current_state.events.map(&:name)).to include(:review)
       end
 
-      it "should be able to revert the submit" do
-        expect {
+      it 'should be able to revert the submit' do
+        expect do
           subject.revert_submit!
-        }.to change {
+        end.to change {
           subject.current_state.name
         }.from(:awaiting_review).to(:new)
       end
     end
   end
 
-  describe "#92 - Load ad-hoc workflow specification" do
-    let(:adhoc_class) {
+  describe '#92 - Load ad-hoc workflow specification' do
+    let(:adhoc_class) do
       c = Class.new
       c.send :include, Workflow
       c
-    }
+    end
 
-    let(:workflow_spec) {
+    let(:workflow_spec) do
       Workflow::Specification.new do
         state :one do
           on :dynamic_transition, to: :one_a
         end
         state :one_a
       end
-    }
+    end
 
     before do
       adhoc_class.send :assign_workflow, workflow_spec
     end
 
-    subject {adhoc_class.new}
+    subject { adhoc_class.new }
 
-    it "should be able to load and run dynamically generated state transitions" do
-      expect {
+    it 'should be able to load and run dynamically generated state transitions' do
+      expect do
         subject.dynamic_transition!(1)
-      }.to change {
+      end.to change {
         subject.current_state.name
       }.from(:one).to(:one_a)
     end
 
-    it "should not have a revert event" do
+    it 'should not have a revert event' do
       states = adhoc_class.workflow_spec.states.collect(&:events).flatten.collect(&:name).flatten.uniq.map(&:to_s)
-      expect(states.select{|t| t =~ /^revert/}).to be_empty
+      expect(states.select { |t| t =~ /^revert/ }).to be_empty
     end
 
-    describe "unless you want revert events" do
-      let(:workflow_spec) {
+    describe 'unless you want revert events' do
+      let(:workflow_spec) do
         Workflow::Specification.new do
           define_revert_events!
           state :one do
@@ -96,11 +97,11 @@ RSpec.describe "Advanced Examples" do
           end
           state :one_a
         end
-      }
+      end
 
-      it "should have revert events" do
+      it 'should have revert events' do
         states = adhoc_class.workflow_spec.states.collect(&:events).flatten.collect(&:name).flatten.uniq.map(&:to_s)
-        expect(states.select{|t| t =~ /^revert/}).not_to be_empty
+        expect(states.select { |t| t =~ /^revert/ }).not_to be_empty
       end
     end
   end

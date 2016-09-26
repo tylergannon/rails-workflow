@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Workflow
   module Callbacks
     module TransitionCallbacks
@@ -38,7 +39,7 @@ module Workflow
         #
         # Enables comparison of two wrapper procs to determine if they wrap the same
         # Method.
-        OVERLOAD_EQUALITY_OPERATOR_PROC = Proc.new do |method_name|
+        OVERLOAD_EQUALITY_OPERATOR_PROC = proc do |_method_name|
           def method_name
             method_name
           end
@@ -56,12 +57,12 @@ module Workflow
             case other
             when ::Proc
               if other.respond_to?(:raw_proc)
-                self.method_name == other.method_name
+                method_name == other.method_name
               else
                 false
               end
             when ::Symbol
-              self.method_name == other
+              method_name == other
             else
               false
             end
@@ -70,9 +71,9 @@ module Workflow
 
         def name_arguments_string
           if name_params.any?
-            name_params.map{|name|
+            name_params.map do |name|
               "name_proc.call(:#{name})"
-            }.join(', ')
+            end.join(', ')
           end
         end
 

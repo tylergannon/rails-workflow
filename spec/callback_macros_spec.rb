@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 RSpec.describe Workflow::Callbacks do
@@ -14,9 +15,9 @@ RSpec.describe Workflow::Callbacks do
     end
   end
 
-  let(:model) {
+  let(:model) do
     workflow_class.new
-  }
+  end
 
   before do
     workflow_class.class_eval do
@@ -26,39 +27,39 @@ RSpec.describe Workflow::Callbacks do
       end
 
       before_transition do
-        raise "Problem!"
+        raise 'Problem!'
       end
     end
   end
 
-  describe "#ensure_after_transitions" do
+  describe '#ensure_after_transitions' do
     def run_transition
-      expect {
+      expect do
         model.process!
-      }.to raise_error(RuntimeError, "Problem!")
+      end.to raise_error(RuntimeError, 'Problem!')
     end
-    it "Always calls the block" do
+    it 'Always calls the block' do
       workflow_class.class_eval do
         ensure_after_transitions do
-          self.messages << :foo
+          messages << :foo
         end
       end
       run_transition
       expect(model.messages).to include(:foo)
     end
 
-    it "Always calls the expression" do
+    it 'Always calls the expression' do
       workflow_class.class_eval do
-        ensure_after_transitions "self.messages << :foo"
+        ensure_after_transitions 'self.messages << :foo'
       end
       run_transition
       expect(model.messages).to include(:foo)
     end
 
-    it "Always calls the expression and the block" do
+    it 'Always calls the expression and the block' do
       workflow_class.class_eval do
-        ensure_after_transitions "self.messages << :foo" do
-          self.messages << :foo
+        ensure_after_transitions 'self.messages << :foo' do
+          messages << :foo
         end
       end
       run_transition
@@ -66,97 +67,94 @@ RSpec.describe Workflow::Callbacks do
     end
   end
 
-  describe "#on_error" do
-    describe "with conditions" do
-      it "Only catches the error on the given condition" do
+  describe '#on_error' do
+    describe 'with conditions' do
+      it 'Only catches the error on the given condition' do
         workflow_class.class_eval do
-          on_error RuntimeError, if: "self.messages.empty?" do |ex|
-            self.messages << :foo
+          on_error RuntimeError, if: 'self.messages.empty?' do |_ex|
+            messages << :foo
           end
         end
 
-        expect {
+        expect do
           model.process!
-        }.not_to raise_error
+        end.not_to raise_error
         expect(model.messages).to include(:foo)
-        expect {
+        expect do
           model.process!
-        }.to raise_error(RuntimeError, "Problem!")
+        end.to raise_error(RuntimeError, 'Problem!')
         expect(model.messages.length).to eq 1
       end
 
-      it "Only runs the error catching callback on the given event" do
+      it 'Only runs the error catching callback on the given event' do
         workflow_class.class_eval do
-          on_error RuntimeError, only: :process do |ex|
-            self.messages << :foo
+          on_error RuntimeError, only: :process do |_ex|
+            messages << :foo
           end
         end
         3.times do
-          expect {
+          expect do
             model.process!
-          }.not_to raise_error
+          end.not_to raise_error
         end
 
-        expect {
+        expect do
           model.different_process!
-        }.to raise_error(RuntimeError, "Problem!")
+        end.to raise_error(RuntimeError, 'Problem!')
       end
     end
-    it "will raise an error if the error is not caught" do
-      expect {
+    it 'will raise an error if the error is not caught' do
+      expect do
         model.process!
-      }.to raise_error(RuntimeError, "Problem!")
+      end.to raise_error(RuntimeError, 'Problem!')
     end
 
-    it "Catches the error and executes the block" do
+    it 'Catches the error and executes the block' do
       workflow_class.class_eval do
-        on_error RuntimeError do |ex|
-          self.messages << :foo
+        on_error RuntimeError do |_ex|
+          messages << :foo
         end
       end
 
-      expect {
+      expect do
         model.process!
-      }.not_to raise_error
+      end.not_to raise_error
       expect(model.messages).to include(:foo)
-
     end
 
-    it "Catches the error and runs the :rescue expression" do
+    it 'Catches the error and runs the :rescue expression' do
       workflow_class.class_eval do
-        on_error RuntimeError, rescue: "self.messages << :foo"
+        on_error RuntimeError, rescue: 'self.messages << :foo'
       end
 
-      expect {
+      expect do
         model.process!
-      }.not_to raise_error
+      end.not_to raise_error
       expect(model.messages).to include(:foo)
     end
 
-    it "Catches the error and runs the :ensure expression" do
+    it 'Catches the error and runs the :ensure expression' do
       workflow_class.class_eval do
-        on_error RuntimeError, ensure: "self.messages << :foo"
+        on_error RuntimeError, ensure: 'self.messages << :foo'
       end
 
-      expect {
+      expect do
         model.process!
-      }.not_to raise_error
+      end.not_to raise_error
       expect(model.messages).to include(:foo)
     end
 
-    it "Does all three" do
+    it 'Does all three' do
       workflow_class.class_eval do
-        on_error RuntimeError, rescue: "self.messages << :foo", ensure: "self.messages << :foo" do |ex|
-          self.messages << :foo
+        on_error RuntimeError, rescue: 'self.messages << :foo', ensure: 'self.messages << :foo' do |_ex|
+          messages << :foo
         end
       end
 
-      expect {
+      expect do
         model.process!
-      }.not_to raise_error
+      end.not_to raise_error
       expect(model.messages).to eq [:foo, :foo, :foo]
     end
-
-
   end
 end

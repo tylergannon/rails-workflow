@@ -1,4 +1,5 @@
 
+# frozen_string_literal: true
 module Workflow
   module Callbacks
     module TransitionCallbacks
@@ -13,7 +14,8 @@ module Workflow
             rest_param_string,
             kw_arguments_string,
             keyrest_string,
-            procedure_string].compact.join(', ')
+            procedure_string
+          ].compact.join(', ')
 
           raw_proc = self.raw_proc
           str = build_proc("target.instance_exec(#{arguments})")
@@ -25,9 +27,9 @@ module Workflow
         def name_arguments_string
           params = name_params
           names  = []
-          names << 'target'   if params.shift
+          names << 'target' if params.shift
           (names << 'callbacks') && params.shift if around_callback?
-          names += params.map{|name| "name_proc.call(:#{name})"}
+          names += params.map { |name| "name_proc.call(:#{name})" }
           return names.join(', ') if names.any?
         end
 

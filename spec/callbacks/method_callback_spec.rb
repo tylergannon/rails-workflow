@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe "Callback Method Parameters" do
+RSpec.describe 'Callback Method Parameters' do
   let(:workflow_class) do
     klass = Class.new do
       include Workflow
@@ -39,33 +40,33 @@ RSpec.describe "Callback Method Parameters" do
       end
     end
   end
-  subject{workflow_class.new}
+  subject { workflow_class.new }
 
-  describe "One Parameter" do
-    it "gets the message" do
+  describe 'One Parameter' do
+    it 'gets the message' do
       subject.start1! :tight
       expect(subject.message).to eq :tight
     end
   end
 
-  describe "Two Parameter" do
-    it "gets the message" do
+  describe 'Two Parameter' do
+    it 'gets the message' do
       subject.start2! :tight, :nice
       expect(subject.message).to eq [:nice, :tight]
     end
   end
 
-  describe "Three Parameter" do
-    it "gets the message" do
+  describe 'Three Parameter' do
+    it 'gets the message' do
       subject.start3! :tight, :nice, :word, :up, dope: :sauce, cool: :bar, right: :now
-      expect(subject.message).to eq [:tight, :nice, [:word, :up], :bar, {:dope=>:sauce, :right=>:now}]
+      expect(subject.message).to eq [:tight, :nice, [:word, :up], :bar, { dope: :sauce, right: :now }]
     end
   end
 
-  describe "Around Transition" do
-    it "gets the message" do
+  describe 'Around Transition' do
+    it 'gets the message' do
       subject.start4! :tight, :nice, :word, :up, dope: :sauce, cool: :bar, right: :now
-      expect(subject.message).to eq [:tight, :nice, [:word, :up], :bar, {:dope=>:sauce, :right=>:now}]
+      expect(subject.message).to eq [:tight, :nice, [:word, :up], :bar, { dope: :sauce, right: :now }]
       expect(subject).to be_started
     end
   end

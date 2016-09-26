@@ -1,14 +1,13 @@
+# frozen_string_literal: true
 module Workflow
   module Errors
     class TransitionHaltedError < StandardError
-
       attr_reader :halted_because
 
       def initialize(msg = nil)
         @halted_because = msg
         super msg
       end
-
     end
 
     class NoMatchingTransitionError < StandardError

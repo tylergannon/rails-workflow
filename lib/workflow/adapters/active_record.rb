@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Workflow
   module Adapter
     module ActiveRecord
@@ -17,7 +18,7 @@ module Workflow
         def persist_workflow_state(new_value)
           # Rails 3.1 or newer
           if persisted? && Workflow.config.persist_workflow_state_immediately
-            attrs = {self.class.workflow_column => new_value}
+            attrs = { self.class.workflow_column => new_value }
             if Workflow.config.touch_on_update_column
               attrs[:updated_at] = DateTime.now
             end
@@ -47,7 +48,7 @@ module Workflow
       #
       # Article.with_pending_state # => ActiveRecord::Relation
       # Payment.without_refunded_state # => ActiveRecord::Relation
-      #`
+      # `
       # Example above just adds `where(:state_column_name => 'pending')` or
       # `where.not(:state_column_name => 'pending')` to AR query and returns
       # ActiveRecord::Relation.
@@ -65,11 +66,11 @@ module Workflow
 
           states.map(&:name).each do |state|
             define_singleton_method("with_#{state}_state") do
-              where(self.workflow_column.to_sym => state.to_s)
+              where(workflow_column.to_sym => state.to_s)
             end
 
             define_singleton_method("without_#{state}_state") do
-              where.not(self.workflow_column.to_sym => state.to_s)
+              where.not(workflow_column.to_sym => state.to_s)
             end
           end
         end

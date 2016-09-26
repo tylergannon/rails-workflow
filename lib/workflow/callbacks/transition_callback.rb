@@ -1,4 +1,5 @@
 
+# frozen_string_literal: true
 module Workflow
   module Callbacks
     class TransitionCallback
@@ -10,9 +11,9 @@ module Workflow
       end
 
       def self.build_wrapper(callback_type, raw_proc, calling_class)
-        if raw_proc.kind_of? ::Proc
+        if raw_proc.is_a? ::Proc
           TransitionCallbacks::ProcWrapper.new(callback_type, raw_proc, calling_class)
-        elsif raw_proc.kind_of? ::Symbol
+        elsif raw_proc.is_a? ::Symbol
           if zero_arity_method?(raw_proc, calling_class)
             raw_proc
           else
@@ -24,7 +25,7 @@ module Workflow
       end
 
       def wrapper
-        raise NotImplementedError.new "Abstract Method Called"
+        raise NotImplementedError, 'Abstract Method Called'
       end
 
       protected
@@ -35,7 +36,7 @@ module Workflow
       def self.zero_arity_method?(method, calling_class)
         if calling_class.instance_methods.include?(method)
           method = calling_class.instance_method(method)
-          method.arity == 0
+          method.arity.zero?
         end
       end
 
@@ -61,7 +62,7 @@ module Workflow
       end
 
       def name_arguments_string
-        raise NotImplementedError.new "Abstract Method Called"
+        raise NotImplementedError, 'Abstract Method Called'
       end
 
       def kw_arguments_string
@@ -80,7 +81,7 @@ module Workflow
       end
 
       def procedure_string
-        raise NotImplementedError.new "Abstract Method Called"
+        raise NotImplementedError, 'Abstract Method Called'
       end
 
       def name_params
@@ -100,17 +101,17 @@ module Workflow
       end
 
       def params_by_type(*types)
-        parameters.select do |type, name|
+        parameters.select do |type, _name|
           types.include? type
         end.map(&:last)
       end
 
       def parameters
-        raise NotImplementedError.new "Abstract Method Called"
+        raise NotImplementedError, 'Abstract Method Called'
       end
 
       def arity
-        raise NotImplementedError.new "Abstract Method Called"
+        raise NotImplementedError, 'Abstract Method Called'
       end
     end
   end

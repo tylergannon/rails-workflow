@@ -1,0 +1,21 @@
+AllCops:
+  TargetRubyVersion: 2.3
+  Exclude:
+    - 'vendor/**/*'
+    - 'config/initializers/*'
+    - 'tmp/**/*'
+    - 'db/**/*'
+    - 'spec/spec_helper.rb'
+    - 'lib/tasks/**/*'
+    - 'spec/rails_helper.rb'
+    - 'spec/support/*'
+    - 'bin/*'
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 100
+
+Metrics/MethodLength:
+  Max: 14

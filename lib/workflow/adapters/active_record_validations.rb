@@ -1,4 +1,6 @@
+# frozen_string_literal: true
 require 'active_support/concern'
+require "English"
 
 module Workflow
   module Adapter
@@ -20,7 +22,7 @@ module Workflow
         if method.to_s =~ /^transitioning_(from|to|via_event)_([\w_-]+)\?$/
           class_eval "
           def #{method}
-            transitioning? direction: '#{$~[1]}', state: '#{$~[2]}'
+            transitioning? direction: '#{$LAST_MATCH_INFO[1]}', state: '#{$LAST_MATCH_INFO[2]}'
           end
           "
           send method
@@ -61,19 +63,17 @@ module Workflow
       #      end
       #    end
       #
-      def within_transition(from, to, event, &block)
-        begin
-          @transition_context = TransitionContext.new \
-            from: from,
-            to: to,
-            event: event,
-            attributes: {},
-            event_args: []
+      def within_transition(from, to, event)
+        @transition_context = TransitionContext.new \
+          from: from,
+          to: to,
+          event: event,
+          attributes: {},
+          event_args: []
 
-          return block.call()
-        ensure
-          @transition_context = nil
-        end
+        return yield
+      ensure
+        @transition_context = nil
       end
 
       # Override for ActiveRecord::Validations#valid?
@@ -89,7 +89,7 @@ module Workflow
       # meaning that one should call `errors.clear` before {#valid?} will
       # trigger validations to run anew.
       module RevalidateOnlyAfterAttributesChange
-        def valid?(context=nil)
+        def valid?(context = nil)
           if errors.any? && !@changed_since_validation
             false
           else
@@ -109,7 +109,7 @@ module Workflow
 
       module ClassMethods
         def halt_transition_unless_valid!
-          before_transition unless: :valid? do |model|
+          before_transition unless: :valid? do |_model|
             throw :abort
           end
         end

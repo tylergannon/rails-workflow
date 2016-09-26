@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Workflow
   class Event
     # @!attribute [r] name
@@ -28,9 +29,18 @@ module Workflow
     # @param [Object] target An object of the class that this event was defined on.
     # @return [Workflow::State] The first applicable destination state, or nil if none.
     def evaluate(target)
-      transitions.find{|transition|
+      transitions.find do |transition|
         transition.matches? target
-      }&.target_state
+      end&.target_state
+    end
+
+    def evaluate!(target)
+      state_name = evaluate(target)
+      unless state_name
+        raise NoMatchingTransitionError, "No matching transition found on #{name}
+          for target #{target}.  Consider adding a catchall transition.".squish
+      end
+      state_name
     end
 
     # Add a {Workflow::Transition} to the possible {#transitions} for this event.
@@ -44,8 +54,8 @@ module Workflow
     # @yield [] Optional block which, if provided, becomes an `:if` condition for the transition.
     # @return [nil]
     def to(target_state, **conditions_def, &block)
-      conditions = Conditions.new &&conditions_def, block
-      self.transitions << Transition.new(target_state, conditions_def, &block)
+      conditions = Conditions.new && conditions_def, block
+      transitions << Transition.new(target_state, conditions_def, &block)
     end
 
     private
@@ -77,6 +87,7 @@ module Workflow
       end
 
       private
+
       # @!attribute [r] conditions
       #   @return [Workflow::Event::Conditions] Conditions for this transition.
       attr_reader :conditions
@@ -91,7 +102,7 @@ module Workflow
       def initialize(**options, &block)
         @if      = Array(options[:if])
         @unless  = Array(options[:unless])
-        @if      << block if block_given?
+        @if << block if block_given?
         @conditions_lambdas = conditions_lambdas
       end
 
@@ -100,7 +111,7 @@ module Workflow
       end
 
       def apply?(target)
-        @conditions_lambdas.all?{|l| l.call(target)}
+        @conditions_lambdas.all? { |l| l.call(target) }
       end
 
       private

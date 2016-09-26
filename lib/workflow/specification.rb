@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'workflow/state'
 require 'workflow/event'
 require 'workflow/errors'
@@ -26,9 +27,9 @@ module Workflow
     define_callbacks :spec_definition
     set_callback(:spec_definition, :after, if: :define_revert_events?) do |spec|
       spec.states.each do |state|
-        state.events.reject{ |e|
+        state.events.reject do |e|
           e.name.to_s =~ /^revert_/
-        }.select{|e| e.transitions.length == 1}.each do |event|
+        end.select { |e| e.transitions.length == 1 }.each do |event|
           revert_event_name = "revert_#{event.name}".to_sym
           from_state_for_revert = event.transitions.first.target_state
           from_state_for_revert.on revert_event_name, to: state
@@ -42,7 +43,7 @@ module Workflow
           event.transitions.each do |transition|
             target_state = spec.find_state(transition.target_state)
             if target_state.nil?
-              raise Workflow::Errors::WorkflowDefinitionError.new("Event #{event.name} transitions to #{transition.target_state} but there is no such state.")
+              raise Workflow::Errors::WorkflowDefinitionError, "Event #{event.name} transitions to #{transition.target_state} but there is no such state."
             end
             transition.target_state = target_state
           end
@@ -55,7 +56,7 @@ module Workflow
     # @param [Symbol] name Name of state to find.
     # @return [Workflow::State] The state with the given name.
     def find_state(name)
-      states.find{|t| t.name == name.to_sym}
+      states.find { |t| t.name == name.to_sym }
     end
 
     # @api private
@@ -85,8 +86,6 @@ module Workflow
       new_state.instance_eval(&events) if block_given?
     end
 
-
-
     # Specify attributes to make available on the {TransitionContext} object
     # during transitions taking place in this specification.
     # The attributes' values will be taken in order from the arguments passed to
@@ -98,13 +97,12 @@ module Workflow
       @named_arguments = names
     end
 
-
     # Also create additional event transitions that will move each configured transition
     # in the reverse direction.
     #
     # @return [nil]
     #
-    #```ruby
+    # ```ruby
     # class Article
     #   include Workflow
     #   workflow do
@@ -121,17 +119,15 @@ module Workflow
     # a.current_state.name          # => :bax
     # a.transition! :revert_bar
     # a.current_state.name          # => :foo
-    #```
+    # ```
     def define_revert_events!
       @define_revert_events = true
     end
 
     private
 
-
     def define_revert_events?
       !!@define_revert_events
     end
-
   end
 end

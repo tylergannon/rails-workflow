@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Workflow
   # During transitions, an instance of this class can be found
   # on the object as `transition_context`.

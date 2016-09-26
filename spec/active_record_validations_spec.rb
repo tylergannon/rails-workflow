@@ -1,57 +1,58 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe "Active Record Validations" do
-  include_context "ActiveRecord Setup"
-  subject {ActiveRecordArticle.find_by_title 'new1'}
+RSpec.describe 'Active Record Validations' do
+  include_context 'ActiveRecord Setup'
+  subject { ActiveRecordArticle.find_by_title 'new1' }
 
-  describe "Outside of the transition" do
-    it {is_expected.to be_valid}
+  describe 'Outside of the transition' do
+    it { is_expected.to be_valid }
   end
 
-  describe "During the transition" do
-    describe "When the validation rules are met" do
+  describe 'During the transition' do
+    describe 'When the validation rules are met' do
       before do
-        subject.body = "Some Body"
+        subject.body = 'Some Body'
       end
-      it "should be able to transition" do
+      it 'should be able to transition' do
         expect(subject.can_transition?(:accept)).to be_truthy
       end
 
-      it "should succeed the transition" do
+      it 'should succeed the transition' do
         expect(subject.accept!).to be_truthy
         subject.reload
         expect(subject).to be_accepted
       end
     end
 
-    describe "When validation rules are not met" do
+    describe 'When validation rules are not met' do
       before do
         subject.body = nil
       end
-      it "should NOT be able to transition" do
+      it 'should NOT be able to transition' do
         expect(subject.can_transition?(:accept)).to be_falsey
       end
 
-      it "should clear the errors after running" do
+      it 'should clear the errors after running' do
         subject.can_transition?(:accept)
         expect(subject.errors).to be_empty
       end
 
-      it "should NOT succeed the transition" do
+      it 'should NOT succeed the transition' do
         expect(subject.accept!).to be_falsey
         subject.reload
         expect(subject).not_to be_accepted
       end
 
-      it {is_expected.to be_valid}
+      it { is_expected.to be_valid }
 
-      it "should have the errors on the object" do
+      it 'should have the errors on the object' do
         subject.accept!
         expect(subject.errors).not_to be_empty
         expect(subject).not_to be_valid
       end
 
-      it "should re-validate the object after some manipulation." do
+      it 'should re-validate the object after some manipulation.' do
         subject.accept!
         expect(subject.errors).not_to be_empty
         expect(subject).not_to be_valid

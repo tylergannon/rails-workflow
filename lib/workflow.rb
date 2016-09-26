@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rubygems'
 require 'active_support/concern'
 require 'active_support/callbacks'
@@ -10,7 +11,6 @@ require 'workflow/adapters/remodel'
 require 'workflow/adapters/active_record_validations'
 require 'workflow/transition_context'
 require 'active_support/overloads'
-
 
 # See also README.markdown for documentation
 module Workflow
@@ -30,14 +30,13 @@ module Workflow
   # @return [nil]
   def self.config(&block)
     block.call(CONFIGURATION) if block_given?
-    return CONFIGURATION
+    CONFIGURATION
   end
 
   included do
-
     # Look for a hook; otherwise detect based on ancestor class.
     if respond_to?(:workflow_adapter)
-      include self.workflow_adapter
+      include workflow_adapter
     else
       if Object.const_defined?(:ActiveRecord) && self < ActiveRecord::Base
         include Adapter::ActiveRecord
@@ -54,7 +53,7 @@ module Workflow
   # @return [State] Current workflow state
   def current_state
     loaded_state = load_workflow_state
-    res = workflow_spec.states.find{|t| t.name==loaded_state.to_sym} if loaded_state
+    res = workflow_spec.states.find { |t| t.name == loaded_state.to_sym } if loaded_state
     res || workflow_spec.initial_state
   end
 
@@ -86,23 +85,18 @@ module Workflow
   def transition!(name, *args, **attributes)
     name = name.to_sym
     event = current_state.find_event(name)
-    raise NoTransitionAllowed.new(
-      "There is no event #{name} defined for the #{current_state.name} state") \
+    raise NoTransitionAllowed, "There is no event #{name} defined for the #{current_state.name} state" \
       if event.nil?
 
     @halted_because = nil
     @halted = false
 
     target = event.evaluate(self)
-    unless target
-      raise NoMatchingTransitionError.new("No matching transition found on #{name} for target #{target}.  Consider adding a catchall transition.")
-    end
 
-    from = current_state
     return_value = false
     begin
       @transition_context = TransitionContext.new \
-        from: from.name,
+        from: current_state.name,
         to: target.name,
         event: name,
         event_args: args,
@@ -137,7 +131,7 @@ module Workflow
   def halt!(reason = nil)
     @halted_because = reason
     @halted = true
-    raise TransitionHaltedError.new(reason)
+    raise TransitionHaltedError, reason
   end
 
   #   The specification for this object.
@@ -153,9 +147,7 @@ module Workflow
     c = self.class
     # using a simple loop instead of class_inheritable_accessor to avoid
     # dependency on Rails' ActiveSupport
-    until c.workflow_spec || !(c.include? Workflow)
-      c = c.superclass
-    end
+    c = c.superclass until c.workflow_spec || !(c.include? Workflow)
     c.workflow_spec
   end
 
@@ -166,9 +158,9 @@ module Workflow
     # 2. protected method somewhere in the class hierarchy or
     # 3. private in the immediate class (parent classes ignored)
     action = action.to_sym
-    self.respond_to?(action) or
-      self.class.protected_method_defined?(action) or
-      self.private_methods(false).map(&:to_sym).include?(action)
+    respond_to?(action) ||
+      self.class.protected_method_defined?(action) ||
+      private_methods(false).map(&:to_sym).include?(action)
   end
 
   def run_action_callback(action_name, *args)
@@ -183,8 +175,8 @@ module Workflow
   def check_method_arity!(method, *args)
     arity = method.arity
 
-    unless (arity >= 0 && args.length == arity) || (arity < 0 && (args.length + 1) >= arity.abs)
-      raise CallbackArityError.new("Method #{method.name} has arity #{arity} but was called with #{args.length} arguments.")
+    unless (arity >= 0 && args.length == arity) || (arity.negative? && (args.length + 1) >= arity.abs)
+      raise CallbackArityError, "Method #{method.name} has arity #{arity} but was called with #{args.length} arguments."
     end
   end
 
@@ -210,16 +202,13 @@ module Workflow
     #
     # @param [Symbol] column_name If provided, will set a new workflow column name.
     # @return [Symbol] The current (or new) name for the workflow column on this class.
-    def workflow_column(column_name=nil)
-      if column_name
-        @workflow_state_column_name = column_name.to_sym
-      end
+    def workflow_column(column_name = nil)
+      @workflow_state_column_name = column_name.to_sym if column_name
       if !instance_variable_defined?('@workflow_state_column_name') && superclass.respond_to?(:workflow_column)
         @workflow_state_column_name = superclass.workflow_column
       end
       @workflow_state_column_name ||= :workflow_state
     end
-
 
     ##
     # Define workflow for the class.
@@ -251,10 +240,10 @@ module Workflow
     #   end
     # end
     #
-    #~~~
+    # ~~~
     #
     def workflow(&specification)
-      assign_workflow Specification.new(Hash.new, &specification)
+      assign_workflow Specification.new({}, &specification)
     end
 
     private
@@ -264,7 +253,7 @@ module Workflow
       # Merging two workflow specifications can **not** be done automically, so
       # just make the latest specification win. Same for inheritance -
       # definition in the subclass wins.
-      if self.superclass.respond_to?(:workflow_spec, true) && self.superclass.workflow_spec
+      if superclass.respond_to?(:workflow_spec, true) && superclass.workflow_spec
         undefine_methods_defined_by_workflow_spec superclass.workflow_spec
       end
 

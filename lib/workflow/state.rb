@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Workflow
   # Represents one state for the defined workflow,
   # with a list of {Workflow::Event}s that can transition to
@@ -19,14 +20,17 @@ module Workflow
     # @param [Fixnum] sequence Sequencing number that will affect sorting comparisons with other states.
     # @param [Hash] meta: Optional metadata for this state.
     def initialize(name, sequence, meta: {})
-      @name, @sequence, @events, @meta = name.to_sym, sequence, [], meta
+      @name = name.to_sym
+      @sequence = sequence
+      @events = []
+      @meta = meta
     end
 
     # Returns the event with the given name.
     # @param [Symbol] name name of event to find
     # @return [Workflow::Event] The event with the given name, or `nil`
     def find_event(name)
-      events.find{|t| t.name == name}
+      events.find { |t| t.name == name }
     end
 
     # Define an event on this specification.
@@ -38,8 +42,8 @@ module Workflow
     # @yield [] Transitions definition for this event.
     # @return [nil]
     #
-    #```ruby
-    #workflow do
+    # ```ruby
+    # workflow do
     #  state :new do
     #    on :review, to: :being_reviewed
     #
@@ -58,19 +62,19 @@ module Workflow
     #  state :kitchen
     #  state :the_bar
     #  state :the_diner
-    #end
-    #```
+    # end
+    # ```
     def on(name, to: nil, meta: {}, &transitions)
       if to && block_given?
-        raise Errors::WorkflowDefinitionError.new("Event target can only be received in the method call or the block, not both.")
+        raise Errors::WorkflowDefinitionError, 'Event target can only be received in the method call or the block, not both.'
       end
 
       unless to || block_given?
-        raise Errors::WorkflowDefinitionError.new("No event target given for event #{name}")
+        raise Errors::WorkflowDefinitionError, "No event target given for event #{name}"
       end
 
       if find_event(name)
-        raise Errors::WorkflowDefinitionError.new("Already defined an event [#{name}] for state[#{self.name}]")
+        raise Errors::WorkflowDefinitionError, "Already defined an event [#{name}] for state[#{self.name}]"
       end
 
       event = Workflow::Event.new(name, meta: meta)
@@ -82,7 +86,7 @@ module Workflow
       end
 
       if event.transitions.empty?
-        raise Errors::WorkflowDefinitionError.new("No transitions defined for event [#{name}] on state [#{self.name}]")
+        raise Errors::WorkflowDefinitionError, "No transitions defined for event [#{name}] on state [#{self.name}]"
       end
 
       events << event
@@ -101,16 +105,16 @@ module Workflow
     # @return [Integer]
     def <=>(other_state)
       unless other_state.is_a?(State)
-        raise StandardError.new "Other State #{other_state} is a #{other_state.class}.  I can only be compared with a Workflow::State."
+        raise StandardError, "Other State #{other_state} is a #{other_state.class}.  I can only be compared with a Workflow::State."
       end
-      self.sequence <=> other_state.send(:sequence)
+      sequence <=> other_state.send(:sequence)
     end
 
     private
+
     # @api private
     # @!attribute [r] sequence
     #   @return [Fixnum] The position of this state within the order it was defined for in its workflow.
     attr_reader :sequence
-
   end
 end

@@ -1,10 +1,11 @@
-require "spec_helper"
+# frozen_string_literal: true
+require 'spec_helper'
 
-RSpec.shared_examples "Basic Database Operations" do
-  it "should be shippable" do
-    expect {
+RSpec.shared_examples 'Basic Database Operations' do
+  it 'should be shippable' do
+    expect do
       subject.ship!
-    }.to change {
+    end.to change {
       subject.class.find(subject.id)[subject.class.workflow_column]
     }.from('accepted').to('shipped')
   end
@@ -19,42 +20,41 @@ RSpec.shared_examples "Basic Database Operations" do
     expect(subject).to be_shipped
   end
 
-  it "should have the expected workflow column" do
+  it 'should have the expected workflow column' do
     expect(subject.class.workflow_column).to eq(expected_workflow_column)
   end
 
-  let(:workflow_state_names) {
-    subject.class.workflow_spec.states.map(&:name).map{|n| n.to_s}.to_set
-  }
+  let(:workflow_state_names) do
+    subject.class.workflow_spec.states.map(&:name).map(&:to_s).to_set
+  end
 
   it 'can access workflow specification' do
     expect(subject.class.workflow_spec.states.length).to eq 3
-    expect(workflow_state_names).to eq(Set.new ['submitted', 'accepted', 'shipped'])
+    expect(workflow_state_names).to eq(Set.new(%w(submitted accepted shipped)))
   end
 
-  it "can access current state" do
+  it 'can access current state' do
     expect(subject).to be_accepted
     expect(subject.current_state.events.length).to eq 1
   end
 
-  describe "When the initial state is not specified" do
-    let(:order) {subject.class.create(title: 'new object')}
-    it "Automatically sets the initial state." do
+  describe 'When the initial state is not specified' do
+    let(:order) { subject.class.create(title: 'new object') }
+    it 'Automatically sets the initial state.' do
       expect(order).to have_persisted_state(:submitted)
     end
   end
 
-  it "Raises an exception for invalid state transition requested" do
+  it 'Raises an exception for invalid state transition requested' do
     expect(subject).to be_accepted
-    expect {
+    expect do
       subject.accept!
-    }.to raise_error(Workflow::NoTransitionAllowed, "There is no event accept defined for the accepted state")
+    end.to raise_error(Workflow::NoTransitionAllowed, 'There is no event accept defined for the accepted state')
   end
-
 end
 
 RSpec.describe Workflow do
-  it "has a version number" do
+  it 'has a version number' do
     expect(Workflow::VERSION).not_to be nil
   end
 
@@ -62,7 +62,7 @@ RSpec.describe Workflow do
     include Workflow
     workflow do
       state :submitted do
-        on :accept, to: :accepted, :meta => {:weight => 8}
+        on :accept, to: :accepted, meta: { weight: 8 }
       end
       state :accepted do
         on :ship, to: :shipped
@@ -78,7 +78,7 @@ RSpec.describe Workflow do
 
     workflow do
       state :submitted do
-        on :accept, to: :accepted, :meta => {:weight => 8}
+        on :accept, to: :accepted, meta: { weight: 8 }
       end
       state :accepted do
         on :ship, to: :shipped
@@ -90,14 +90,14 @@ RSpec.describe Workflow do
   before do
     ActiveRecord::Schema.define do
       create_table :orders do |t|
-        t.string :title, :null => false
+        t.string :title, null: false
         t.string :workflow_state
       end
     end
 
     ActiveRecord::Schema.define do
       create_table :legacy_orders do |t|
-        t.string :title, :null => false
+        t.string :title, null: false
         t.string :foo_bar
       end
     end
@@ -106,32 +106,32 @@ RSpec.describe Workflow do
 
     ActiveRecord::Schema.define do
       create_table :images do |t|
-        t.string :title, :null => false
+        t.string :title, null: false
         t.string :state
         t.string :type
       end
     end
   end
 
-  describe "Model with standard workflow_state column" do
-    subject {Order.create title: 'some order', workflow_state: 'accepted'}
-    let(:expected_workflow_column) {:workflow_state}
-    it_has_the_behavior_of "Basic Database Operations"
-
+  describe 'Model with standard workflow_state column' do
+    subject { Order.create title: 'some order', workflow_state: 'accepted' }
+    let(:expected_workflow_column) { :workflow_state }
+    it_has_the_behavior_of 'Basic Database Operations'
   end
 
-  describe "Model with custom workflow column" do
-    subject {LegacyOrder.create title: 'some order', foo_bar: 'accepted'}
-    let(:expected_workflow_column) {:foo_bar}
-    it_has_the_behavior_of "Basic Database Operations"
+  describe 'Model with custom workflow column' do
+    subject { LegacyOrder.create title: 'some order', foo_bar: 'accepted' }
+    let(:expected_workflow_column) { :foo_bar }
+    it_has_the_behavior_of 'Basic Database Operations'
   end
 
-  describe "Some Callbacks" do
+  describe 'Some Callbacks' do
     subject do
       klass = Class.new
       klass.class_eval do
         include Workflow
         def before_transition1; end
+
         def after_transition2; end
 
         before_transition :before_transition1
@@ -147,14 +147,14 @@ RSpec.describe Workflow do
       klass.new
     end
 
-    it "calls the callbacks" do
+    it 'calls the callbacks' do
       expect(subject).to receive(:before_transition1)
       expect(subject).to receive(:after_transition2)
       subject.age!
     end
   end
 
-  def new_workflow_class(sup_class=Object, &block)
+  def new_workflow_class(sup_class = Object, &block)
     c = Class.new(sup_class)
     c.class_eval do
       include Workflow
@@ -163,38 +163,38 @@ RSpec.describe Workflow do
     c
   end
 
-  describe "Event Meta Info" do
-    subject {
+  describe 'Event Meta Info' do
+    subject do
       new_workflow_class do
-        state :main, :meta => {:importance => 8}
-        state :supplemental, :meta => {:importance => 1}
+        state :main, meta: { importance: 8 }
+        state :supplemental, meta: { importance: 1 }
       end
-    }
-    let(:state_importance) {subject.workflow_spec.find_state(:supplemental).meta[:importance]}
-    it "should be able to read the meta" do
+    end
+    let(:state_importance) { subject.workflow_spec.find_state(:supplemental).meta[:importance] }
+    it 'should be able to read the meta' do
       expect(state_importance).to eq 1
     end
   end
 
-  describe "Initial State" do
-    subject {
+  describe 'Initial State' do
+    subject do
       new_workflow_class do
         state :one; state :two
       end.new
-    }
-    it {is_expected.to be_one}
+    end
+    it { is_expected.to be_one }
   end
 
-  describe "When initial state stored as nil" do
+  describe 'When initial state stored as nil' do
     before do
       exec "INSERT INTO orders(title, workflow_state) VALUES('nil state', NULL)"
     end
-    subject {Order.find_by title: 'nil state'}
-    it {is_expected.to be_submitted}
-    it {is_expected.not_to be_shipped}
+    subject { Order.find_by title: 'nil state' }
+    it { is_expected.to be_submitted }
+    it { is_expected.not_to be_shipped }
   end
 
-  it "implicit transition callback" do
+  it 'implicit transition callback' do
     klass = new_workflow_class do
       state :one do
         on :my_transition, to: :two
@@ -209,10 +209,9 @@ RSpec.describe Workflow do
     subj = klass.new
     expect(subj).to receive(:my_transition)
     subj.my_transition!
-
   end
 
-  describe "Non-public transition callbacks are allowed" do
+  describe 'Non-public transition callbacks are allowed' do
     let(:base_class) do
       new_workflow_class do
         state :new do
@@ -222,84 +221,85 @@ RSpec.describe Workflow do
       end
     end
 
-    describe "When callback is public" do
-      subject {
+    describe 'When callback is public' do
+      subject do
         base_class.class_eval do
           def assign
           end
         end
         base_class.new
-      }
-      it "works" do
+      end
+      it 'works' do
         expect(subject).to receive(:assign)
         subject.assign!
       end
     end
 
-    describe "When callback is protected" do
-      subject {
+    describe 'When callback is protected' do
+      subject do
         base_class.class_eval do
           protected
+
           def assign
           end
         end
         base_class.new
-      }
-      it "works" do
+      end
+      it 'works' do
         expect(subject).to receive(:assign)
         subject.assign!
       end
     end
 
-    describe "When callback is private" do
-      subject {
+    describe 'When callback is private' do
+      subject do
         base_class.class_eval do
           private
+
           def assign
           end
         end
         base_class.new
-      }
-      it "works" do
+      end
+      it 'works' do
         expect(subject).to receive(:assign)
         subject.assign!
       end
     end
-
   end
 
-  describe "Single Table Inheritance" do
-    let(:base_class) {Class.new(Order)}
-    subject {base_class.new}
-    it {is_expected.to be_submitted}
-    it {is_expected.not_to be_accepted}
+  describe 'Single Table Inheritance' do
+    let(:base_class) { Class.new(Order) }
+    subject { base_class.new }
+    it { is_expected.to be_submitted }
+    it { is_expected.not_to be_accepted }
 
-    describe "When parent has changed workflow_state column" do
-      let(:subclass) {Class.new(LegacyOrder)}
-      let(:sub_subclass) {Class.new(subclass)}
-      it "should have the same workflow column" do
+    describe 'When parent has changed workflow_state column' do
+      let(:subclass) { Class.new(LegacyOrder) }
+      let(:sub_subclass) { Class.new(subclass) }
+      it 'should have the same workflow column' do
         expect(subclass.workflow_column).to eq(LegacyOrder.workflow_column)
         expect(sub_subclass.workflow_column).to eq(LegacyOrder.workflow_column)
       end
 
-      subject {sub_subclass.new}
-      it {is_expected.to be_submitted}
+      subject { sub_subclass.new }
+      it { is_expected.to be_submitted }
     end
   end
 
-  describe "When workflow is overridden in subclass" do
-    let(:subclass) {
+  describe 'When workflow is overridden in subclass' do
+    let(:subclass) do
       new_workflow_class(Order) do
         state :start_big
       end
-    }
-    subject {subclass.new}
+    end
+    subject { subclass.new }
 
-    it {is_expected.to be_start_big}
+    it { is_expected.to be_start_big }
   end
 
-  describe "#halt" do
-    subject {
+  describe '#halt' do
+    subject do
       klass = new_workflow_class do
         state :young do
           on :age, to: :old
@@ -308,33 +308,34 @@ RSpec.describe Workflow do
         state :old
       end
       klass.class_eval do
-        def age(by=1)
+        def age(by = 1)
           halt 'too fast' if by > 100
         end
+
         def reject(reason)
           halt! 'We do not reject articles unless the reason is important' \
             unless reason =~ /important/i
-          self.too_far = "This line should not be executed"
+          self.too_far = 'This line should not be executed'
         end
       end
       klass.new
-    }
+    end
 
-    it "stops the transition" do
+    it 'stops the transition' do
       expect(subject).to be_young
       subject.age! 120
       expect(subject).to be_young
       expect(subject.halted_because).to eq('too fast')
     end
 
-    describe "#halt!" do
-      it "raises an exception" do
-        expect {subject.reject!('it is stupid')}.to raise_error(Workflow::TransitionHaltedError)
+    describe '#halt!' do
+      it 'raises an exception' do
+        expect { subject.reject!('it is stupid') }.to raise_error(Workflow::TransitionHaltedError)
       end
     end
   end
 
-  describe "#can_fire_event? methods" do
+  describe '#can_fire_event? methods' do
     subject do
       new_workflow_class do
         state :newborn do
@@ -348,22 +349,22 @@ RSpec.describe Workflow do
       end.new
     end
 
-    it "should be able to do the events from current state" do
+    it 'should be able to do the events from current state' do
       expect(subject).to be_newborn
       expect(subject.can_go_to_school?).to be_truthy
     end
-    it "should not be able to do the events from other states" do
+    it 'should not be able to do the events from other states' do
       expect(subject).not_to be_schoolboy
       expect(subject.can_go_to_college?).to be_falsey
     end
 
-    describe "With conditions" do
+    describe 'With conditions' do
       subject do
         klass = new_workflow_class do
           state :off do
             on :turn_on do
               to :on, if: :sufficient_battery_level?
-              to :low_battery, if: -> (obj) {obj.battery > 0}
+              to :low_battery, if: -> (obj) { obj.battery > 0 }
             end
           end
           state :on
@@ -379,28 +380,27 @@ RSpec.describe Workflow do
         klass.new
       end
 
-      describe "when the condition is not met" do
-        it "should not be able to transition" do
+      describe 'when the condition is not met' do
+        it 'should not be able to transition' do
           subject.battery = 0
           expect(subject.can_turn_on?).to be_falsey
         end
       end
-      describe "when the condition is met" do
-        it "will turn on when battery is sufficient" do
+      describe 'when the condition is met' do
+        it 'will turn on when battery is sufficient' do
           subject.battery = 50
           expect(subject.can_turn_on?).to be_truthy
           subject.turn_on!
           expect(subject).to be_on
         end
 
-        it "will power on to low battery if the battery is low but not zero" do
+        it 'will power on to low battery if the battery is low but not zero' do
           subject.battery = 5
           expect(subject.can_turn_on?).to be_truthy
           subject.turn_on!
           expect(subject).to be_low_battery
         end
       end
-
     end
   end
 end

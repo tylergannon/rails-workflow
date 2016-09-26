@@ -1,17 +1,16 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe "Workflow Class Inheritance" do
+RSpec.describe 'Workflow Class Inheritance' do
   class Animal
     include Workflow
 
     workflow do
-
       state :conceived do
         on :birth, to: :born
       end
 
       state :born do
-
       end
     end
   end
@@ -19,54 +18,52 @@ RSpec.describe "Workflow Class Inheritance" do
   class Cat < Animal
     prepend Workflow
     workflow do
-
       state :upset do
         on :scratch, to: :hiding
       end
 
       state :hiding do
-
       end
     end
   end
 
-  let(:states) {subject.class.workflow_spec.states.map(&:name)}
+  let(:states) { subject.class.workflow_spec.states.map(&:name) }
 
   describe Animal do
-    it "should have these states state" do
+    it 'should have these states state' do
       expect(states).to include(:born)
       expect(states).to include(:conceived)
     end
 
-    it "should have a birth event" do
-      expect {
+    it 'should have a birth event' do
+      expect do
         subject.birth!
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
-    it "should have the following event processing methods" do
-      expect(bang_methods(subject)).to eq(Set.new [:birth!, :halt!, :transition!])
+    it 'should have the following event processing methods' do
+      expect(bang_methods(subject)).to eq(Set.new([:birth!, :halt!, :transition!]))
     end
   end
 
   describe Cat do
-    it "should not have the Animal states" do
+    it 'should not have the Animal states' do
       expect(states).not_to include(:born)
       expect(states).not_to include(:conceived)
     end
 
-    it "should have cat states" do
+    it 'should have cat states' do
       expect(states).to include(:hiding)
       expect(states).to include(:upset)
     end
-    it "should have the following event processing methods" do
-      expect(bang_methods(subject)).to eq(Set.new [:halt!, :transition!, :scratch!])
+    it 'should have the following event processing methods' do
+      expect(bang_methods(subject)).to eq(Set.new([:halt!, :transition!, :scratch!]))
     end
 
-    it "should not have a birth! method like Animal does" do
-      expect {
+    it 'should not have a birth! method like Animal does' do
+      expect do
         subject.birth!
-      }.to raise_error(NoMethodError)
+      end.to raise_error(NoMethodError)
     end
   end
 

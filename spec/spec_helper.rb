@@ -1,5 +1,5 @@
-$LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-require "workflow"
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'workflow'
 require 'active_record'
 require 'sqlite3'
 require 'workflow'
@@ -21,8 +21,8 @@ RSpec.configure do |config|
   # Capybara::Screenshot.autosave_on_failure = false
   config.run_all_when_everything_filtered = true
   config.shared_context_metadata_behavior = :apply_to_host_groups
-  config.include_context "ActiveRecord Setup"
-  config.include_context "Shared Helpers"
+  config.include_context 'ActiveRecord Setup'
+  config.include_context 'Shared Helpers'
 
   config.alias_it_should_behave_like_to :it_has_the_behavior_of, 'has the behavior:'
 

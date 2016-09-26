@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Workflow
   class Configuration
     attr_accessor :persist_workflow_state_immediately, :touch_on_update_column

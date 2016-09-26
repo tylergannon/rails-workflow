@@ -14,15 +14,15 @@ RSpec::Matchers.define :have_persisted_state do |state|
   end
 end
 
-RSpec.shared_context "ActiveRecord Setup", :shared_context => :metadata do
+RSpec.shared_context 'ActiveRecord Setup', shared_context: :metadata do
   def exec(sql)
     ActiveRecord::Base.connection.execute sql
   end
 
   before do
     ActiveRecord::Base.establish_connection(
-      :adapter => "sqlite3",
-      :database  => ":memory:" #"tmp/test"
+      adapter: 'sqlite3',
+      database: ':memory:' # "tmp/test"
     )
 
     # eliminate ActiveRecord warning. TODO: delete as soon as ActiveRecord is fixed
@@ -32,5 +32,4 @@ RSpec.shared_context "ActiveRecord Setup", :shared_context => :metadata do
   after do
     ActiveRecord::Base.connection.disconnect!
   end
-
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Workflow
   module Callbacks
     #
@@ -10,16 +11,14 @@ module Workflow
       include Comparable
 
       attr_reader :expression, :callback
-      def initialize(expression, inverted=false)
+      def initialize(expression, inverted = false)
         @expression = expression
-        @callback     = make_lambda(expression)
-        if inverted
-          @callback = invert_lambda(@callback)
-        end
+        @callback = make_lambda(expression)
+        @callback = invert_lambda(@callback) if inverted
       end
 
       def call(target)
-        callback.call(target, ->{})
+        callback.call(target, -> {})
       end
 
       def self.build_inverse(expression)
@@ -29,7 +28,7 @@ module Workflow
       private
 
       def invert_lambda(l)
-        lambda { |*args, &blk| !l.call(*args, &blk) }
+        ->(*args, &blk) { !l.call(*args, &blk) }
       end
 
       # Filters support:
@@ -44,31 +43,31 @@ module Workflow
       def make_lambda(filter)
         case filter
         when Symbol
-          lambda { |target, _, &blk| target.send filter, &blk }
+          ->(target, _, &blk) { target.send filter, &blk }
         when String
           l = eval "lambda { |value| #{filter} }"
-          lambda { |target, value| target.instance_exec(value, &l) }
+          ->(target, value) { target.instance_exec(value, &l) }
         # when Conditionals::Value then filter
         when ::Proc
           if filter.arity > 1
-            return lambda { |target, _, &block|
+            return lambda do |target, _, &block|
               raise ArgumentError unless block
               target.instance_exec(target, block, &filter)
-            }
+            end
           end
 
           if filter.arity <= 0
-            lambda { |target, _| target.instance_exec(&filter) }
+            ->(target, _) { target.instance_exec(&filter) }
           else
-            lambda { |target, _| target.instance_exec(target, &filter) }
+            ->(target, _) { target.instance_exec(target, &filter) }
           end
         else
           scopes = Array(chain_config[:scope])
-          method_to_call = scopes.map{ |s| public_send(s) }.join("_")
+          method_to_call = scopes.map { |s| public_send(s) }.join('_')
 
-          lambda { |target, _, &blk|
+          lambda do |target, _, &blk|
             filter.public_send method_to_call, target, &blk
-          }
+          end
         end
       end
 

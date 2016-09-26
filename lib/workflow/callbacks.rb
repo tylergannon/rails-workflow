@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'workflow/callbacks/callback'
 require 'workflow/callbacks/transition_callback'
 require 'workflow/callbacks/transition_callbacks/method_wrapper'
@@ -5,11 +6,10 @@ require 'workflow/callbacks/transition_callbacks/proc_wrapper'
 
 module Workflow
   module Callbacks
-
     extend ActiveSupport::Concern
     include ActiveSupport::Callbacks
 
-    CALLBACK_MAP =   {
+    CALLBACK_MAP = {
       transition: :event,
       exit: :from,
       enter: :to
@@ -22,27 +22,27 @@ module Workflow
     included do
       CALLBACK_MAP.keys.each do |type|
         define_callbacks type,
-          skip_after_callbacks_if_terminated: true
+                         skip_after_callbacks_if_terminated: true
       end
     end
 
     module ClassMethods
-      def ensure_after_transitions(name=nil, **opts, &block)
-        _ensure_procs  = [name, block].compact.map do |exe|
+      def ensure_after_transitions(name = nil, **opts, &block)
+        _ensure_procs = [name, block].compact.map do |exe|
           Callback.new(exe)
         end
 
         prepend_around_transition **opts do |obj, callbacks|
           begin
-            callbacks.call()
+            callbacks.call
           ensure
-            _ensure_procs.each {|l| l.callback.call obj, ->{}}
+            _ensure_procs.each { |l| l.callback.call obj, -> {} }
           end
         end
       end
 
-      def on_error(error_class=Exception, **opts, &block)
-        _error_procs  = [opts.delete(:rescue)].compact.map do |exe|
+      def on_error(error_class = Exception, **opts, &block)
+        _error_procs = [opts.delete(:rescue)].compact.map do |exe|
           Callback.new(exe)
         end
 
@@ -50,15 +50,15 @@ module Workflow
           Callback.new(exe)
         end
 
-        prepend_around_transition **opts do |obj, callbacks|
+        prepend_around_transition **opts do |_obj, callbacks|
           begin
             callbacks.call
           rescue error_class => ex
-            self.instance_exec(ex, &block) if block_given?
+            instance_exec(ex, &block) if block_given?
             # block.call(ex) if block_given?
-            _error_procs.each {|l| l.callback.call self, ->{}}
+            _error_procs.each { |l| l.callback.call self, -> {} }
           ensure
-            _ensure_procs.each {|l| l.callback.call self, ->{}}
+            _ensure_procs.each { |l| l.callback.call self, -> {} }
           end
         end
       end
@@ -270,9 +270,9 @@ module Workflow
         end
       end
 
-      def applicable_callback?(callback, procedure)
+      def applicable_callback?(_callback, procedure)
         arity = procedure.arity
-        return true if arity < 0 || arity > 2
+        return true if arity.negative? || arity > 2
         if [:key, :keyreq, :keyrest].include? procedure.parameters[-1][0]
           return true
         else
@@ -281,6 +281,7 @@ module Workflow
       end
 
       private
+
       def _insert_callbacks(callbacks, context_attribute, block = nil)
         options = callbacks.extract_options!
         _normalize_callback_options(options, context_attribute)
@@ -298,15 +299,16 @@ module Workflow
       def _normalize_callback_option(options, context_attribute, from, to) # :nodoc:
         if from = options[from]
           _from = Array(from).map(&:to_sym).to_set
-          from = proc { |record|
+          from = proc do |record|
             _from.include? record.transition_context.send(context_attribute).to_sym
-          }
+          end
           options[to] = Array(options[to]).unshift(from)
         end
       end
     end
 
     private
+
     #  TODO: Do something here.
     def halted_callback_hook(filter)
       # byebug

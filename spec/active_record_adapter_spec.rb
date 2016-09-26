@@ -1,7 +1,8 @@
-require "spec_helper"
+# frozen_string_literal: true
+require 'spec_helper'
 
-RSpec.describe "Active Record Scopes", type: :active_record_examples do
-  include_context "ActiveRecord Setup"
+RSpec.describe 'Active Record Scopes', type: :active_record_examples do
+  include_context 'ActiveRecord Setup'
   class Article < ActiveRecord::Base
     include Workflow
 
@@ -27,62 +28,62 @@ RSpec.describe "Active Record Scopes", type: :active_record_examples do
     end
   end
 
-  describe "#load_workflow_state" do
-    it "should return nil if the database value is nil" do
+  describe '#load_workflow_state' do
+    it 'should return nil if the database value is nil' do
       a = Article.new(workflow_state: nil)
       expect(a.current_state).not_to be_nil
     end
   end
 
-  describe "#persist_workflow_state" do
-    describe "when the object has not been persisted" do
-      it "sets the attribute on the object" do
+  describe '#persist_workflow_state' do
+    describe 'when the object has not been persisted' do
+      it 'sets the attribute on the object' do
         a = Article.new
         a.accept!
         expect(a).to be_accepted
       end
     end
 
-    describe "#touch_on_update_column" do
-      subject {Article.create}
-      describe "When turned off" do
+    describe '#touch_on_update_column' do
+      subject { Article.create }
+      describe 'When turned off' do
         before do
           Workflow.config.touch_on_update_column = false
         end
-        it "should not update the update_at time" do
+        it 'should not update the update_at time' do
           expect(subject.updated_at).not_to be_nil
-          expect {
+          expect do
             subject.accept!
-          }.not_to change {
+          end.not_to change {
             Article.last.updated_at
           }
         end
       end
 
-      describe "When enabled" do
+      describe 'When enabled' do
         before do
           Workflow.config.touch_on_update_column = true
         end
         after do
           Workflow.config.touch_on_update_column = false
         end
-        it "should update the update_at time" do
+        it 'should update the update_at time' do
           expect(subject.updated_at).not_to be_nil
-          expect {
+          expect do
             subject.accept!
-          }.to change {
+          end.to change {
             Article.last.updated_at
           }
         end
       end
     end
 
-    describe "when the object has been persisted" do
-      describe "If configured to persist state immediately" do
+    describe 'when the object has been persisted' do
+      describe 'If configured to persist state immediately' do
         before do
           Workflow.config.persist_workflow_state_immediately = true
         end
-        it "should update the column" do
+        it 'should update the column' do
           a = Article.create
           expect(a).to be_new
           a.accept!
@@ -91,14 +92,14 @@ RSpec.describe "Active Record Scopes", type: :active_record_examples do
         end
       end
 
-      describe "If configured not to persist state immediately" do
+      describe 'If configured not to persist state immediately' do
         before do
           Workflow.config.persist_workflow_state_immediately = false
         end
         after do
           Workflow.config.persist_workflow_state_immediately = true
         end
-        it "should update the column" do
+        it 'should update the column' do
           a = Article.create
           expect(a).to be_new
           a.accept!
@@ -110,9 +111,9 @@ RSpec.describe "Active Record Scopes", type: :active_record_examples do
     end
   end
 
-  subject {Article}
-  it {is_expected.to respond_to(:with_new_state)}
-  it {is_expected.to respond_to(:with_accepted_state)}
-  it {is_expected.to respond_to(:without_new_state)}
-  it {is_expected.to respond_to(:without_accepted_state)}
+  subject { Article }
+  it { is_expected.to respond_to(:with_new_state) }
+  it { is_expected.to respond_to(:with_accepted_state) }
+  it { is_expected.to respond_to(:without_new_state) }
+  it { is_expected.to respond_to(:without_accepted_state) }
 end

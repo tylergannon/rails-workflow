@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe "Nested Callbacks" do
+RSpec.describe 'Nested Callbacks' do
   def define_all_callbacks
     workflow_class.class_eval do
       [:transition, :enter, :exit].each do |name|
@@ -11,7 +12,7 @@ RSpec.describe "Nested Callbacks" do
           end
         end
         method = "around_#{name}".to_sym
-        send method do |obj, proc|
+        send method do |_obj, proc|
           callbacks << method
           proc.call
         end
@@ -33,15 +34,17 @@ RSpec.describe "Nested Callbacks" do
     end
     klass.class_eval do
       attr_accessor :callbacks
-      def initialize; @callbacks = []; end
+      def initialize
+        @callbacks = []
+      end
     end
     klass
   end
-  subject {
+  subject do
     workflow_class.new
-  }
+  end
 
-  describe "Aborting callback sequence" do
+  describe 'Aborting callback sequence' do
     before do
       define_all_callbacks
       workflow_class.class_eval do
@@ -53,40 +56,40 @@ RSpec.describe "Nested Callbacks" do
       end
     end
 
-    describe "when making unaffected transitions" do
-      it "should still be able to progress" do
+    describe 'when making unaffected transitions' do
+      it 'should still be able to progress' do
         subject.start!
         expect(subject).to be_somewhere_else
       end
     end
 
-    describe "when trying to leave the :somewhere_else state" do
+    describe 'when trying to leave the :somewhere_else state' do
       before do
         subject.start!
         subject.callbacks.clear
         expect(subject).to be_somewhere_else
       end
-      it "should fail the transition" do
+      it 'should fail the transition' do
         subject.goto_final!
         expect(subject).to be_somewhere_else
       end
-      it "should not run the rest of the callbacks" do
+      it 'should not run the rest of the callbacks' do
         subject.goto_final!
         expect(subject.callbacks).to eq [:before_transition, :around_transition, :before_exit, :around_exit]
       end
     end
 
-    describe "Skip before_exit and fail another way" do
+    describe 'Skip before_exit and fail another way' do
       before do
         workflow_class.class_eval do
           def abort_callback
-            raise "Abort!  Does Not Compute!"
+            raise 'Abort!  Does Not Compute!'
           end
           skip_before_exit :abort_callback, only: :somewhere_else
-          before_exit :abort_callback, only: :somewhere_else, unless: "something.nil?"
+          before_exit :abort_callback, only: :somewhere_else, unless: 'something.nil?'
         end
       end
-      it "should succeed the transition" do
+      it 'should succeed the transition' do
         expect(subject).not_to receive(:abort_callback)
         subject.start!
         expect(subject.something).to be_nil
@@ -94,20 +97,20 @@ RSpec.describe "Nested Callbacks" do
         expect(subject).to be_final
       end
 
-      describe "If the new string condition is met" do
-        it "should fail the transition" do
+      describe 'If the new string condition is met' do
+        it 'should fail the transition' do
           subject.start!
-          subject.something = "anything"
-          expect {
+          subject.something = 'anything'
+          expect do
             subject.goto_final!
-          }.to raise_error(RuntimeError)
+          end.to raise_error(RuntimeError)
           expect(subject).to be_somewhere_else
         end
       end
     end
   end
 
-  describe "Callbacks on a given state exit" do
+  describe 'Callbacks on a given state exit' do
     before do
       workflow_class.class_eval do
         before_exit only: :initial do
@@ -116,18 +119,18 @@ RSpec.describe "Nested Callbacks" do
       end
     end
 
-    it "should call the callback when leaving by the :start! event" do
+    it 'should call the callback when leaving by the :start! event' do
       subject.start!
       expect(subject.callbacks).to eq([:initial])
     end
 
-    it "should call the callback when leaving by the :dope! event" do
+    it 'should call the callback when leaving by the :dope! event' do
       subject.dope!
       expect(subject.callbacks).to eq([:initial])
     end
   end
 
-  describe "Callbacks on a given state ENTRY" do
+  describe 'Callbacks on a given state ENTRY' do
     before do
       workflow_class.class_eval do
         before_enter only: :final do
@@ -136,20 +139,20 @@ RSpec.describe "Nested Callbacks" do
       end
     end
 
-    it "should call the callback once when entering the :final state" do
+    it 'should call the callback once when entering the :final state' do
       subject.dope!
       subject.start!
       expect(subject.callbacks).to eq([:final])
     end
 
-    it "should call the callback when leaving by the :dope! event" do
+    it 'should call the callback when leaving by the :dope! event' do
       subject.start!
       subject.start!
       expect(subject.callbacks).to eq([:final])
     end
   end
 
-  describe "Callbacks on a given event name" do
+  describe 'Callbacks on a given event name' do
     before do
       workflow_class.class_eval do
         before_transition only: :start do
@@ -161,8 +164,8 @@ RSpec.describe "Nested Callbacks" do
       end
     end
 
-    describe "When the start is called twice" do
-      it "should run the callback twice" do
+    describe 'When the start is called twice' do
+      it 'should run the callback twice' do
         subject.start!
         expect(subject).to be_somewhere_else
         subject.start!
@@ -171,8 +174,8 @@ RSpec.describe "Nested Callbacks" do
       end
     end
 
-    describe "when the start is only called once" do
-      it "should run the callback twice" do
+    describe 'when the start is only called once' do
+      it 'should run the callback twice' do
         subject.dope!
         expect(subject).to be_somewhere_else
         subject.start!
@@ -182,11 +185,11 @@ RSpec.describe "Nested Callbacks" do
     end
   end
 
-  describe "Callback Order" do
+  describe 'Callback Order' do
     before do
       define_all_callbacks
     end
-    it "should call the callbacks in a given order" do
+    it 'should call the callbacks in a given order' do
       a = workflow_class.new
       a.start!
       expect(a.callbacks).to eq [:before_transition, :around_transition, :before_exit, :around_exit, :before_enter, :around_enter, :after_enter, :after_exit, :after_transition]
