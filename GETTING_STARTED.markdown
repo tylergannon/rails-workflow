@@ -3,6 +3,7 @@ layout: default
 title: Getting Started
 categories: documentation
 permalink: /getting_started/
+show_in_header: true
 ---
 # Install
 

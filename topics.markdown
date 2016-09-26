@@ -3,6 +3,7 @@ layout: default
 title: Topics
 categories: documentation
 permalink: /topics/
+show_in_header: true
 ---
 
 # Documentation Topics

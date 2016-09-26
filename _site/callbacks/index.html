@@ -6,14 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Rails Workflow</title>
+  <title>Callbacks For State Transitions</title>
   <meta name="description" content="Rails Workflow began as a fork of the Workflow gem by Vladimir Dobriakov. It is a nearly total rewrite but maintains the same core architecture. It is releas...">
 
   
   
-  <link rel="stylesheet" href="https://tylergannon.github.io/rails-workflow/css/main.css">
-  <link rel="canonical" href="https://tylergannon.github.io/rails-workflow/callbacks/">
-  <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="https://tylergannon.github.io/rails-workflow/feed.xml">
+  <link rel="stylesheet" href="/rails-workflow/css/main.css">
+  <link rel="canonical" href="/rails-workflow/callbacks/">
+  <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="/rails-workflow/feed.xml">
   
   
 </head>
@@ -27,7 +27,7 @@
 
     
     
-    <a class="site-title" href="https://tylergannon.github.io/rails-workflow/">Rails Workflow</a>
+    <a class="site-title" href="/rails-workflow/">Rails Workflow</a>
 
     <nav class="site-nav">
       <a href="#" class="menu-icon">
@@ -45,25 +45,17 @@
           
         
           
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/api_docs">Api Docs</a>
+          <a class="page-link" href="/rails-workflow/api_docs">Api Docs</a>
           
         
           
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/blog.html">Blog</a>
-          
-        
-          
-        
+          <a class="page-link" href="/rails-workflow/blog.html">Blog</a>
           
         
           
         
           
-        
-          
-        
-          
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/getting_started/">Getting Started</a>
+          <a class="page-link" href="/rails-workflow/callbacks/">Callbacks For State Transitions</a>
           
         
           
@@ -71,7 +63,17 @@
           
         
           
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/topics/">Topics</a>
+        
+          
+          <a class="page-link" href="/rails-workflow/getting_started/">Getting Started</a>
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/rails-workflow/topics/">Topics</a>
           
         
       </div>
@@ -84,32 +86,21 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post">
+        <main>
+  <article class="post">
 
-  <header class="post-header">
-    <h1 class="post-title"></h1>
-  </header>
+    <header class="post-header">
+      <h1 class="post-title">Callbacks For State Transitions</h1>
+    </header>
 
-  <div class="post-content">
-    <ul class="section-nav">
-<li class="toc-entry toc-h1"><a href="#callback-registration">Callback Registration</a></li>
-<li class="toc-entry toc-h1"><a href="#available-callbacks">Available Callbacks</a></li>
-<li class="toc-entry toc-h1"><a href="#callback-conditions">Callback Conditions</a></li>
-<li class="toc-entry toc-h2"><a href="#selecting-transitions">Selecting Transitions</a></li>
-<li class="toc-entry toc-h3"><a href="#on-transition-callbacks">On Transition Callbacks</a></li>
-<li class="toc-entry toc-h3"><a href="#on-enter-callbacks">On Enter Callbacks</a></li>
-<li class="toc-entry toc-h3"><a href="#on-exit-callbacks">On Exit Callbacks</a></li>
-<li class="toc-entry toc-h1"><a href="#callback-arguments">Callback Arguments</a></li>
-<li class="toc-entry toc-h1"><a href="#around-callbacks">Around Callbacks</a></li>
-<li class="toc-entry toc-h1"><a href="#prepending-callbacks">Prepending Callbacks</a></li>
-<li class="toc-entry toc-h1"><a href="#skipping-callbacks">Skipping Callbacks</a></li>
-</ul><h1 id="callback-registration">
+    <div class="post-content">
+      <h1 id="callback-registration">
 <a id="callback-registration" class="anchor" href="#callback-registration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Callback Registration</h1>
 
 <p>The basic expression is the same as you expect for <a href="http://guides.rubyonrails.org/active_record_callbacks.html#callback-registration">ActiveRecord Callbacks</a>.</p>
 
 <div class="language-ruby highlighter-rouge">
-<pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="n">before_transition</span> <span class="ss">:set_requesting_user</span>
 
   <span class="n">workflow</span> <span class="k">do</span>
@@ -292,9 +283,25 @@ be skipped if registered using a method name.  The above trivial example could b
 solved a better way, but skipping callbacks is useful if a large class hierarchy
 all requires a particular callback, and a small number of classes do not use it.</p>
 
-  </div>
+    </div>
 
-</article>
+  </article>
+  <aside>
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#callback-registration">Callback Registration</a></li>
+<li class="toc-entry toc-h1"><a href="#available-callbacks">Available Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#callback-conditions">Callback Conditions</a></li>
+<li class="toc-entry toc-h2"><a href="#selecting-transitions">Selecting Transitions</a></li>
+<li class="toc-entry toc-h3"><a href="#on-transition-callbacks">On Transition Callbacks</a></li>
+<li class="toc-entry toc-h3"><a href="#on-enter-callbacks">On Enter Callbacks</a></li>
+<li class="toc-entry toc-h3"><a href="#on-exit-callbacks">On Exit Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#callback-arguments">Callback Arguments</a></li>
+<li class="toc-entry toc-h1"><a href="#around-callbacks">Around Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#prepending-callbacks">Prepending Callbacks</a></li>
+<li class="toc-entry toc-h1"><a href="#skipping-callbacks">Skipping Callbacks</a></li>
+</ul>
+  </aside>
+</main>
 
       </div>
     </main>

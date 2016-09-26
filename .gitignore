@@ -1,5 +1,6 @@
 nbproject
 html/
+.sass-cache
 *.swp
 *.gem
 *.rbc
@@ -22,3 +23,4 @@ tmp
 .byebug_history
 
 lib/active_support/callbacks.rb
+errors.html

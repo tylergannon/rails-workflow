@@ -11,9 +11,9 @@
 
   
   
-  <link rel="stylesheet" href="https://tylergannon.github.io/rails-workflow/css/main.css">
-  <link rel="canonical" href="https://tylergannon.github.io/rails-workflow/callback_arguments/">
-  <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="https://tylergannon.github.io/rails-workflow/feed.xml">
+  <link rel="stylesheet" href="/rails-workflow/css/main.css">
+  <link rel="canonical" href="/rails-workflow/callback_arguments/">
+  <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="/rails-workflow/feed.xml">
   
   
 </head>
@@ -27,7 +27,7 @@
 
     
     
-    <a class="site-title" href="https://tylergannon.github.io/rails-workflow/">Rails Workflow</a>
+    <a class="site-title" href="/rails-workflow/">Rails Workflow</a>
 
     <nav class="site-nav">
       <a href="#" class="menu-icon">
@@ -45,25 +45,17 @@
           
         
           
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/api_docs">Api Docs</a>
+          <a class="page-link" href="/rails-workflow/api_docs">Api Docs</a>
           
         
           
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/blog.html">Blog</a>
-          
-        
-          
-        
+          <a class="page-link" href="/rails-workflow/blog.html">Blog</a>
           
         
           
         
           
-        
-          
-        
-          
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/getting_started/">Getting Started</a>
+          <a class="page-link" href="/rails-workflow/callbacks/">Callbacks For State Transitions</a>
           
         
           
@@ -71,7 +63,17 @@
           
         
           
-          <a class="page-link" href="https://tylergannon.github.io/rails-workflow/topics/">Topics</a>
+        
+          
+          <a class="page-link" href="/rails-workflow/getting_started/">Getting Started</a>
+          
+        
+          
+        
+          
+        
+          
+          <a class="page-link" href="/rails-workflow/topics/">Topics</a>
           
         
       </div>
@@ -84,13 +86,100 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post">
+        <main>
+  <article class="post">
 
-  <header class="post-header">
-    <h1 class="post-title"></h1>
-  </header>
+    <header class="post-header">
+      <h1 class="post-title"></h1>
+    </header>
 
-  <div class="post-content">
+    <div class="post-content">
+      <h1 id="callback-arguments">Callback Arguments</h1>
+
+<p>You can pass any data in to your transition, and then only receive certain
+arguments in your callbacks.</p>
+
+<p>First, let’s assume you’ve passed a whole bunch of data to your transition event:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">article</span><span class="p">.</span><span class="nf">submit!</span> <span class="n">current_user</span><span class="p">,</span> <span class="n">request</span><span class="p">.</span><span class="nf">user_agent</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="ss">:time_zone</span><span class="p">],</span>
+  <span class="ss">article_params: </span><span class="n">article_params</span><span class="p">,</span>
+  <span class="ss">foo: :baz</span><span class="p">,</span>
+  <span class="ss">quux: :certainly</span>
+</code></pre>
+</div>
+
+<p>You can define a keyword argument on your callback to get just one or two of the
+arguments:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:get_quux</span>
+
+<span class="k">def</span> <span class="nf">get_quux</span><span class="p">(</span><span class="n">quux</span><span class="p">:,</span> <span class="n">foo</span><span class="p">:)</span>
+  <span class="nb">puts</span> <span class="n">quux</span>
+  <span class="c1"># =&gt; :certainly</span>
+  <span class="nb">puts</span> <span class="n">foo</span>
+  <span class="c1"># =&gt; :baz</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<p>Another example:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="ss">:get_quux</span>
+
+<span class="k">def</span> <span class="nf">get_quux</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">quux</span><span class="p">:,</span> <span class="n">foo</span><span class="p">:,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">)</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+<p>Here, the <code class="highlighter-rouge">args</code> array will contain everything but the user, and <code class="highlighter-rouge">attributes</code> will contain <code class="highlighter-rouge">:article_params</code>.</p>
+
+<h1 id="special-keywords-event-from-to">Special Keywords: event, from, to</h1>
+
+<p>Get the name of the event being fired, the state being exited, and/or the
+state being entered, by adding any or all of those parameter names to your callback.</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">my_callback</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">from</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">current_user</span><span class="p">:)</span>
+<span class="k">end</span>
+
+<span class="c1"># ...</span>
+<span class="n">my_obj</span><span class="p">.</span><span class="nf">submit!</span> <span class="ss">current_user: </span><span class="n">current_user</span>
+</code></pre>
+</div>
+
+<h1 id="block-style-definition">Block-Style Definition</h1>
+
+<p>To make use of this functionality on block style callbacks:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">current_user</span><span class="ss">:|</span>
+  <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="n">current_user</span><span class="p">.</span><span class="nf">name</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">around_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">object</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">,</span> <span class="n">current_user</span><span class="ss">:|</span>
+  <span class="n">logger</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="n">current_user</span><span class="p">.</span><span class="nf">name</span><span class="p">)</span>
+  <span class="n">callbacks</span><span class="p">.</span><span class="nf">call</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h3 id="caveat-using-normal-arguments-on-a-block">Caveat: Using normal arguments on a block</h3>
+
+<p>Due to implementation particulars, if you’re going to use normal arguments on
+a before or after callback block, you must also receive a copy of the object
+as the first argument to your block:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">before_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">object</span><span class="p">,</span> <span class="n">current_user</span><span class="o">|</span>
+  <span class="n">object</span> <span class="o">==</span> <span class="nb">self</span> <span class="c1">#  This will be true</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span>
+
+<span class="n">my_object</span><span class="p">.</span><span class="nf">submit!</span> <span class="n">current_user</span>
+</code></pre>
+</div>
+
+    </div>
+
+  </article>
+  <aside>
     <h1 id="callback-arguments">Callback Arguments</h1>
 
 <p>You can pass any data in to your transition, and then only receive certain
@@ -173,9 +262,8 @@ as the first argument to your block:</p>
 </code></pre>
 </div>
 
-  </div>
-
-</article>
+  </aside>
+</main>
 
       </div>
     </main>

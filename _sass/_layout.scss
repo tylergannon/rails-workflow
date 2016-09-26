@@ -1,0 +1,11 @@
+
+main {
+  @include outer-container;
+
+  article {
+    @include span-columns(10);
+  }
+  aside {
+    @include span-columns(2)
+  }
+}

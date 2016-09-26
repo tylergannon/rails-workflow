@@ -1,5 +1,6 @@
 ---
 layout: page
+title: Callbacks For State Transitions
 permalink: /callbacks/
 toc: true
 ---
@@ -9,7 +10,7 @@ toc: true
 The basic expression is the same as you expect for [ActiveRecord Callbacks](http://guides.rubyonrails.org/active_record_callbacks.html#callback-registration).
 
 ```ruby
-class Arcticle < ApplicationRecord
+class Article < ApplicationRecord
   before_transition :set_requesting_user
 
   workflow do
