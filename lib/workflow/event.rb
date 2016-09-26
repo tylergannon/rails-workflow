@@ -117,8 +117,8 @@ module Workflow
       private
 
       def conditions_lambdas
-        @if.map { |c| Callbacks::Callback.new c } +
-          @unless.map { |c| Callbacks::Callback.new c, true }
+        @if.map { |c| Callbacks::Callback.build c } +
+          @unless.map { |c| Callbacks::Callback.inverted c }
       end
     end
   end

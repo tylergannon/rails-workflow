@@ -21,8 +21,19 @@ module Workflow
         callback.call(target, -> {})
       end
 
-      def self.build_inverse(expression)
-        new expression, true
+      def self.inverted(expression)
+        build(expression, true)
+      end
+
+      def self.build(expression, inverted = false)
+        case expression
+        when Symbol
+          MethodCallback.new(expression, inverted)
+        when String
+          StringCallback.new(expression, inverted)
+        when Proc
+          ProcCallback.new(expression, inverted)
+        end
       end
 
       private
@@ -41,34 +52,6 @@ module Workflow
       # All of these objects are converted into a lambda and handled
       # the same after this point.
       def make_lambda(filter)
-        case filter
-        when Symbol
-          ->(target, _, &blk) { target.send filter, &blk }
-        when String
-          l = eval "lambda { |value| #{filter} }"
-          ->(target, value) { target.instance_exec(value, &l) }
-        # when Conditionals::Value then filter
-        when ::Proc
-          if filter.arity > 1
-            return lambda do |target, _, &block|
-              raise ArgumentError unless block
-              target.instance_exec(target, block, &filter)
-            end
-          end
-
-          if filter.arity <= 0
-            ->(target, _) { target.instance_exec(&filter) }
-          else
-            ->(target, _) { target.instance_exec(target, &filter) }
-          end
-        else
-          scopes = Array(chain_config[:scope])
-          method_to_call = scopes.map { |s| public_send(s) }.join('_')
-
-          lambda do |target, _, &blk|
-            filter.public_send method_to_call, target, &blk
-          end
-        end
       end
 
       def compute_identifier(filter)
@@ -82,3 +65,7 @@ module Workflow
     end
   end
 end
+
+require 'workflow/callbacks/proc_callback'
+require 'workflow/callbacks/string_callback'
+require 'workflow/callbacks/method_callback'

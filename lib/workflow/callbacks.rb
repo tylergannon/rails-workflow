@@ -25,7 +25,7 @@ module Workflow
     module ClassMethods
       def ensure_after_transitions(name = nil, **opts, &block)
         ensure_procs = [name, block].compact.map do |exe|
-          Callback.new(exe)
+          Callback.build(exe)
         end
 
         prepend_around_transition(**opts) do |obj, callbacks|
@@ -61,7 +61,7 @@ module Workflow
 
       private def build_lambdas(*names)
         [names].flatten.compact.map do |name|
-          Callback.new name
+          Callback.build name
         end
       end
 
