@@ -15,7 +15,7 @@ RSpec.describe Workflow::Callbacks::TransitionCallback do
   end
   describe 'Method-Type Callback' do
     subject do
-      described_class.build_wrapper(:before, :zero_arity, workflow_class)
+      described_class.build(:before, :zero_arity, workflow_class)
     end
     describe 'When the method has zero-arity' do
       describe 'when the method has already been defined when the callback is defined' do

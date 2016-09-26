@@ -5,8 +5,7 @@ module Workflow
       private
 
       def make_lambda(filter)
-        l = eval "lambda { |value| #{filter} }"
-        ->(target, value) { target.instance_exec(value, &l) }
+        ->(target, _value) { target.instance_eval(filter) }
       end
     end
   end

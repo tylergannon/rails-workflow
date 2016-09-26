@@ -10,7 +10,7 @@ module ActiveSupport
 
     def make_lambda(filter)
       if filter.is_a? Workflow::Callbacks::TransitionCallback
-        super(filter.wrapper)
+        filter
       else
         super
       end

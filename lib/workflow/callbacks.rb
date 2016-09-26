@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 require 'workflow/callbacks/callback'
 require 'workflow/callbacks/transition_callback'
-require 'workflow/callbacks/transition_callbacks/method_wrapper'
-require 'workflow/callbacks/transition_callbacks/proc_wrapper'
+require 'workflow/callbacks/transition_callbacks/method_caller'
+require 'workflow/callbacks/transition_callbacks/proc_caller'
 
 module Workflow
   module Callbacks
@@ -273,7 +273,7 @@ module Workflow
       end
 
       private def cb(callback, name, target)
-        Callbacks::TransitionCallback.build_wrapper(callback, name, target)
+        Callbacks::TransitionCallback.build(callback, name, target)
       end
 
       def applicable_callback?(_callback, procedure)
