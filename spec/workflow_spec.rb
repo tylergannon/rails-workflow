@@ -235,7 +235,6 @@ RSpec.describe Workflow do
         subject.assign!
       end
     end
-
   end
 
   describe 'Single Table Inheritance' do

@@ -3,7 +3,7 @@ require 'active_support/concern'
 require 'English'
 
 module Workflow
-  module Adapter
+  module Adapters
     module ActiveRecordValidations
       extend ActiveSupport::Concern
 
