@@ -1,8 +1,10 @@
+# frozen_string_literal: true
 module Workflow
   module Transitions
     extend ActiveSupport::Concern
 
     # @api private
+    # @!attribute [r] transition_context
     # @return [Workflow::TransitionContext] During transition, or nil if no transition is underway.
     # During a state transition, contains transition-specific information:
     # * The name of the {Workflow::State} being exited,
@@ -79,7 +81,6 @@ module Workflow
     # @return [String] The reason the transition was aborted.
     attr_reader :halted_because
 
-
     # load_workflow_state and persist_workflow_state
     # can be overriden to handle the persistence of the workflow state.
     #
@@ -94,6 +95,5 @@ module Workflow
     def persist_workflow_state(new_value)
       @workflow_state = new_value
     end
-
   end
 end

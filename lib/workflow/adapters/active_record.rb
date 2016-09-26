@@ -49,38 +49,36 @@ module Workflow
       # `where.not(:state_column_name => 'pending')` to AR query and returns
       # ActiveRecord::Relation.
       module ClassMethods
-        def self.extended(object)
-          class << object
-            alias_method :workflow_without_scopes, :workflow unless method_defined?(:workflow_without_scopes)
-            alias_method :workflow, :workflow_with_scopes
-          end
-        end
-
         # Instructs Workflow which column to use to persist workflow state.
         #
         # @param [Symbol] column_name If provided, will set a new workflow column name.
         # @return [Symbol] The current (or new) name for the workflow column on this class.
         def workflow_column(column_name = nil)
-          @workflow_state_column_name = column_name.to_sym if column_name
-          if !instance_variable_defined?('@workflow_state_column_name') && superclass.respond_to?(:workflow_column)
-            @workflow_state_column_name = superclass.workflow_column
-          end
-          @workflow_state_column_name ||= :workflow_state
+          @workflow_column = column_name.to_sym if column_name
+          @workflow_column ||= superclass_workflow || :workflow_state
         end
 
-        def workflow_with_scopes(&specification)
-          workflow_without_scopes(&specification)
-          states = workflow_spec.states
+        def workflow(&specification)
+          super
+          workflow_spec.states.each { |state| define_scopes(state) }
+        end
 
-          states.map(&:name).each do |state|
-            define_singleton_method("with_#{state}_state") do
-              where(workflow_column.to_sym => state.to_s)
-            end
+        private
 
-            define_singleton_method("without_#{state}_state") do
-              where.not(workflow_column.to_sym => state.to_s)
-            end
-          end
+        def superclass_workflow
+          superclass.workflow_column if superclass.respond_to?(:workflow_column)
+        end
+
+        def define_scopes(state)
+          state_name = state.name
+
+          scope "with_#{state_name}_state", lambda {
+            where(workflow_column => state_name)
+          }
+
+          scope "without_#{state_name}_state", lambda {
+            where.not(workflow_column => state_name)
+          }
         end
       end
     end

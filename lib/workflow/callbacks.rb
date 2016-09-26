@@ -15,10 +15,6 @@ module Workflow
       enter: :to
     }.freeze
 
-    # @!attribute [r] transition_context
-    #   During state transition events, contains a {TransitionContext} representing the transition underway.
-    #   @return [TransitionContext] representation of current state transition
-    #
     included do
       CALLBACK_MAP.keys.each do |type|
         define_callbacks type,
@@ -28,38 +24,44 @@ module Workflow
 
     module ClassMethods
       def ensure_after_transitions(name = nil, **opts, &block)
-        _ensure_procs = [name, block].compact.map do |exe|
+        ensure_procs = [name, block].compact.map do |exe|
           Callback.new(exe)
         end
 
-        prepend_around_transition **opts do |obj, callbacks|
+        prepend_around_transition(**opts) do |obj, callbacks|
           begin
             callbacks.call
           ensure
-            _ensure_procs.each { |l| l.callback.call obj, -> {} }
+            ensure_procs.each { |l| l.callback.call obj, -> {} }
           end
         end
       end
 
+      EMPTY_LAMBDA = -> {}
+
       def on_error(error_class = Exception, **opts, &block)
-        _error_procs = [opts.delete(:rescue)].compact.map do |exe|
-          Callback.new(exe)
-        end
+        error_procs  = build_lambdas([opts.delete(:rescue), block])
+        ensure_procs = build_lambdas(opts.delete(:ensure))
 
-        _ensure_procs = [opts.delete(:ensure)].compact.map do |exe|
-          Callback.new(exe)
-        end
+        prepend_around_transition(**opts, &on_error_proc(error_class, error_procs, ensure_procs))
+      end
 
-        prepend_around_transition **opts do |_obj, callbacks|
+      private def on_error_proc(error_class, error_procs, ensure_procs)
+        proc do |_obj, callbacks|
           begin
             callbacks.call
           rescue error_class => ex
             instance_exec(ex, &block) if block_given?
-            # block.call(ex) if block_given?
-            _error_procs.each { |l| l.callback.call self, -> {} }
+            error_procs.each { |l| l.callback.call self, EMPTY_LAMBDA }
           ensure
-            _ensure_procs.each { |l| l.callback.call self, -> {} }
+            ensure_procs.each { |l| l.callback.call self, EMPTY_LAMBDA }
           end
+        end
+      end
+
+      private def build_lambdas(*names)
+        [names].flatten.compact.map do |name|
+          Callback.new name
         end
       end
 
@@ -247,13 +249,13 @@ module Workflow
         CALLBACK_MAP.each do |type, context_attribute|
           define_method "#{callback}_#{type}" do |*names, &blk|
             _insert_callbacks(names, context_attribute, blk) do |name, options|
-              set_callback(type, callback, Callbacks::TransitionCallback.build_wrapper(callback, name, self), options)
+              set_callback(type, callback, cb(callback, name, self), options)
             end
           end
 
           define_method "prepend_#{callback}_#{type}" do |*names, &blk|
             _insert_callbacks(names, context_attribute, blk) do |name, options|
-              set_callback(type, callback, Callbacks::TransitionCallback.build_wrapper(callback, name, self), options.merge(prepend: true))
+              set_callback(type, callback, cb(callback, name, self), options.merge(prepend: true))
             end
           end
 
@@ -270,14 +272,15 @@ module Workflow
         end
       end
 
+      private def cb(callback, name, target)
+        Callbacks::TransitionCallback.build_wrapper(callback, name, target)
+      end
+
       def applicable_callback?(_callback, procedure)
         arity = procedure.arity
         return true if arity.negative? || arity > 2
-        if [:key, :keyreq, :keyrest].include? procedure.parameters[-1][0]
-          return true
-        else
-          return false
-        end
+
+        [:key, :keyreq, :keyrest].include?(procedure.parameters[-1][0])
       end
 
       private
@@ -297,13 +300,13 @@ module Workflow
       end
 
       def _normalize_callback_option(options, context_attribute, from, to) # :nodoc:
-        if from = options[from]
-          _from = Array(from).map(&:to_sym).to_set
-          from = proc do |record|
-            _from.include? record.transition_context.send(context_attribute).to_sym
-          end
-          options[to] = Array(options[to]).unshift(from)
+        return unless options[from]
+
+        all_names = Array(options[from]).map(&:to_sym).to_set
+        from = proc do |record|
+          all_names.include? record.transition_context.send(context_attribute).to_sym
         end
+        options[to] = Array(options[to]).unshift(from)
       end
     end
 
