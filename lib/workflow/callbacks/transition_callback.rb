@@ -115,7 +115,7 @@ module Workflow
           end.map(&:last)
         end
 
-        # Parameter definition for the object.  See {UnboundMethod#parameters}
+        # Parameter definition for the object.  See UnboundMethod#parameters
         #
         # @return [Array] Parameters
         def parameters

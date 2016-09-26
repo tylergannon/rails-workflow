@@ -18,7 +18,7 @@ module Workflow
     # For creating {Workflow::State} objects please see {Specification#state}
     # @param [Symbol] name Name of the state being created. Must be unique within its workflow.
     # @param [Fixnum] sequence Sort location among states on this workflow.
-    # @param [Hash] meta: Optional metadata for this state.
+    # @param [Hash] meta Optional metadata for this state.
     def initialize(name, sequence, meta: {})
       @name = name.to_sym
       @sequence = sequence
@@ -34,12 +34,12 @@ module Workflow
     end
 
     # Define an event on this specification.
-    # Must be called within the scope of the block within a call to {#state}.
+    # Must be called within the scope of the block within a call to {Workflow::Specification#state}.
     #
     # @param [Symbol] name The name of the event
-    # @param [Symbol] to: Optional name of {Workflow::State} this event will transition to.
+    # @param [Symbol] to Optional name of {Workflow::State} this event will transition to.
     #                     Must be omitted if a block is provided.
-    # @param [Hash] meta: Optional hash of metadata to be stored on the event object.
+    # @param [Hash] meta Optional hash of metadata to be stored on the event object.
     # @yield [] Transitions definition for this event.
     # @return [nil]
     #

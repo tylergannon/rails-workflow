@@ -12,7 +12,7 @@ module Workflow
     # @api private
     # See {Workflow::State#on} for creating objects of this class.
     # @param [Symbol] name The name of the event to create.
-    # @param [Hash] meta: Optional Metadata for this object.
+    # @param [Hash] meta Optional Metadata for this object.
     def initialize(name, meta: {})
       @name = name.to_sym
       @transitions = []
