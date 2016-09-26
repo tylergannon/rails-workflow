@@ -27,7 +27,10 @@ RSpec.describe 'Workflow::State' do
               end
             end
           end
-        end.to raise_error(Workflow::Errors::WorkflowDefinitionError, 'No transitions defined for event [event1] on state [initial_state]')
+        end.to raise_error(
+          Workflow::Errors::NoTransitionsDefinedError,
+          'No transitions defined for event [event1] on state [initial_state]'
+        )
       end
     end
     describe 'When defining an event for the second time on the same state' do
@@ -39,7 +42,10 @@ RSpec.describe 'Workflow::State' do
               on :event1, to: :real_state
             end
           end
-        end.to raise_error(Workflow::Errors::WorkflowDefinitionError, 'Already defined an event [event1] for state[initial_state]')
+        end.to raise_error(
+          Workflow::Errors::EventNameCollisionError,
+          'Already defined an event [event1] for state[initial_state]'
+        )
       end
     end
     describe 'When defining an event transition with a nonexistent target state' do
@@ -48,7 +54,10 @@ RSpec.describe 'Workflow::State' do
           new_workflow_class do
             state(:initial_state) { on :event1, to: :nonexistent_state }
           end
-        end.to raise_error(Workflow::Errors::WorkflowDefinitionError, 'Event event1 transitions to nonexistent_state but there is no such state.')
+        end.to raise_error(
+          Workflow::Errors::WorkflowDefinitionError,
+          'Event event1 transitions to nonexistent_state but there is no such state.'
+        )
       end
     end
   end

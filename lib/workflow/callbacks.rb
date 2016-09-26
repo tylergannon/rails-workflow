@@ -317,14 +317,24 @@ module Workflow
       # byebug
     end
 
-    def run_all_callbacks(&block)
+    def run_all_callbacks
       catch(:abort) do
         run_callbacks :transition do
-          throw(:abort) if false == run_callbacks(:exit) do
-            throw(:abort) if false == run_callbacks(:enter, &block)
+          aborting_callbacks(:exit) do
+            aborting_callbacks(:enter) do
+              yield
+            end
           end
         end
       end
+    end
+
+    def aborting_callbacks(kind)
+      return_value = run_callbacks(kind) do
+        yield
+      end
+      throw(:abort) if false == return_value
+      return_value
     end
   end
 end

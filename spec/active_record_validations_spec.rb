@@ -73,9 +73,24 @@ RSpec.describe 'Active Record Validations' do
       end
     end
 
-    exec "INSERT INTO active_record_articles(title, body, blame_reason, reject_reason, workflow_state) VALUES('new1', NULL, NULL, NULL, 'new')"
-    exec "INSERT INTO active_record_articles(title, body, blame_reason, reject_reason, workflow_state) VALUES('new2', 'some content', NULL, NULL, 'new')"
-    exec "INSERT INTO active_record_articles(title, body, blame_reason, reject_reason, workflow_state) VALUES('accepted1', 'some content', NULL, NULL, 'accepted')"
+    exec <<-EOF
+      INSERT INTO active_record_articles(
+        title, body, blame_reason, reject_reason, workflow_state
+      )
+      VALUES('new1', NULL, NULL, NULL, 'new')
+    EOF
+    exec <<-EOF
+      INSERT INTO active_record_articles(
+        title, body, blame_reason, reject_reason, workflow_state
+      )
+      VALUES('new2', 'some content', NULL, NULL, 'new')
+    EOF
+    exec <<-EOF
+      INSERT INTO active_record_articles (
+        title, body, blame_reason, reject_reason, workflow_state
+      )
+      VALUES('accepted1', 'some content', NULL, NULL, 'accepted')
+    EOF
   end
   # Transition based validation
   # ---------------------------

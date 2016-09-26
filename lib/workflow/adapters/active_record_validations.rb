@@ -16,7 +16,8 @@ module Workflow
       # Captures instance method calls of the form `:transitioning_from_<state_name>`
       #   and `:transitioning_to_<state_name>`.
       #
-      # For use with validators, e.g. `validates :foobar, presence: true, if: :transitioning_to_some_state?`
+      # For use with validators, e.g. `validates :foobar, presence: true,
+      #   if: :transitioning_to_some_state?`
       #
       def method_missing(method, *args, &block)
         if method.to_s =~ /^transitioning_(from|to|via_event)_([\w_-]+)\?$/
@@ -29,6 +30,10 @@ module Workflow
         else
           super
         end
+      end
+
+      def respond_to_missing?(method_name, _include_private = false)
+        method_name.to_s =~ /^transitioning_(from|to|via_event)_([\w_-]+)\?$/
       end
 
       def can_transition?(event_id)
@@ -53,7 +58,8 @@ module Workflow
       # correct answers to the questions, `:transitioning_from_<old_state>?`.
       # `:transitioning_to_<new_state>`, `:transitioning_via_event_<event_name>?`
       #
-      # For use with validators, e.g. `validates :foobar, presence: true, if: :transitioning_to_some_state?`
+      # For use with validators, e.g. `validates :foobar, presence: true,
+      # if: :transitioning_to_some_state?`
       #
       # = Example:
       #

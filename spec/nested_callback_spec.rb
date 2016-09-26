@@ -11,9 +11,8 @@ RSpec.describe 'Nested Callbacks' do
             callbacks << method
           end
         end
-        method = "around_#{name}".to_sym
-        send method do |_obj, proc|
-          callbacks << method
+        send "around_#{name}".to_sym do |_obj, proc|
+          callbacks << "around_#{name}".to_sym
           proc.call
         end
       end
@@ -73,9 +72,12 @@ RSpec.describe 'Nested Callbacks' do
         subject.goto_final!
         expect(subject).to be_somewhere_else
       end
+      let(:callbacks) do
+        [:before_transition, :around_transition, :before_exit, :around_exit]
+      end
       it 'should not run the rest of the callbacks' do
         subject.goto_final!
-        expect(subject.callbacks).to eq [:before_transition, :around_transition, :before_exit, :around_exit]
+        expect(subject.callbacks).to eq callbacks
       end
     end
 
@@ -185,6 +187,11 @@ RSpec.describe 'Nested Callbacks' do
     end
   end
 
+  let(:all_callbacks) do
+    [:before_transition, :around_transition, :before_exit, :around_exit,
+     :before_enter, :around_enter, :after_enter, :after_exit, :after_transition]
+  end
+
   describe 'Callback Order' do
     before do
       define_all_callbacks
@@ -192,7 +199,7 @@ RSpec.describe 'Nested Callbacks' do
     it 'should call the callbacks in a given order' do
       a = workflow_class.new
       a.start!
-      expect(a.callbacks).to eq [:before_transition, :around_transition, :before_exit, :around_exit, :before_enter, :around_enter, :after_enter, :after_exit, :after_transition]
+      expect(a.callbacks).to eq all_callbacks
     end
   end
 end

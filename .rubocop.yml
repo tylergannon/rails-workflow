@@ -9,6 +9,8 @@ AllCops:
     - 'lib/tasks/**/*'
     - 'spec/rails_helper.rb'
     - 'spec/support/*'
+    - 'spec/active_support_callbacks_spec.rb'
+    - 'rails-workflow.gemspec'
     - 'bin/*'
 
 Style/Documentation:
@@ -19,3 +21,9 @@ Metrics/LineLength:
 
 Metrics/MethodLength:
   Max: 14
+
+Lint/Eval:
+  Exclude:
+    - 'lib/workflow/callbacks/string_callback.rb'
+    - 'lib/workflow/callbacks/transition_callbacks/method_wrapper.rb'
+    - 'lib/workflow/callbacks/transition_callbacks/proc_wrapper.rb'

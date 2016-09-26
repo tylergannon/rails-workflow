@@ -9,7 +9,8 @@ module Workflow
     end
 
     def configure!
-      undefine_methods_defined_by_workflow_spec if has_inherited_workflow_spec?
+      undefine_methods_defined_by_workflow_spec if inherited_workflow_spec?
+      define_revert_events if workflow_spec.define_revert_events?
       create_instance_methods
     end
 
@@ -30,6 +31,22 @@ module Workflow
 
     private
 
+    def define_revert_events
+      workflow_spec.states.each do |state|
+        reversible_events(state).each do |event|
+          revert_event_name = "revert_#{event.name}".to_sym
+          from_state_for_revert = event.transitions.first.target_state
+          from_state_for_revert.on revert_event_name, to: state
+        end
+      end
+    end
+
+    def reversible_events(state)
+      state.events.select do |e|
+        e.name !~ /^revert_/ && e.transitions.length == 1
+      end
+    end
+
     def event_method?(event)
       workflow_class.instance_methods.include?(event_method_name(event))
     end
@@ -45,30 +62,38 @@ module Workflow
         end
 
         define_method "can_#{event.name}?" do
-          return !!current_state.find_event(event.name)&.evaluate(self)
+          current_state.find_event(event.name)&.evaluate(self)
         end
       end
     end
 
-    def has_inherited_workflow_spec?
+    def inherited_workflow_spec?
       workflow_class.superclass.respond_to?(:workflow_spec, true) &&
         workflow_class.superclass.workflow_spec
     end
 
     def undefine_methods_defined_by_workflow_spec
-      workflow_class.superclass.workflow_spec.states.each do |state|
-        state_name = state.name
-        workflow_class.module_eval do
-          undef_method "#{state_name}?"
-        end
+      superclass_workflow_spec.states.each do |state|
+        workflow_class.class_exec(state.name, &undef_state_method_proc)
 
         state.events.each do |event|
-          event_name = event.name
-          workflow_class.module_eval do
-            undef_method "#{event_name}!".to_sym
-            undef_method "can_#{event_name}?"
-          end
+          workflow_class.class_exec(event.name, &undef_event_method_procs)
         end
+      end
+    end
+
+    def superclass_workflow_spec
+      workflow_class.superclass.workflow_spec
+    end
+
+    def undef_state_method_proc
+      -> (state) { undef_method "#{state}?" }
+    end
+
+    def undef_event_method_procs
+      lambda do |event_name|
+        undef_method "#{event_name}!"
+        undef_method "can_#{event_name}?"
       end
     end
   end

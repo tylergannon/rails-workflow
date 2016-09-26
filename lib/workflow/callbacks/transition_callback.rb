@@ -10,17 +10,30 @@ module Workflow
         @calling_class = calling_class
       end
 
-      def self.build_wrapper(callback_type, raw_proc, calling_class)
-        if raw_proc.is_a? ::Proc
-          TransitionCallbacks::ProcWrapper.new(callback_type, raw_proc, calling_class)
-        elsif raw_proc.is_a? ::Symbol
-          if zero_arity_method?(raw_proc, calling_class)
-            raw_proc
+      class << self
+        def build_wrapper(callback_type, raw_proc, calling_class)
+          if raw_proc.is_a? ::Proc
+            TransitionCallbacks::ProcWrapper.new(callback_type, raw_proc, calling_class)
+          elsif raw_proc.is_a? ::Symbol
+            if zero_arity_method?(raw_proc, calling_class)
+              raw_proc
+            else
+              TransitionCallbacks::MethodWrapper.new(callback_type, raw_proc, calling_class)
+            end
           else
-            TransitionCallbacks::MethodWrapper.new(callback_type, raw_proc, calling_class)
+            raw_proc
           end
-        else
-          raw_proc
+        end
+
+        private
+
+        # Returns true if the method has arity zero.
+        # Returns false if the method is defined and has non-zero arity.
+        # Returns nil if the method has not been defined.
+        def zero_arity_method?(method, calling_class)
+          return false unless calling_class.instance_methods.include?(method)
+          method = calling_class.instance_method(method)
+          method.arity.zero?
         end
       end
 
@@ -29,16 +42,6 @@ module Workflow
       end
 
       protected
-
-      # Returns true if the method has arity zero.
-      # Returns false if the method is defined and has non-zero arity.
-      # Returns nil if the method has not been defined.
-      def self.zero_arity_method?(method, calling_class)
-        if calling_class.instance_methods.include?(method)
-          method = calling_class.instance_method(method)
-          method.arity.zero?
-        end
-      end
 
       def build_proc(proc_body)
         <<-EOF

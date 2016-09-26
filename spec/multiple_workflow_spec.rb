@@ -10,35 +10,42 @@ RSpec.describe 'Multiple Workflows' do
         t.string :workflow_type
       end
     end
-    exec "INSERT INTO bookings(title, workflow_state, workflow_type) VALUES('booking1', 'initial', 'workflow_1')"
-    exec "INSERT INTO bookings(title, workflow_state, workflow_type) VALUES('booking2', 'initial', 'workflow_2')"
+    exec "INSERT INTO bookings(title, workflow_state, workflow_type)
+          VALUES('booking1', 'initial', 'workflow_1')"
+    exec "INSERT INTO bookings(title, workflow_state, workflow_type)
+          VALUES('booking2', 'initial', 'workflow_2')"
   end
 
   class Booking < ActiveRecord::Base
     include Workflow
+    def workflow1
+      class << self
+        workflow do
+          state :initial do
+            on :progress, to: :last
+          end
+          state :last
+        end
+      end
+    end
+
+    def workflow2
+      class << self
+        workflow do
+          state :initial do
+            on :progress, to: :intermediate
+          end
+          state :intermediate
+          state :last
+        end
+      end
+    end
 
     def initialize_workflow
       # define workflow per object instead of per class
       case workflow_type
-      when 'workflow_1'
-        class << self
-          workflow do
-            state :initial do
-              on :progress, to: :last
-            end
-            state :last
-          end
-        end
-      when 'workflow_2'
-        class << self
-          workflow do
-            state :initial do
-              on :progress, to: :intermediate
-            end
-            state :intermediate
-            state :last
-          end
-        end
+      when 'workflow_1' then workflow1
+      when 'workflow_2' then workflow2
       end
     end
 

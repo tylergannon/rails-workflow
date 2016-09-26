@@ -74,7 +74,7 @@ RSpec.describe 'Advanced Examples' do
     end
 
     it 'should not have a revert event' do
-      states = adhoc_class.workflow_spec.states.collect(&:events).flatten.collect(&:name).flatten.uniq.map(&:to_s)
+      states = adhoc_class.workflow_spec.unique_event_names.map(&:to_s)
       expect(states.select { |t| t =~ /^revert/ }).to be_empty
     end
 

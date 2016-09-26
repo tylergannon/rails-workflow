@@ -146,7 +146,8 @@ RSpec.describe Workflow::Callbacks do
 
     it 'Does all three' do
       workflow_class.class_eval do
-        on_error RuntimeError, rescue: 'self.messages << :foo', ensure: 'self.messages << :foo' do |_ex|
+        on_error RuntimeError, rescue: 'self.messages << :foo',
+                               ensure: 'self.messages << :foo' do
           messages << :foo
         end
       end

@@ -28,9 +28,9 @@ module Workflow
               cb_object.send(:procedure_string)].compact.join(', ')
             target.instance_eval("send(\#{arguments})")
           EOF
-          _wrapper = eval(proc_string)
-          _wrapper.instance_exec(raw_proc, &OVERLOAD_EQUALITY_OPERATOR_PROC)
-          _wrapper
+          wrapper_proc = eval(proc_string)
+          wrapper_proc.instance_exec(raw_proc, &OVERLOAD_EQUALITY_OPERATOR_PROC)
+          wrapper_proc
         end
 
         private
@@ -70,18 +70,19 @@ module Workflow
         end
 
         def name_arguments_string
-          if name_params.any?
-            name_params.map do |name|
-              "name_proc.call(:#{name})"
-            end.join(', ')
-          end
+          return unless name_params.any?
+
+          name_params.map do |name|
+            "name_proc.call(:#{name})"
+          end.join(', ')
         end
 
         def procedure_string
           '&callbacks' if around_callback?
         end
 
-        # @return [UnboundMethod] Method representation from class {#calling_class}, named by {#raw_proc}
+        # @return [UnboundMethod] Method representation from class
+        #                         {#calling_class}, named by {#raw_proc}
         def callback_method
           @meth ||= calling_class.instance_method(raw_proc)
         end

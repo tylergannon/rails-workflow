@@ -66,18 +66,7 @@ module Workflow
     # end
     # ```
     def on(name, to: nil, meta: {}, &transitions)
-      if to && block_given?
-        raise Errors::WorkflowDefinitionError, 'Event target can only be received in the method call or the block, not both.'
-      end
-
-      unless to || block_given?
-        raise Errors::WorkflowDefinitionError, "No event target given for event #{name}"
-      end
-
-      if find_event(name)
-        raise Errors::WorkflowDefinitionError, "Already defined an event [#{name}] for state[#{self.name}]"
-      end
-
+      check_can_add_transition!(name, to: to, &transitions)
       event = Workflow::Event.new(name, meta: meta)
 
       if to
@@ -86,12 +75,22 @@ module Workflow
         event.instance_eval(&transitions)
       end
 
-      if event.transitions.empty?
-        raise Errors::WorkflowDefinitionError, "No transitions defined for event [#{name}] on state [#{self.name}]"
+      unless event.valid?
+        raise Errors::NoTransitionsDefinedError.new(self, event)
       end
 
       events << event
       nil
+    end
+
+    private def check_can_add_transition!(name, to: nil)
+      raise Errors::DualEventDefinitionError if to && block_given?
+
+      unless to || block_given?
+        raise Errors::WorkflowDefinitionError, "No event target given for event #{name}"
+      end
+
+      raise Errors::EventNameCollisionError.new(self, name) if find_event(name)
     end
 
     # @return [String] String representation of object
@@ -102,20 +101,19 @@ module Workflow
     # Overloaded comparison operator.  Workflow states are sorted according to the order
     # in which they were defined.
     #
-    # @param [Workflow::State] other_state state to be compared against.
+    # @param [Workflow::State] other state to be compared against.
     # @return [Integer]
-    def <=>(other_state)
-      unless other_state.is_a?(State)
-        raise StandardError, "Other State #{other_state} is a #{other_state.class}.  I can only be compared with a Workflow::State."
-      end
-      sequence <=> other_state.send(:sequence)
+    def <=>(other)
+      raise Errors::StateComparisonError, other unless other.is_a?(State)
+      sequence <=> other.send(:sequence)
     end
 
     private
 
     # @api private
     # @!attribute [r] sequence
-    #   @return [Fixnum] The position of this state within the order it was defined for in its workflow.
+    #   @return [Fixnum] The position of this state within the
+    #                     order it was defined for in its workflow.
     attr_reader :sequence
   end
 end

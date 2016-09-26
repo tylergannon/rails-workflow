@@ -3,7 +3,7 @@ require 'spec_helper'
 
 RSpec.describe 'Callback Method Parameters' do
   let(:workflow_class) do
-    klass = Class.new do
+    Class.new do
       include Workflow
       attr_accessor :message
 
@@ -59,14 +59,24 @@ RSpec.describe 'Callback Method Parameters' do
   describe 'Three Parameter' do
     it 'gets the message' do
       subject.start3! :tight, :nice, :word, :up, dope: :sauce, cool: :bar, right: :now
-      expect(subject.message).to eq [:tight, :nice, [:word, :up], :bar, { dope: :sauce, right: :now }]
+      expect(subject.message).to eq long_response
     end
+  end
+
+  let(:long_response) do
+    [
+      :tight,
+      :nice,
+      [:word, :up],
+      :bar,
+      { dope: :sauce, right: :now }
+    ]
   end
 
   describe 'Around Transition' do
     it 'gets the message' do
       subject.start4! :tight, :nice, :word, :up, dope: :sauce, cool: :bar, right: :now
-      expect(subject.message).to eq [:tight, :nice, [:word, :up], :bar, { dope: :sauce, right: :now }]
+      expect(subject.message).to eq long_response
       expect(subject).to be_started
     end
   end

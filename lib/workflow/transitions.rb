@@ -22,33 +22,13 @@ module Workflow
     # @return [Symbol] The name of the new state, or `false` if the transition failed.
     # TODO: connect args to documentation on how arguments are accessed during state transitions.
     def transition!(name, *args, **attributes)
-      name = name.to_sym
-      event = current_state.find_event(name)
-      raise Errors::NoTransitionAllowed, "There is no event #{name} defined for the #{current_state.name} state" \
-        if event.nil?
+      @transition_context = prepare_transition(name, args, attributes)
 
-      @halted_because = nil
-      @halted = false
-
-      target = event.evaluate(self)
-
-      return_value = false
-      begin
-        @transition_context = TransitionContext.new \
-          from: current_state.name,
-          to: target.name,
-          event: name,
-          event_args: args,
-          attributes: attributes,
-          named_arguments: workflow_spec.named_arguments
-
-        run_all_callbacks do
-          return_value = persist_workflow_state(target.name)
-        end
-      ensure
-        @transition_context = nil
+      run_all_callbacks do
+        persist_workflow_state(@transition_context.to)
       end
-      return_value
+    ensure
+      @transition_context = nil
     end
 
     # Stop the current transition and set the reason for the abort.
@@ -94,6 +74,21 @@ module Workflow
 
     def persist_workflow_state(new_value)
       @workflow_state = new_value
+    end
+
+    def prepare_transition(name, args, attributes)
+      event = current_state.find_event(name.to_sym)
+      raise Errors::NoTransitionAllowed.new(current_state, name) unless event
+
+      target = event.evaluate(self)
+
+      TransitionContext.new \
+        from: current_state.name,
+        to: target.name,
+        event: event.name,
+        event_args: args,
+        attributes: attributes,
+        named_arguments: workflow_spec.named_arguments
     end
   end
 end

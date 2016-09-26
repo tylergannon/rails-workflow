@@ -19,6 +19,10 @@ module Workflow
       @meta = meta || {}
     end
 
+    def valid?
+      transitions.any?
+    end
+
     def inspect
       "<Event name=#{name.inspect} transitions(#{transitions.length})=#{transitions.inspect}>"
     end
@@ -47,18 +51,18 @@ module Workflow
     #
     # @param [Symbol] target_state the name of the state target state if this transition matches.
     # @option conditions_def [Symbol] :if Name of instance method to evaluate. e.g. `:valid?`
-    # @option conditions_def [Array] :if Mixed array of Symbol, String or Proc conditions.  All must match for the transition to apply.
-    # @option conditions_def [String] :if A string to evaluate on the target. e.g. `"self.foo == :bar"`
-    # @option conditions_def [Proc] :if A proc which will be evaluated on the object e.g. `->{self.foo == :bar}`
-    # @option conditions_def [Symbol] :unless Same as `:if` except all conditions must **not** match.
+    # @option conditions_def [Array] :if Mixed array of Symbol, String or Proc conditions.
+    #                                       All must match for the transition to apply.
+    # @option conditions_def [String] :if A string to evaluate on the target.
+    #                                       e.g. `"self.foo == :bar"`
+    # @option conditions_def [Proc] :if A proc which will be evaluated on the object
+    #                                       e.g. `->{self.foo == :bar}`
+    # @option conditions_def [Symbol] :unless Same Like `:if` but all conditions must **not** match
     # @yield [] Optional block which, if provided, becomes an `:if` condition for the transition.
     # @return [nil]
     def to(target_state, **conditions_def, &block)
-      conditions = Conditions.new && conditions_def, block
       transitions << Transition.new(target_state, conditions_def, &block)
     end
-
-    private
 
     # @api private
     # Represents a possible transition via the event on which it is defined.

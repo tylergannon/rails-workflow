@@ -49,7 +49,10 @@ RSpec.shared_examples 'Basic Database Operations' do
     expect(subject).to be_accepted
     expect do
       subject.accept!
-    end.to raise_error(Workflow::NoTransitionAllowed, 'There is no event accept defined for the accepted state')
+    end.to raise_error(
+      Workflow::NoTransitionAllowed,
+      'There is no event accept defined for the accepted state'
+    )
   end
 end
 
@@ -158,7 +161,7 @@ RSpec.describe Workflow do
     c = Class.new(sup_class)
     c.class_eval do
       include Workflow
-      workflow &block
+      workflow(&block)
     end
     c
   end
@@ -179,7 +182,8 @@ RSpec.describe Workflow do
   describe 'Initial State' do
     subject do
       new_workflow_class do
-        state :one; state :two
+        state :one
+        state :two
       end.new
     end
     it { is_expected.to be_one }

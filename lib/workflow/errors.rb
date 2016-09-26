@@ -13,16 +13,48 @@ module Workflow
     class NoMatchingTransitionError < StandardError
     end
 
+    class WorkflowDefinitionError < StandardError
+    end
+
+    class NoTransitionsDefinedError < WorkflowDefinitionError
+      def initialize(state, event)
+        super("No transitions defined for event [#{event.name}] on state [#{state.name}]")
+      end
+    end
+
+    class DualEventDefinitionError < WorkflowDefinitionError
+      def initialize
+        super('Event target can only be received in the method call or the block, not both.')
+      end
+    end
+
+    class EventNameCollisionError < WorkflowDefinitionError
+      def initialize(state, event_name)
+        super("Already defined an event [#{event_name}] for state[#{state.name}]")
+      end
+    end
+
+    class StateComparisonError < StandardError
+      def initialize(state)
+        super("Other State #{state} is a #{state.class}.
+              I can only be compared with a Workflow::State.".squish)
+      end
+    end
+
+    class NoSuchStateError < WorkflowDefinitionError
+      def initialize(event, transition)
+        super("Event #{event.name} transitions to
+              #{transition.target_state} but there is no such state.".squish)
+      end
+    end
+
     class NoTransitionAllowed < StandardError
+      def initialize(state, event_name)
+        super("There is no event #{event_name} defined for the #{state.name} state")
+      end
     end
 
     class WorkflowError < StandardError
-    end
-
-    class CallbackArityError < StandardError
-    end
-
-    class WorkflowDefinitionError < StandardError
     end
   end
 end

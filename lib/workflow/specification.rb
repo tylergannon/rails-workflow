@@ -25,17 +25,6 @@ module Workflow
     attr_reader :named_arguments
 
     define_callbacks :spec_definition
-    set_callback(:spec_definition, :after, if: :define_revert_events?) do |spec|
-      spec.states.each do |state|
-        state.events.reject do |e|
-          e.name.to_s =~ /^revert_/
-        end.select { |e| e.transitions.length == 1 }.each do |event|
-          revert_event_name = "revert_#{event.name}".to_sym
-          from_state_for_revert = event.transitions.first.target_state
-          from_state_for_revert.on revert_event_name, to: state
-        end
-      end
-    end
 
     set_callback(:spec_definition, :after) do |spec|
       spec.states.each do |state|
@@ -43,7 +32,7 @@ module Workflow
           event.transitions.each do |transition|
             target_state = spec.find_state(transition.target_state)
             if target_state.nil?
-              raise Workflow::Errors::WorkflowDefinitionError, "Event #{event.name} transitions to #{transition.target_state} but there is no such state."
+              raise Errors::NoSuchStateError.new(event, transition)
             end
             transition.target_state = target_state
           end
@@ -128,10 +117,8 @@ module Workflow
       states.collect(&:events).flatten.collect(&:name).flatten.uniq
     end
 
-    private
-
     def define_revert_events?
-      !!@define_revert_events
+      @define_revert_events
     end
   end
 end
