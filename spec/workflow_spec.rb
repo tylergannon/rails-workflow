@@ -202,8 +202,8 @@ RSpec.describe Workflow do
       state :two
     end
     klass.class_eval do
-      def my_transition(args)
-        args.my_tran
+      before_transition :my_transition
+      def my_transition
       end
     end
     subj = klass.new
@@ -224,6 +224,7 @@ RSpec.describe Workflow do
     describe 'When callback is public' do
       subject do
         base_class.class_eval do
+          before_transition :assign
           def assign
           end
         end
@@ -235,37 +236,6 @@ RSpec.describe Workflow do
       end
     end
 
-    describe 'When callback is protected' do
-      subject do
-        base_class.class_eval do
-          protected
-
-          def assign
-          end
-        end
-        base_class.new
-      end
-      it 'works' do
-        expect(subject).to receive(:assign)
-        subject.assign!
-      end
-    end
-
-    describe 'When callback is private' do
-      subject do
-        base_class.class_eval do
-          private
-
-          def assign
-          end
-        end
-        base_class.new
-      end
-      it 'works' do
-        expect(subject).to receive(:assign)
-        subject.assign!
-      end
-    end
   end
 
   describe 'Single Table Inheritance' do
@@ -308,6 +278,8 @@ RSpec.describe Workflow do
         state :old
       end
       klass.class_eval do
+        before_transition :age, only: :age
+        before_transition :reject, only: :reject
         def age(by = 1)
           halt 'too fast' if by > 100
         end

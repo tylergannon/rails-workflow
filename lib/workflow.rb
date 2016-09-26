@@ -105,9 +105,7 @@ module Workflow
         named_arguments: workflow_spec.named_arguments
 
       run_all_callbacks do
-        callback_value  = run_action_callback name, *args
-        persist_value   = persist_workflow_state(target.name)
-        return_value    = callback_value || persist_value
+        return_value = persist_workflow_state(target.name)
       end
     ensure
       @transition_context = nil
