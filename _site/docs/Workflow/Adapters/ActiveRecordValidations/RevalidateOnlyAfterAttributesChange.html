@@ -4,7 +4,7 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
-  Module: Workflow::Adapter::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange
+  Module: Workflow::Adapters::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange
   
     &mdash; Documentation by YARD 0.9.5
   
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../../../css/common.css" type="text/css" charset="utf-8" />
 
 <script type="text/javascript" charset="utf-8">
-  pathId = "Workflow::Adapter::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange";
+  pathId = "Workflow::Adapters::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange";
   relpath = '../../../';
 </script>
 
@@ -37,7 +37,7 @@
         <div id="menu">
   
     <a href="../../../_index.html">Index (R)</a> &raquo;
-    <span class='title'><span class='object_link'><a href="../../../Workflow.html" title="Workflow (module)">Workflow</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Adapter.html" title="Workflow::Adapter (module)">Adapter</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../ActiveRecordValidations.html" title="Workflow::Adapter::ActiveRecordValidations (module)">ActiveRecordValidations</a></span></span>
+    <span class='title'><span class='object_link'><a href="../../../Workflow.html" title="Workflow (module)">Workflow</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Adapters.html" title="Workflow::Adapters (module)">Adapters</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../ActiveRecordValidations.html" title="Workflow::Adapters::ActiveRecordValidations (module)">ActiveRecordValidations</a></span></span>
      &raquo; 
     <span class="title">RevalidateOnlyAfterAttributesChange</span>
   
@@ -61,7 +61,7 @@
 
       <iframe id="search_frame" src="../../../class_list.html"></iframe>
 
-      <div id="content"><h1>Module: Workflow::Adapter::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange
+      <div id="content"><h1>Module: Workflow::Adapters::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange
   
   
   
@@ -93,11 +93,11 @@ We need to be able to maintain the errors list for the object
 through future valid? calls or the list will be cleared
 next time valid? is called.</p>
 
-<p>Once any attributes have changed on the object, the following call to <span class='object_link'><a href="#valid%3F-instance_method" title="Workflow::Adapter::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange#valid? (method)">#valid?</a></span>
+<p>Once any attributes have changed on the object, the following call to <span class='object_link'><a href="#valid%3F-instance_method" title="Workflow::Adapters::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange#valid? (method)">#valid?</a></span>
 will cause revalidation.</p>
 
 <p>Note that a change on an association will not trigger a reset,
-meaning that one should call <code>errors.clear</code> before <span class='object_link'><a href="#valid%3F-instance_method" title="Workflow::Adapter::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange#valid? (method)">#valid?</a></span> will
+meaning that one should call <code>errors.clear</code> before <span class='object_link'><a href="#valid%3F-instance_method" title="Workflow::Adapters::ActiveRecordValidations::RevalidateOnlyAfterAttributesChange#valid? (method)">#valid?</a></span> will
 trigger validations to run anew.</p>
 
 
@@ -211,22 +211,22 @@ trigger validations to run anew.</p>
       <pre class="lines">
 
 
-92
-93
-94
-95
-96
-97
 98
 99
 100
 101
-102</pre>
+102
+103
+104
+105
+106
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record_validations.rb', line 92</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record_validations.rb', line 98</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span><span class='lparen'>(</span><span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@changed_since_validation</span>
     <span class='kw'>false</span>
   <span class='kw'>else</span>
@@ -257,13 +257,13 @@ trigger validations to run anew.</p>
       <pre class="lines">
 
 
-104
-105
-106
-107</pre>
+110
+111
+112
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record_validations.rb', line 104</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record_validations.rb', line 110</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_write_attribute'>write_attribute</span><span class='lparen'>(</span><span class='id identifier rubyid_attr_name'>attr_name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='ivar'>@changed_since_validation</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -279,7 +279,7 @@ trigger validations to run anew.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Sep 25 16:38:03 2016 by
+  Generated on Tue Sep 27 05:03:38 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.5 (ruby-2.3.1).
 </div>

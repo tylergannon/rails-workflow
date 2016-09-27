@@ -225,7 +225,7 @@ other states.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#%3C%3D%3E-instance_method" title="#&lt;=&gt; (instance method)">#<strong>&lt;=&gt;</strong>(other_state)  &#x21d2; Integer </a>
+      <a href="#%3C%3D%3E-instance_method" title="#&lt;=&gt; (instance method)">#<strong>&lt;=&gt;</strong>(other)  &#x21d2; Integer </a>
     
 
     
@@ -380,7 +380,7 @@ other states.</p>
       
       
         &mdash;
-        <div class='inline'><p>The name of the state being created.  Should be unique within its workflow.</p>
+        <div class='inline'><p>Name of the state being created. Must be unique within its workflow.</p>
 </div>
       
     </li>
@@ -395,20 +395,18 @@ other states.</p>
       
       
         &mdash;
-        <div class='inline'><p>Sequencing number that will affect sorting comparisons with other states.</p>
+        <div class='inline'><p>Sort location among states on this workflow.</p>
 </div>
       
     </li>
   
     <li>
       
-        <span class='name'>meta:</span>
+        <span class='name'>meta</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
-      
-        <em class="default">(defaults to: <tt>{}</tt>)</em>
       
       
         &mdash;
@@ -426,15 +424,21 @@ other states.</p>
       <pre class="lines">
 
 
-21
 22
-23</pre>
+23
+24
+25
+26
+27</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 22</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_sequence'>sequence</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-  <span class='ivar'>@name</span><span class='comma'>,</span> <span class='ivar'>@sequence</span><span class='comma'>,</span> <span class='ivar'>@events</span><span class='comma'>,</span> <span class='ivar'>@meta</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='comma'>,</span> <span class='id identifier rubyid_sequence'>sequence</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_meta'>meta</span>
+  <span class='ivar'>@name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='ivar'>@sequence</span> <span class='op'>=</span> <span class='id identifier rubyid_sequence'>sequence</span>
+  <span class='ivar'>@events</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@meta</span> <span class='op'>=</span> <span class='id identifier rubyid_meta'>meta</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -490,10 +494,10 @@ other states.</p>
       <pre class="lines">
 
 
-14</pre>
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 15</span>
 
 <span class='id identifier rubyid_attr_reader'>attr_reader</span> <span class='symbol'>:name</span><span class='comma'>,</span> <span class='symbol'>:events</span><span class='comma'>,</span> <span class='symbol'>:meta</span></pre>
     </td>
@@ -528,10 +532,10 @@ other states.</p>
       <pre class="lines">
 
 
-14</pre>
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 15</span>
 
 <span class='id identifier rubyid_attr_reader'>attr_reader</span> <span class='symbol'>:name</span><span class='comma'>,</span> <span class='symbol'>:events</span><span class='comma'>,</span> <span class='symbol'>:meta</span></pre>
     </td>
@@ -583,12 +587,12 @@ other states.</p>
       <pre class="lines">
 
 
-14
 15
-16</pre>
+16
+17</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
   <span class='ivar'>@name</span>
@@ -608,7 +612,7 @@ other states.</p>
       <div class="method_details first">
   <h3 class="signature first" id="<=>-instance_method">
   
-    #<strong>&lt;=&gt;</strong>(other_state)  &#x21d2; <tt>Integer</tt> 
+    #<strong>&lt;=&gt;</strong>(other)  &#x21d2; <tt>Integer</tt> 
   
 
   
@@ -628,7 +632,7 @@ in which they were defined.</p>
   
     <li>
       
-        <span class='name'>other_state</span>
+        <span class='name'>other</span>
       
       
         <span class='type'>(<tt><span class='object_link'><a href="" title="Workflow::State (class)">Workflow::State</a></span></tt>)</span>
@@ -656,6 +660,19 @@ in which they were defined.</p>
     </li>
   
 </ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Errors/StateComparisonError.html" title="Workflow::Errors::StateComparisonError (class)">Errors::StateComparisonError</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -663,21 +680,17 @@ in which they were defined.</p>
       <pre class="lines">
 
 
-102
-103
-104
-105
 106
-107</pre>
+107
+108
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 102</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 106</span>
 
-<span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other_state'>other_state</span><span class='rparen'>)</span>
-  <span class='kw'>unless</span> <span class='id identifier rubyid_other_state'>other_state</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>State</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>StandardError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Other State </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_other_state'>other_state</span><span class='embexpr_end'>}</span><span class='tstring_content'> is a </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_other_state'>other_state</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>.  I can only be compared with a Workflow::State.</span><span class='tstring_end'>&quot;</span></span>
-  <span class='kw'>end</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_sequence'>sequence</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_other_state'>other_state</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:sequence</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>StateComparisonError</span><span class='comma'>,</span> <span class='id identifier rubyid_other'>other</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>State</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_sequence'>sequence</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:sequence</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -745,15 +758,15 @@ in which they were defined.</p>
       <pre class="lines">
 
 
-28
-29
-30</pre>
+32
+33
+34</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 32</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_find_event'>find_event</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_events'>events</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_events'>events</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span> <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -802,12 +815,12 @@ in which they were defined.</p>
       <pre class="lines">
 
 
-93
-94
-95</pre>
+97
+98
+99</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 93</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 97</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;State name=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> events(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_events'>events</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'>)=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_events'>events</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -829,7 +842,7 @@ in which they were defined.</p>
 </h3><div class="docstring">
   <div class="discussion">
     <p>Define an event on this specification.
-Must be called within the scope of the block within a call to #state.</p>
+Must be called within the scope of the block within a call to <span class='object_link'><a href="Specification.html#state-instance_method" title="Workflow::Specification#state (method)">Workflow::Specification#state</a></span>.</p>
 
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_workflow'>workflow</span> <span class='kw'>do</span>
  <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:new</span> <span class='kw'>do</span>
@@ -877,30 +890,27 @@ Must be called within the scope of the block within a call to #state.</p>
   
     <li>
       
-        <span class='name'>to:</span>
+        <span class='name'>to</span>
       
       
         <span class='type'>(<tt>Symbol</tt>)</span>
       
       
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
       
         &mdash;
-        <div class='inline'><p>Optional name of <span class='object_link'><a href="" title="Workflow::State (class)">Workflow::State</a></span> this event will transition to.  Must be omitted if a block is provided.</p>
+        <div class='inline'><p>Optional name of <span class='object_link'><a href="" title="Workflow::State (class)">Workflow::State</a></span> this event will transition to.
+Must be omitted if a block is provided.</p>
 </div>
       
     </li>
   
     <li>
       
-        <span class='name'>meta:</span>
+        <span class='name'>meta</span>
       
       
         <span class='type'>(<tt>Hash</tt>)</span>
       
-      
-        <em class="default">(defaults to: <tt>{}</tt>)</em>
       
       
         &mdash;
@@ -948,11 +958,6 @@ Must be called within the scope of the block within a call to #state.</p>
       <pre class="lines">
 
 
-63
-64
-65
-66
-67
 68
 69
 70
@@ -969,30 +974,13 @@ Must be called within the scope of the block within a call to #state.</p>
 81
 82
 83
-84
-85
-86
-87
-88
-89
-90</pre>
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_on'>on</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_transitions'>transitions</span><span class='rparen'>)</span>
-  <span class='kw'>if</span> <span class='id identifier rubyid_to'>to</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>WorkflowDefinitionError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Event target can only be received in the method call or the block, not both.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>unless</span> <span class='id identifier rubyid_to'>to</span> <span class='op'>||</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>WorkflowDefinitionError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No event target given for event </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>if</span> <span class='id identifier rubyid_find_event'>find_event</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>WorkflowDefinitionError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Already defined an event [</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>] for state[</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-
+  <span class='id identifier rubyid_check_can_add_transition!'>check_can_add_transition!</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_transitions'>transitions</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_event'>event</span> <span class='op'>=</span> <span class='const'>Workflow</span><span class='op'>::</span><span class='const'>Event</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='id identifier rubyid_meta'>meta</span><span class='rparen'>)</span>
 
   <span class='kw'>if</span> <span class='id identifier rubyid_to'>to</span>
@@ -1001,8 +989,8 @@ Must be called within the scope of the block within a call to #state.</p>
     <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_instance_eval'>instance_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_transitions'>transitions</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
-  <span class='kw'>if</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_transitions'>transitions</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
-    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>WorkflowDefinitionError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No transitions defined for event [</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>] on state [</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>unless</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>NoTransitionsDefinedError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_event'>event</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='id identifier rubyid_events'>events</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_event'>event</span>
@@ -1018,7 +1006,7 @@ Must be called within the scope of the block within a call to #state.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Sep 25 16:38:03 2016 by
+  Generated on Tue Sep 27 05:03:38 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.5 (ruby-2.3.1).
 </div>

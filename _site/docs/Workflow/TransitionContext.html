@@ -332,7 +332,7 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(from:, to:, event:, event_args:, attributes:, named_arguments: [])  &#x21d2; TransitionContext </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(from:, to:, event:, event_args:, **args)  &#x21d2; TransitionContext </a>
     
 
     
@@ -379,7 +379,7 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#respond_to%3F-instance_method" title="#respond_to? (instance method)">#<strong>respond_to?</strong>(method)  &#x21d2; Boolean </a>
+      <a href="#respond_to_missing%3F-instance_method" title="#respond_to_missing? (instance method)">#<strong>respond_to_missing?</strong>(method, _include_private = false)  &#x21d2; Boolean </a>
     
 
     
@@ -429,7 +429,7 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(from:, to:, event:, event_args:, attributes:, named_arguments: [])  &#x21d2; <tt><span class='object_link'><a href="" title="Workflow::TransitionContext (class)">TransitionContext</a></span></tt> 
+    #<strong>initialize</strong>(from:, to:, event:, event_args:, **args)  &#x21d2; <tt><span class='object_link'><a href="" title="Workflow::TransitionContext (class)">TransitionContext</a></span></tt> 
   
 
   
@@ -451,25 +451,25 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-33
 34
 35
 36
 37
 38
 39
-40</pre>
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 34</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>from:</span><span class='comma'>,</span> <span class='label'>to:</span><span class='comma'>,</span> <span class='label'>event:</span><span class='comma'>,</span> <span class='label'>event_args:</span><span class='comma'>,</span> <span class='label'>attributes:</span><span class='comma'>,</span> <span class='label'>named_arguments:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>from:</span><span class='comma'>,</span> <span class='label'>to:</span><span class='comma'>,</span> <span class='label'>event:</span><span class='comma'>,</span> <span class='label'>event_args:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='ivar'>@from</span> <span class='op'>=</span> <span class='id identifier rubyid_from'>from</span>
   <span class='ivar'>@to</span> <span class='op'>=</span> <span class='id identifier rubyid_to'>to</span>
   <span class='ivar'>@event</span> <span class='op'>=</span> <span class='id identifier rubyid_event'>event</span>
   <span class='ivar'>@event_args</span> <span class='op'>=</span> <span class='id identifier rubyid_event_args'>event_args</span>
-  <span class='ivar'>@attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_attributes'>attributes</span>
-  <span class='ivar'>@named_arguments</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_named_arguments'>named_arguments</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span><span class='lparen'>(</span><span class='id identifier rubyid_event_args'>event_args</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span>
+  <span class='ivar'>@attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='symbol'>:attributes</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='ivar'>@named_arguments</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='symbol'>:named_arguments</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span><span class='lparen'>(</span><span class='id identifier rubyid_event_args'>event_args</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -499,16 +499,16 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-50
 51
 52
 53
 54
 55
-56</pre>
+56
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_named_arguments'>named_arguments</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
@@ -554,12 +554,12 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attributes'>attributes</span>
   <span class='ivar'>@attributes</span>
@@ -596,12 +596,12 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_event'>event</span>
   <span class='ivar'>@event</span>
@@ -638,12 +638,12 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_event_args'>event_args</span>
   <span class='ivar'>@event_args</span>
@@ -680,12 +680,12 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_from'>from</span>
   <span class='ivar'>@from</span>
@@ -722,12 +722,12 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_arguments'>named_arguments</span>
   <span class='ivar'>@named_arguments</span>
@@ -764,12 +764,12 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 32</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to'>to</span>
   <span class='ivar'>@to</span>
@@ -787,9 +787,9 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="respond_to?-instance_method">
+  <h3 class="signature first" id="respond_to_missing?-instance_method">
   
-    #<strong>respond_to?</strong>(method)  &#x21d2; <tt>Boolean</tt> 
+    #<strong>respond_to_missing?</strong>(method, _include_private = false)  &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -823,14 +823,14 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-46
 47
-48</pre>
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 47</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_respond_to_missing?'>respond_to_missing?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='id identifier rubyid__include_private'>_include_private</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_named_arguments'>named_arguments</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_method'>method</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -853,12 +853,12 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
       <pre class="lines">
 
 
-42
 43
-44</pre>
+44
+45</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 42</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/transition_context.rb', line 43</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_values'>values</span>
   <span class='lbracket'>[</span><span class='id identifier rubyid_from'>from</span><span class='comma'>,</span> <span class='id identifier rubyid_to'>to</span><span class='comma'>,</span> <span class='id identifier rubyid_event'>event</span><span class='comma'>,</span> <span class='id identifier rubyid_event_args'>event_args</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='comma'>,</span> <span class='id identifier rubyid_attributes'>attributes</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='rbracket'>]</span>
@@ -873,7 +873,7 @@ If you pass fewer parameters, the later ones will simply be nil.</p>
 </div>
 
       <div id="footer">
-  Generated on Sun Sep 25 16:38:04 2016 by
+  Generated on Tue Sep 27 05:03:39 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.5 (ruby-2.3.1).
 </div>

@@ -80,7 +80,7 @@
   
   <dl>
       <dt>Includes:</dt>
-      <dd>ActiveSupport::Callbacks</dd>
+      <dd><span class='object_link'><a href="../ActiveSupport/Callbacks.html" title="ActiveSupport::Callbacks (module)">ActiveSupport::Callbacks</a></span></dd>
   </dl>
   
   
@@ -96,7 +96,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/workflow/callbacks.rb<span class="defines">,<br />
-  lib/workflow/callbacks/callback.rb,<br /> lib/workflow/callbacks/transition_callback.rb,<br /> lib/workflow/callbacks/transition_callbacks/proc_wrapper.rb,<br /> lib/workflow/callbacks/transition_callbacks/method_wrapper.rb</span>
+  lib/workflow/callbacks/callback.rb,<br /> lib/workflow/callbacks/proc_callback.rb,<br /> lib/workflow/callbacks/method_callback.rb,<br /> lib/workflow/callbacks/string_callback.rb,<br /> lib/workflow/callbacks/transition_callback.rb,<br /> lib/workflow/callbacks/transition_callbacks/proc_caller.rb,<br /> lib/workflow/callbacks/transition_callbacks/method_caller.rb</span>
 </dd>
   </dl>
   
@@ -110,7 +110,7 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Callbacks/Callback.html" title="Workflow::Callbacks::Callback (class)">Callback</a></span>, <span class='object_link'><a href="Callbacks/TransitionCallback.html" title="Workflow::Callbacks::TransitionCallback (class)">TransitionCallback</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Callbacks/Callback.html" title="Workflow::Callbacks::Callback (class)">Callback</a></span>, <span class='object_link'><a href="Callbacks/MethodCallback.html" title="Workflow::Callbacks::MethodCallback (class)">MethodCallback</a></span>, <span class='object_link'><a href="Callbacks/ProcCallback.html" title="Workflow::Callbacks::ProcCallback (class)">ProcCallback</a></span>, <span class='object_link'><a href="Callbacks/StringCallback.html" title="Workflow::Callbacks::StringCallback (class)">StringCallback</a></span>, <span class='object_link'><a href="Callbacks/TransitionCallback.html" title="Workflow::Callbacks::TransitionCallback (class)">TransitionCallback</a></span>
     
   
 </p>
@@ -132,120 +132,22 @@
 
 
 
-  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
-  <ul class="summary">
-    
-      <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#transition_context-instance_method" title="#transition_context (instance method)">#<strong>transition_context</strong>  &#x21d2; TransitionContext </a>
-    
-
-    
-  </span>
-  
-  
-  
-    
-      <span class="note title readonly">readonly</span>
-    
-    
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'><p>During state transition events, contains a <span class='object_link'><a href="TransitionContext.html" title="Workflow::TransitionContext (class)">TransitionContext</a></span> representing the transition underway.</p>
-</div></span>
-  
-</li>
-
-    
-  </ul>
-
 
 
 
 
   
   
-  <div id="instance_attr_details" class="attr_details">
-    <h2>Instance Attribute Details</h2>
-    
-      
-      <span id=""></span>
-      <div class="method_details first">
-  <h3 class="signature first" id="transition_context-instance_method">
   
-    #<strong>transition_context</strong>  &#x21d2; <tt><span class='object_link'><a href="TransitionContext.html" title="Workflow::TransitionContext (class)">TransitionContext</a></span></tt>  <span class="extras">(readonly)</span>
   
-
   
-
   
-</h3><div class="docstring">
-  <div class="discussion">
-    <p>During state transition events, contains a <span class='object_link'><a href="TransitionContext.html" title="Workflow::TransitionContext (class)">TransitionContext</a></span> representing the transition underway.</p>
-
-
-  </div>
-</div>
-<div class="tags">
   
-<p class="tag_title">Returns:</p>
-<ul class="return">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="TransitionContext.html" title="Workflow::TransitionContext (class)">TransitionContext</a></span></tt>)</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'><p>representation of current state transition</p>
-</div>
-      
-    </li>
-  
-</ul>
-
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-22
-23
-24
-25
-26
-27</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/callbacks.rb', line 22</span>
-
-<span class='id identifier rubyid_included'>included</span> <span class='kw'>do</span>
-  <span class='const'>CALLBACK_MAP</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_type'>type</span><span class='op'>|</span>
-    <span class='id identifier rubyid_define_callbacks'>define_callbacks</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span>
-      <span class='label'>skip_after_callbacks_if_terminated:</span> <span class='kw'>true</span>
-  <span class='kw'>end</span>
-<span class='kw'>end</span></pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-  </div>
-
 
 </div>
 
       <div id="footer">
-  Generated on Sun Sep 25 16:38:03 2016 by
+  Generated on Tue Sep 27 05:03:38 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.5 (ruby-2.3.1).
 </div>
