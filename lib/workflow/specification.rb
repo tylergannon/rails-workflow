@@ -40,6 +40,8 @@ module Workflow
       end
     end
 
+    set_callback(:spec_definition, :after, :define_tag_methods)
+
     # Find the state with the given name.
     #
     # @param [Symbol] name Name of state to find.
@@ -65,11 +67,12 @@ module Workflow
     #
     # @param [Symbol] name name of state
     # @param [Hash] meta Metadata to be stored with the state within the {Specification} object
+    # @param [Array] tags Tags to apply to the {Workflow::State} object
     # @yield [] block defining events for this state.
     # @return [nil]
-    def state(name, meta: {}, &events)
+    def state(name, tags: [], meta: {}, &events)
       name = name.to_sym
-      new_state = Workflow::State.new(name, @states.length, meta: meta)
+      new_state = Workflow::State.new(name, @states.length, tags: tags, meta: meta)
       @initial_state ||= new_state
       @states << new_state
       new_state.instance_eval(&events) if block_given?
@@ -119,6 +122,39 @@ module Workflow
 
     def define_revert_events?
       @define_revert_events
+    end
+
+    private
+
+    module TagHelpers
+      def initial?
+        sequence.zero?
+      end
+
+      def terminal?
+        events.empty?
+      end
+    end
+
+    def define_tag_methods
+      tags = states.map(&:tags).flatten.uniq
+      tag_method_module = build_tag_method_module(tags)
+      states.each do |state|
+        state.send :extend, tag_method_module
+      end
+    end
+
+    def build_tag_method_module(tags)
+      tag_method_module = Module.new
+      tag_method_module.send :include, TagHelpers
+      tag_method_module.class_eval do
+        tags.each do |tag|
+          define_method "#{tag}?" do
+            self.tags.include?(tag)
+          end
+        end
+      end
+      tag_method_module
     end
   end
 end

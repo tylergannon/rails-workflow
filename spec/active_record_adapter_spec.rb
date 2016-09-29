@@ -94,7 +94,9 @@ RSpec.describe 'Active Record Scopes', type: :active_record_examples do
 
       describe 'If configured not to persist state immediately' do
         before do
-          Workflow.config.persist_workflow_state_immediately = false
+          Workflow.config do |config|
+            config.persist_workflow_state_immediately = false
+          end
         end
         after do
           Workflow.config.persist_workflow_state_immediately = true
