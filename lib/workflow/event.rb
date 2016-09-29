@@ -7,16 +7,23 @@ module Workflow
     #   @return [Array] Array of {Workflow::Event::Transition}s defined for this event.
     # @!attribute [r] meta
     #   @return [Hash] Extra information defined for this event.
-    attr_reader :name, :transitions, :meta
+    # @!attribute [r] tags
+    #   @return [Array] Tags for this event.
+    attr_reader :name, :transitions, :meta, :tags
 
     # @api private
     # See {Workflow::State#on} for creating objects of this class.
     # @param [Symbol] name The name of the event to create.
     # @param [Hash] meta Optional Metadata for this object.
-    def initialize(name, meta: {})
+    # @param [Array] tags Tags for this event.
+    def initialize(name, tags: [], meta: {})
       @name = name.to_sym
       @transitions = []
       @meta = meta || {}
+      @tags = [tags].flatten.uniq
+      unless @tags.reject { |t| t.is_a? Symbol }
+        raise WorkflowDefinitionError, "Tags can only include symbols, event: [#{name}]"
+      end
     end
 
     def valid?

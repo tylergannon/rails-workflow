@@ -26,9 +26,9 @@ module Workflow
       @sequence = sequence
       @events = []
       @meta = meta
-      @tags = [tags].flatten
+      @tags = [tags].flatten.uniq
       unless @tags.reject { |t| t.is_a? Symbol }
-        raise WorkflowDefinitionError, "Tags can only include symbols, state: #{name}"
+        raise WorkflowDefinitionError, "Tags can only include symbols, state: [#{name}]"
       end
     end
 
@@ -71,9 +71,9 @@ module Workflow
     #  state :the_diner
     # end
     # ```
-    def on(name, to: nil, meta: {}, &transitions)
+    def on(name, to: nil, tags: [], meta: {}, &transitions)
       check_can_add_transition!(name, to: to, &transitions)
-      event = Workflow::Event.new(name, meta: meta)
+      event = Workflow::Event.new(name, tags: tags, meta: meta)
 
       if to
         event.to to

@@ -41,6 +41,7 @@ module Workflow
     end
 
     set_callback(:spec_definition, :after, :define_tag_methods)
+    set_callback(:spec_definition, :after, :define_event_tag_methods)
 
     # Find the state with the given name.
     #
@@ -126,7 +127,7 @@ module Workflow
 
     private
 
-    module TagHelpers
+    module StateTagHelpers
       def initial?
         sequence.zero?
       end
@@ -138,15 +139,24 @@ module Workflow
 
     def define_tag_methods
       tags = states.map(&:tags).flatten.uniq
-      tag_method_module = build_tag_method_module(tags)
+      tag_method_module = build_tag_method_module(tags, true)
       states.each do |state|
         state.send :extend, tag_method_module
       end
     end
 
-    def build_tag_method_module(tags)
+    def define_event_tag_methods
+      events = states.map(&:events).flatten
+      tags   = events.map(&:tags).flatten
+      tag_method_module = build_tag_method_module(tags, false)
+      events.each do |event|
+        event.send :extend, tag_method_module
+      end
+    end
+
+    def build_tag_method_module(tags, include_state_helpers)
       tag_method_module = Module.new
-      tag_method_module.send :include, TagHelpers
+      tag_method_module.send :include, StateTagHelpers if include_state_helpers
       tag_method_module.class_eval do
         tags.each do |tag|
           define_method "#{tag}?" do
