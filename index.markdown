@@ -21,5 +21,6 @@ to enable a more flexible application of callbacks.
 * [Getting Started]({{site.baseurl}}/getting_started)
 * [Conditional State Transitions]({{ site.baseurl }}/conditional_transitions)
 * [Transition Callbacks]({{ site.baseurl }}/callbacks)
+* [Tagging States]({{ site.baseurl }}/tags_for_states)
 * [Callback Arguments]({{ site.baseurl }}/callback_arguments)
 * [Full API Documentation]({{ site.baseurl }}/docs)

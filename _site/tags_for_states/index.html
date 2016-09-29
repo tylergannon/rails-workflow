@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Blog</title>
+  <title>Rails Workflow</title>
   <meta name="description" content="Rails Workflow began as a fork of the Workflow gem by Vladimir Dobriakov. It is a nearly total rewrite but maintains the same core architecture. It is releas...">
 
   
   
   <link rel="stylesheet" href="/rails-workflow/css/main.css">
-  <link rel="canonical" href="/rails-workflow/blog.html">
+  <link rel="canonical" href="/rails-workflow/tags_for_states/">
   <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="/rails-workflow/feed.xml">
   
   
@@ -90,25 +90,45 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <div class="home">
+        <main>
+  <article class="post">
 
-  <h1 class="page-heading">Posts</h1>
+    <header class="post-header">
+      <h1 class="post-title"></h1>
+    </header>
 
-  <ul class="post-list">
-    
-      <li>
-        <span class="post-meta">Sep 25, 2016</span>
+    <div class="post-content">
+      <h1 id="tagging-states">Tagging States</h1>
 
-        <h2>
-          <a class="post-link" href="/rails-workflow/update/2016/09/25/welcome-to-rails-workflow.html">Welcome to Rails-Workflow!</a>
-        </h2>
-      </li>
-    
-  </ul>
+<p>Place your workflow states into groups by tagging them.
+Also note the helper methods <code class="highlighter-rouge">initial?</code> and <code class="highlighter-rouge">terminal?</code>.</p>
 
-  <p class="rss-subscribe">subscribe <a href="/rails-workflow/feed.xml">via RSS</a></p>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Foo</span>
+  <span class="kp">include</span> <span class="no">Workflow</span>
+  <span class="n">state</span> <span class="ss">:new</span><span class="p">,</span> <span class="ss">tags: :bar</span> <span class="k">do</span>
+    <span class="n">on</span> <span class="ss">:complete</span><span class="p">,</span> <span class="ss">to: :completed</span>
+  <span class="k">end</span>
+  <span class="n">state</span> <span class="ss">:completed</span><span class="p">,</span> <span class="ss">tags: </span><span class="p">[</span><span class="ss">:awesome</span><span class="p">,</span> <span class="ss">:congrats</span><span class="p">]</span>
+<span class="k">end</span>
 
+<span class="n">a</span> <span class="o">=</span> <span class="no">Foo</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">bar?</span>
+<span class="c1"># =&gt; true</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">initial?</span>
+<span class="c1"># =&gt; true</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">awesome?</span>
+<span class="c1"># =&gt; false</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:complete</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">terminal?</span>
+<span class="c1"># =&gt; true</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">awesome?</span>
+<span class="c1"># =&gt; true</span>
+</code></pre>
 </div>
+
+    </div>
+  </article>
+</main>
 
       </div>
     </main>

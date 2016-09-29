@@ -10,11 +10,7 @@ layout: default
     </header>
 
     <div class="post-content">
-      {{ content | inject_anchors }}
+      {{ content }}
     </div>
-
   </article>
-  <aside>
-    {{ content | toc_only }}
-  </aside>
 </main>

@@ -1,5 +1,6 @@
 ---
 layout: page
+permalink: /tags_for_states/
 ---
 
 # Tagging States
