@@ -63,22 +63,39 @@ module Workflow
           workflow_spec.states.each { |state| define_scopes(state) }
         end
 
+        # Find objects that are in a terminal state - no available
+        # event transitions
+        # @return [ActiveRecord::Relation] ActiveRecord query object meeting the criteria
         def in_terminal_state
           with_state workflow_spec.states.select(&:terminal?)
         end
 
+        # Find objects that are not in a terminal state
+        # @return [ActiveRecord::Relation] ActiveRecord query object meeting the criteria
         def not_in_terminal_state
           with_state(workflow_spec.states.reject(&:terminal?))
         end
 
+        # Locate objects that are in a state tagged with the given tag(s)
+        #
+        # @param [Symbol] tags List of tags that apply
+        # @return [ActiveRecord::Relation] ActiveRecord query object meeting the criteria
         def state_tagged_with(*tags)
           with_state workflow_spec.states.tagged_with(tags)
         end
 
+        # Locate objects that are not in a state tagged with the given tag(s)
+        #
+        # @param [Symbol] tags List of tags the objects (and their states) should not have
+        # @return [ActiveRecord::Relation] ActiveRecord query object meeting the criteria
         def state_not_tagged_with(*tags)
           with_state workflow_spec.states.not_tagged_with(tags)
         end
 
+        # Find objects in the given state(s)
+        #
+        # @param [Object] states Symbol, String or {Workflow::State} objects
+        # @return [ActiveRecord::Relation] ActiveRecord query object meeting the criteria
         def with_state(*states)
           states = [states].flatten
           states.map! do |state|
