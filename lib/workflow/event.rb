@@ -26,6 +26,11 @@ module Workflow
       end
     end
 
+    # @return [String] Titleized name of this event.
+    def title
+      name.to_s.titleize
+    end
+
     def valid?
       transitions.any?
     end
