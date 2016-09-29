@@ -23,6 +23,7 @@ to enable a more flexible application of callbacks.
 * [Transition Callbacks]({{ site.baseurl }}/callbacks)
 * [Tagging States And Events]({{ site.baseurl }}/tags_for_states)
 * [ActiveRecord Scopes]({{ site.baseurl }}/active_record_scopes)
+* [State-Specific Validations]({{ site.baseurl }}/state_specific_validations)
 * [State And Event Metadata]({{ site.baseurl }}/metadata)
 * [Callback Arguments]({{ site.baseurl }}/callback_arguments)
 * [Full API Documentation]({{ site.baseurl }}/docs)

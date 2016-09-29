@@ -12,7 +12,7 @@
   
   
   <link rel="stylesheet" href="/rails-workflow/css/main.css">
-  <link rel="canonical" href="/rails-workflow/conditional_transitions/">
+  <link rel="canonical" href="/rails-workflow/state_specific_validations/">
   <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="/rails-workflow/feed.xml">
   
   
@@ -94,37 +94,69 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <h1 id="multiple-possible-targets-for-a-given-event">Multiple Possible Targets For A Given Event</h1>
+        <main>
+  <article class="post">
 
-<p>The first matching condition will determine the target state.
-An error will be raised if none match, so a catchall at the end is a good idea.</p>
+    <header class="post-header">
+      <h1 class="post-title"></h1>
+    </header>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span>
+    <div class="post-content">
+      <h1 id="state-specific-validations">State-Specific Validations</h1>
+
+<p>If your class inherits from <code class="highlighter-rouge">ActiveModel::Validations</code> (which includes any
+ActiveRecord models), the object will be validated in its new state.</p>
+
+<p>If the validation fails, the object will be returned to its original state,
+the method call will return a falsy value, and the errors object will contain
+whatever errors resulted from the validation.</p>
+
+<p>Use the overloaded comparison operators on the current state to
+create conditional validations that apply only to certain states or ranges of
+states:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="kp">include</span> <span class="no">Workflow</span>
+
+  <span class="n">validates</span> <span class="ss">:reviewer</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">if: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="n">current_state</span> <span class="o">&gt;=</span> <span class="ss">:reviewed</span> <span class="p">}</span>
+  <span class="n">validates</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">presence: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">if: </span><span class="o">-&gt;</span> <span class="p">{</span> <span class="n">current_state</span> <span class="o">&gt;</span> <span class="ss">:new</span> <span class="p">},</span> <span class="ss">unless: :trashed?</span>
+
   <span class="n">workflow</span> <span class="k">do</span>
     <span class="n">state</span> <span class="ss">:new</span> <span class="k">do</span>
-      <span class="n">on</span> <span class="ss">:submit</span> <span class="k">do</span>
-        <span class="n">to</span> <span class="ss">:awaiting_review</span><span class="p">,</span> <span class="ss">if: :today_is_wednesday?</span>
-        <span class="n">to</span> <span class="ss">:being_reviewed</span><span class="p">,</span> <span class="ss">unless: </span><span class="s2">"author.name == 'Foo Bar'"</span>
-        <span class="n">to</span> <span class="ss">:accepted</span><span class="p">,</span> <span class="ss">if: </span><span class="o">-&gt;</span> <span class="p">{</span><span class="n">author</span><span class="p">.</span><span class="nf">role</span> <span class="o">==</span> <span class="s1">'Admin'</span><span class="p">}</span>
-        <span class="n">to</span> <span class="ss">:rejected</span><span class="p">,</span> <span class="ss">if: </span><span class="p">[</span><span class="ss">:bad_hair_day?</span><span class="p">,</span> <span class="ss">:in_a_bad_mood?</span><span class="p">]</span>
-        <span class="n">to</span> <span class="ss">:the_bad_place</span>
-      <span class="k">end</span>
+      <span class="n">on</span> <span class="ss">:submit</span><span class="p">,</span> <span class="ss">to: :submitted</span>
     <span class="k">end</span>
-    <span class="n">state</span> <span class="ss">:awaiting_review</span> <span class="k">do</span>
-      <span class="n">on</span> <span class="ss">:review</span><span class="p">,</span> <span class="ss">to: :being_reviewed</span>
+    <span class="n">state</span> <span class="ss">:submitted</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:review</span><span class="p">,</span> <span class="ss">to: :reviewed</span>
     <span class="k">end</span>
-    <span class="n">state</span> <span class="ss">:being_reviewed</span> <span class="k">do</span>
-      <span class="n">on</span> <span class="ss">:accept</span><span class="p">,</span> <span class="ss">to: :accepted</span>
-      <span class="n">on</span> <span class="ss">:reject</span><span class="p">,</span> <span class="ss">to: :rejected</span>
+    <span class="n">state</span> <span class="ss">:reviewed</span> <span class="k">do</span>
+      <span class="n">on</span> <span class="ss">:publish</span><span class="p">,</span> <span class="ss">to: :published</span>
+      <span class="n">on</span> <span class="ss">:trash</span><span class="p">,</span> <span class="ss">to: :trashed</span>
     <span class="k">end</span>
-    <span class="n">state</span> <span class="ss">:accepted</span>
-    <span class="n">state</span> <span class="ss">:rejected</span>
-    <span class="n">state</span> <span class="ss">:the_bad_place</span>
+    <span class="n">state</span> <span class="ss">:published</span>
+    <span class="n">state</span> <span class="ss">:trashed</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </code></pre>
 </div>
+
+<p>The <code class="highlighter-rouge">valid?</code> method has been overridden for classes inheriting from <code class="highlighter-rouge">ActiveRecord::Base</code>,
+such that calling <code class="highlighter-rouge">valid?</code> will not trigger another validation until some attribute has
+been changed.</p>
+
+<p>This is so that you can do something like:</p>
+
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="n">my_object</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:failing_transition</span>
+<span class="n">my_object</span><span class="p">.</span><span class="nf">valid?</span>
+<span class="c1"># =&gt; false</span>
+<span class="n">my_object</span><span class="p">.</span><span class="nf">errors</span><span class="p">.</span><span class="nf">clear</span>
+<span class="n">my_object</span><span class="p">.</span><span class="nf">valid?</span>
+<span class="c1"># =&gt; true</span>
+</code></pre>
+</div>
+
+    </div>
+  </article>
+</main>
 
       </div>
     </main>
