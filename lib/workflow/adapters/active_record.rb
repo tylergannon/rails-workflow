@@ -63,16 +63,32 @@ module Workflow
           workflow_spec.states.each { |state| define_scopes(state) }
         end
 
+        def in_terminal_state
+          with_state workflow_spec.states.select(&:terminal?)
+        end
+
+        def not_in_terminal_state
+          with_state(workflow_spec.states.reject(&:terminal?))
+        end
+
         def state_tagged_with(*tags)
-          states = workflow_spec.states.tagged_with(tags)
-          states.map! { |state| state.name.to_s }
-          where(workflow_state: states)
+          with_state workflow_spec.states.tagged_with(tags)
         end
 
         def state_not_tagged_with(*tags)
-          states = workflow_spec.states.tagged_with(tags)
-          states.map! { |state| state.name.to_s }
-          where.not(workflow_state: states)
+          with_state workflow_spec.states.not_tagged_with(tags)
+        end
+
+        def with_state(*states)
+          states = [states].flatten
+          states.map! do |state|
+            if state.is_a?(Workflow::State)
+              state.name.to_s
+            else
+              state.to_s
+            end
+          end
+          where(workflow_state: states)
         end
 
         private

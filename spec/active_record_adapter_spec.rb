@@ -31,7 +31,23 @@ RSpec.describe Workflow::Adapters::ActiveRecord, type: :active_record_examples d
   describe 'tagged_with scopes' do
     before do
       Article.create workflow_state: 'new', title: 'Yeah'
-      Article.create workflow_state: 'accepted'
+      Article.create workflow_state: 'accepted', title: 'No'
+    end
+
+    describe '.in_terminal_state' do
+      subject { Article.in_terminal_state }
+      it 'should have just one record' do
+        expect(subject.length).to eq 1
+        expect(subject.first.title).to eq 'No'
+      end
+    end
+
+    describe '.not_in_terminal_state' do
+      subject { Article.not_in_terminal_state }
+      it 'should have just one record' do
+        expect(subject.length).to eq 1
+        expect(subject.first.title).to eq 'Yeah'
+      end
     end
 
     describe '.state_tagged_with' do
