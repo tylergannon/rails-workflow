@@ -5,6 +5,70 @@ RSpec.describe 'Active Record Validations' do
   include_context 'ActiveRecord Setup'
   subject { ActiveRecordArticle.find_by_title 'new1' }
 
+  describe 'Conditional Validation With Procs' do
+    class FooClass
+      include ActiveModel::Validations
+      include Workflow
+      attr_accessor :nice, :bar
+      workflow do
+        state :new do
+          on :go, to: :went
+        end
+        state :went do
+          on :go, to: :went_further
+        end
+        state :went_further do
+          on :go, to: :went_far_enough
+        end
+        state :went_far_enough
+      end
+    end
+    describe 'validation with >=' do
+      subject { FooWithGreaterThanEqual.new }
+      class FooWithGreaterThanEqual < FooClass
+        validates :nice, presence: true, if: -> { current_state >= :went }
+      end
+
+      it "doesn't fire if the state is before the named state" do
+        expect(subject).to be_valid
+      end
+
+      it 'fires if the state is at the named state' do
+        subject.go!
+        expect(subject.errors).not_to be_empty
+      end
+
+      it 'returns the object back to its prior state' do
+        subject.go!
+        expect(subject).to be_new
+      end
+    end
+
+    describe 'validation with >' do
+      subject { FooWithGreaterThan.new }
+      class FooWithGreaterThan < FooClass
+        validates :nice, presence: true, if: -> { current_state > :went }
+      end
+
+      it "doesn't fire if the state is before the named state" do
+        expect(subject).to be_valid
+      end
+
+      it 'does not fire if the state is at the named state' do
+        subject.go!
+        expect(subject.errors).to be_empty
+        expect(subject).to be_went
+      end
+
+      it 'fires when the subject is beyond the named state' do
+        subject.go!
+        subject.go!
+        expect(subject.errors).not_to be_empty
+        expect(subject).to be_went
+      end
+    end
+  end
+
   describe 'Outside of the transition' do
     it { is_expected.to be_valid }
   end

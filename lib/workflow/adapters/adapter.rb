@@ -10,6 +10,9 @@ module Workflow
         else
           if Adapters.const_defined?(:ActiveRecord) && self < ::ActiveRecord::Base
             include Adapters::ActiveRecord
+          end
+
+          if included_modules.map(&:name).include?('ActiveModel::Validations')
             include ActiveRecordValidations
           end
 

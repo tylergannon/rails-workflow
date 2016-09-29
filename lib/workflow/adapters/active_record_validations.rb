@@ -8,7 +8,7 @@ module Workflow
       extend ActiveSupport::Concern
 
       included do
-        prepend RevalidateOnlyAfterAttributesChange
+        prepend RevalidateOnlyAfterAttributesChange if self < ::ActiveRecord::Base
       end
 
       ###
@@ -126,6 +126,14 @@ module Workflow
       end
 
       private
+
+      def persist_workflow_state(new_state)
+        old_state = current_state.name
+        return_val = super
+        return return_val if valid?
+        super(old_state)
+        false
+      end
 
       def define_transitioning_method(method, direction, state)
         class_eval do
