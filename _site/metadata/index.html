@@ -12,7 +12,7 @@
   
   
   <link rel="stylesheet" href="/rails-workflow/css/main.css">
-  <link rel="canonical" href="/rails-workflow/tags_for_states/">
+  <link rel="canonical" href="/rails-workflow/metadata/">
   <link rel="alternate" type="application/rss+xml" title="Rails Workflow" href="/rails-workflow/feed.xml">
   
   
@@ -100,37 +100,27 @@
     </header>
 
     <div class="post-content">
-      <h1 id="tagging-states-and-events">Tagging States And Events</h1>
+      <h1 id="state-and-event-metadata">State and Event Metadata</h1>
 
 <p>Place your workflow states into groups by tagging them.
 Also note the helper methods <code class="highlighter-rouge">initial?</code> and <code class="highlighter-rouge">terminal?</code>.</p>
 
 <div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Foo</span>
   <span class="kp">include</span> <span class="no">Workflow</span>
-  <span class="n">state</span> <span class="ss">:new</span><span class="p">,</span> <span class="ss">tags: :bar</span> <span class="k">do</span>
-    <span class="n">on</span> <span class="ss">:complete</span><span class="p">,</span> <span class="ss">to: :completed</span><span class="p">,</span> <span class="ss">tags: </span><span class="p">[</span><span class="ss">:feedback</span><span class="p">]</span>
-    <span class="n">on</span> <span class="ss">:cancel</span><span class="p">,</span> <span class="ss">to: :cancelled</span><span class="p">,</span> <span class="ss">tags: :bad</span>
+
+  <span class="n">state</span> <span class="ss">:new</span><span class="p">,</span> <span class="ss">tags: :bar</span><span class="p">,</span> <span class="ss">css_class: </span><span class="s1">'bg-primary'</span> <span class="k">do</span>
+    <span class="n">on</span> <span class="ss">:complete</span><span class="p">,</span> <span class="ss">to: :completed</span><span class="p">,</span> <span class="ss">css_class: </span><span class="s1">'bg-success'</span>
+    <span class="n">on</span> <span class="ss">:cancel</span><span class="p">,</span> <span class="ss">to: :cancelled</span><span class="p">,</span> <span class="ss">css_class: </span><span class="s1">'bg-warning'</span>
   <span class="k">end</span>
-  <span class="n">state</span> <span class="ss">:completed</span><span class="p">,</span> <span class="ss">tags: </span><span class="p">[</span><span class="ss">:awesome</span><span class="p">,</span> <span class="ss">:congrats</span><span class="p">]</span>
-  <span class="n">state</span> <span class="ss">:cancelled</span>
+  <span class="n">state</span> <span class="ss">:completed</span><span class="p">,</span> <span class="ss">tags: </span><span class="p">[</span><span class="ss">:awesome</span><span class="p">,</span> <span class="ss">:congrats</span><span class="p">],</span> <span class="ss">css_class: </span><span class="s1">'bg-success'</span>
+  <span class="n">state</span> <span class="ss">:cancelled</span><span class="p">,</span> <span class="ss">css_class: </span><span class="s1">'bg-danger'</span>
 <span class="k">end</span>
 
 <span class="n">a</span> <span class="o">=</span> <span class="no">Foo</span><span class="p">.</span><span class="nf">new</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">bar?</span>
-<span class="c1"># =&gt; true</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">initial?</span>
-<span class="c1"># =&gt; true</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">events</span><span class="p">.</span><span class="nf">first</span><span class="p">.</span><span class="nf">feedback?</span>
-<span class="c1"># =&gt; true</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">events</span><span class="p">.</span><span class="nf">first</span><span class="p">.</span><span class="nf">bad?</span>
-<span class="c1"># =&gt; false</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">awesome?</span>
-<span class="c1"># =&gt; false</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">transition!</span> <span class="ss">:complete</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">terminal?</span>
-<span class="c1"># =&gt; true</span>
-<span class="n">a</span><span class="p">.</span><span class="nf">awesome?</span>
-<span class="c1"># =&gt; true</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">css_class</span>
+<span class="c1"># =&gt; 'bg-primary'</span>
+<span class="n">a</span><span class="p">.</span><span class="nf">current_state</span><span class="p">.</span><span class="nf">events</span><span class="p">.</span><span class="nf">first</span><span class="p">.</span><span class="nf">css_class</span>
+<span class="c1"># =&gt; 'bg-success'</span>
 </code></pre>
 </div>
 
