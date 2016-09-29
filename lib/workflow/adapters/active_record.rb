@@ -37,14 +37,26 @@ module Workflow
         write_attribute self.class.workflow_column, current_state.name
       end
 
-      # This module will automatically generate ActiveRecord scopes based on workflow states.
-      # The name of each generated scope will be something like `with_<state_name>_state`
+      # Scopes for the ActiveRecord entity class.
+      #
+      # Two scopes for each {Workflow::State} specified plus some general ones:
       #
       # Examples:
-      #
+      #~~~ruby
+      # class Article < ApplicationRecord
+      #   include Workflow
+      #   state :pending, tags: :some_tag do
+      #     on :submit, to: :submitted
+      #   end
+      #   state :submitted
+      # end
       # Article.with_pending_state # => ActiveRecord::Relation
-      # Payment.without_refunded_state # => ActiveRecord::Relation
-      # `
+      # Article.without_pending_state # => ActiveRecord::Relation
+      # Article.state_tagged_with(:some_tag, :another_tag)
+      # Article.state_not_tagged_with(:some_tag)
+      # Article.in_terminal_state
+      #
+      #~~~
       # Example above just adds `where(:state_column_name => 'pending')` or
       # `where.not(:state_column_name => 'pending')` to AR query and returns
       # ActiveRecord::Relation.
