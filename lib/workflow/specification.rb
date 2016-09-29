@@ -71,9 +71,9 @@ module Workflow
     # @param [Array] tags Tags to apply to the {Workflow::State} object
     # @yield [] block defining events for this state.
     # @return [nil]
-    def state(name, tags: [], meta: {}, &events)
+    def state(name, tags: [], **meta, &events)
       name = name.to_sym
-      new_state = Workflow::State.new(name, @states.length, tags: tags, meta: meta)
+      new_state = Workflow::State.new(name, @states.length, tags: tags, **meta)
       @initial_state ||= new_state
       @states << new_state
       new_state.instance_eval(&events) if block_given?

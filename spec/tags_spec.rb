@@ -21,7 +21,7 @@ RSpec.describe Workflow::State do
       expect(subject.current_state).to be_initial
     end
 
-    it "has tag helpers on its events" do
+    it 'has tag helpers on its events' do
       expect(subject.current_state.events.first).to be_feedback
     end
 
@@ -38,11 +38,11 @@ RSpec.describe Workflow::State do
       expect(subject.current_state).not_to be_terminal
     end
 
-    describe "In the interim state" do
+    describe 'In the interim state' do
       before do
         subject.complete!
       end
-      it "has tag helpers on its events" do
+      it 'has tag helpers on its events' do
         expect(subject.current_state.events.first).not_to be_feedback
         expect(subject.current_state.events.first).to be_bar
         expect(subject.current_state.events.first).to be_foo

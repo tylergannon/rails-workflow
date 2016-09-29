@@ -16,13 +16,20 @@ module Workflow
     # @param [Symbol] name The name of the event to create.
     # @param [Hash] meta Optional Metadata for this object.
     # @param [Array] tags Tags for this event.
-    def initialize(name, tags: [], meta: {})
+    def initialize(name, tags: [], **meta)
       @name = name.to_sym
       @transitions = []
       @meta = meta || {}
       @tags = [tags].flatten.uniq
       unless @tags.reject { |t| t.is_a? Symbol }
         raise WorkflowDefinitionError, "Tags can only include symbols, event: [#{name}]"
+      end
+
+      meta.each do |meta_name, value|
+        class_eval do
+          attr_accessor meta_name
+        end
+        instance_variable_set("@#{meta_name}", value)
       end
     end
 

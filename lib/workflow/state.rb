@@ -10,25 +10,29 @@ module Workflow
     #   @return [Symbol] The name of the state.
     # @!attribute [r] events
     #   @return [Array] Array of {Workflow::Event}s defined for this state.
-    # @!attribute [r] meta
-    #   @return [Hash] Extra information defined for this state.
     # @!attribute [r] tags
     #   @return [Array] Tags for this state.
-    attr_reader :name, :events, :meta, :tags
+    attr_reader :name, :events, :tags
 
     # @api private
     # For creating {Workflow::State} objects please see {Specification#state}
     # @param [Symbol] name Name of the state being created. Must be unique within its workflow.
     # @param [Fixnum] sequence Sort location among states on this workflow.
     # @param [Hash] meta Optional metadata for this state.
-    def initialize(name, sequence, tags: [], meta: {})
+    def initialize(name, sequence, tags: [], **meta)
       @name = name.to_sym
       @sequence = sequence
       @events = []
-      @meta = meta
       @tags = [tags].flatten.uniq
       unless @tags.reject { |t| t.is_a? Symbol }
         raise WorkflowDefinitionError, "Tags can only include symbols, state: [#{name}]"
+      end
+
+      meta.each do |meta_name, value|
+        class_eval do
+          attr_accessor meta_name
+        end
+        instance_variable_set("@#{meta_name}", value)
       end
     end
 
@@ -71,9 +75,9 @@ module Workflow
     #  state :the_diner
     # end
     # ```
-    def on(name, to: nil, tags: [], meta: {}, &transitions)
+    def on(name, to: nil, tags: [], **meta, &transitions)
       check_can_add_transition!(name, to: to, &transitions)
-      event = Workflow::Event.new(name, tags: tags, meta: meta)
+      event = Workflow::Event.new(name, tags: tags, **meta)
 
       if to
         event.to to
