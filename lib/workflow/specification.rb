@@ -89,7 +89,7 @@ module Workflow
     # @return [nil]
     def state(name, tags: [], **meta, &events)
       name = name.to_sym
-      new_state = Workflow::State.new(name, @states.length, tags: tags, **meta)
+      new_state = Workflow::State.new(name, @states, tags: tags, **meta)
       @initial_state ||= new_state
       @states << new_state
       new_state.instance_eval(&events) if block_given?
@@ -145,7 +145,7 @@ module Workflow
 
     module StateTagHelpers
       def initial?
-        sequence.zero?
+        all_states.index(self).zero?
       end
 
       def terminal?

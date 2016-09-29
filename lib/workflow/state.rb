@@ -17,11 +17,11 @@ module Workflow
     # @api private
     # For creating {Workflow::State} objects please see {Specification#state}
     # @param [Symbol] name Name of the state being created. Must be unique within its workflow.
-    # @param [Fixnum] sequence Sort location among states on this workflow.
+    # @param [Array] all_states All states defined for this workflow, used for sorting.
     # @param [Hash] meta Optional metadata for this state.
-    def initialize(name, sequence, tags: [], **meta)
+    def initialize(name, all_states, tags: [], **meta)
       @name = name.to_sym
-      @sequence = sequence
+      @all_states = all_states
       @events = []
       @tags = [tags].flatten.uniq
       unless @tags.reject { |t| t.is_a? Symbol }
@@ -93,6 +93,12 @@ module Workflow
       nil
     end
 
+    class << self
+      def beyond?(other)
+        -> { current_state > other }
+      end
+    end
+
     private def check_can_add_transition!(name, to: nil)
       raise Errors::DualEventDefinitionError if to && block_given?
 
@@ -111,19 +117,20 @@ module Workflow
     # Overloaded comparison operator.  Workflow states are sorted according to the order
     # in which they were defined.
     #
-    # @param [Workflow::State] other state to be compared against.
+    # @param [Workflow::State] other state or Symbol name to be compared against.
     # @return [Integer]
     def <=>(other)
-      raise Errors::StateComparisonError, other unless other.is_a?(State)
-      sequence <=> other.send(:sequence)
+      if other.is_a?(Symbol)
+        other = all_states.find { |state| state.name == other }
+      end
+      all_states.index(self) <=> all_states.index(other)
     end
 
     private
 
     # @api private
-    # @!attribute [r] sequence
-    #   @return [Fixnum] The position of this state within the
-    #                     order it was defined for in its workflow.
-    attr_reader :sequence
+    # @!attribute [r] all_states
+    #   @return [Array] All states defined on my workflow.  Used for sorting.
+    attr_reader :all_states
   end
 end

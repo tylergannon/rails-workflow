@@ -21,11 +21,7 @@ module Workflow
       #
       def method_missing(method, *args, &block)
         if method.to_s =~ /^transitioning_(from|to|via_event)_([\w_-]+)\?$/
-          class_eval "
-          def #{method}
-            transitioning? direction: '#{$LAST_MATCH_INFO[1]}', state: '#{$LAST_MATCH_INFO[2]}'
-          end
-          "
+          define_transitioning_method(method, *$LAST_MATCH_INFO[1..2])
           send method
         else
           super
@@ -108,7 +104,7 @@ module Workflow
         end
 
         def write_attribute(attr_name, value)
-          @changed_since_validation = true
+          @changed_since_validation = true unless attr_name.to_sym == :workflow_state
           super
         end
       end
@@ -130,6 +126,14 @@ module Workflow
       end
 
       private
+
+      def define_transitioning_method(method, direction, state)
+        class_eval do
+          define_method method do
+            transitioning? direction: direction, state: state
+          end
+        end
+      end
 
       def transitioning?(direction:, state:)
         state = state.to_sym
