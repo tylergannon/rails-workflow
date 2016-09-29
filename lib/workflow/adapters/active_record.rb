@@ -42,7 +42,7 @@ module Workflow
       # Two scopes for each {Workflow::State} specified plus some general ones:
       #
       # Examples:
-      #~~~ruby
+      # ~~~ruby
       # class Article < ApplicationRecord
       #   include Workflow
       #   state :pending, tags: :some_tag do
@@ -56,7 +56,7 @@ module Workflow
       # Article.state_not_tagged_with(:some_tag)
       # Article.in_terminal_state
       #
-      #~~~
+      # ~~~
       # Example above just adds `where(:state_column_name => 'pending')` or
       # `where.not(:state_column_name => 'pending')` to AR query and returns
       # ActiveRecord::Relation.

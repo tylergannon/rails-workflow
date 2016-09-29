@@ -57,6 +57,16 @@ module Workflow
       states.find { |t| t.name == name.to_sym }
     end
 
+    # @return [Array] Array of unique event names defined for this workflow spec.
+    def event_names
+      events.map(&:name).uniq
+    end
+
+    # @return [Array] Names of states defined on this workflow spec.
+    def state_names
+      states.map(&:name)
+    end
+
     # @api private
     #
     # @param [Hash] meta Metadata
