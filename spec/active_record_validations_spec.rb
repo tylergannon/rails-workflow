@@ -23,6 +23,7 @@ RSpec.describe 'Active Record Validations' do
         state :went_far_enough
       end
     end
+
     describe 'validation with >=' do
       subject { FooWithGreaterThanEqual.new }
       class FooWithGreaterThanEqual < FooClass

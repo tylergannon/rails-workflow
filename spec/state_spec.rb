@@ -17,6 +17,21 @@ RSpec.describe 'Workflow::State' do
     end
   end
 
+  describe 'comparisons' do
+    let(:workflow_class) do
+      new_workflow_class do
+        state :foo
+      end
+    end
+    describe 'when comparing against a non-existent state' do
+      it 'should raise error' do
+        expect do
+          workflow_class.new.current_state < :foo_baz
+        end.to raise_error(Workflow::Errors::StateComparisonError)
+      end
+    end
+  end
+
   describe 'Error Conditions' do
     describe 'If no target transition is given for an event' do
       it 'should raise an error' do

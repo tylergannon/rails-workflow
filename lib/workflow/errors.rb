@@ -35,9 +35,8 @@ module Workflow
     end
 
     class StateComparisonError < StandardError
-      def initialize(state)
-        super("Other State #{state} is a #{state.class}.
-              I can only be compared with a Workflow::State.".squish)
+      def initialize(state, other)
+        super("Can't compare #{state} with #{other} bc [#{other}] is not a defined state.")
       end
     end
 

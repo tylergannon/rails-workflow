@@ -114,6 +114,10 @@ module Workflow
       "<State name=#{name.inspect} events(#{events.length})=#{events.inspect}>"
     end
 
+    def to_s
+      name.to_s
+    end
+
     # Overloaded comparison operator.  Workflow states are sorted according to the order
     # in which they were defined.
     #
@@ -121,7 +125,9 @@ module Workflow
     # @return [Integer]
     def <=>(other)
       if other.is_a?(Symbol)
-        other = all_states.find { |state| state.name == other }
+        state = all_states.find { |s| s.name == other }
+        raise Errors::StateComparisonError.new(self, other) unless state
+        other = state
       end
       all_states.index(self) <=> all_states.index(other)
     end
