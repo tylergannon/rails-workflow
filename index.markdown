@@ -22,6 +22,7 @@ to enable a more flexible application of callbacks.
 * [Conditional State Transitions]({{ site.baseurl }}/conditional_transitions)
 * [Transition Callbacks]({{ site.baseurl }}/callbacks)
 * [Tagging States And Events]({{ site.baseurl }}/tags_for_states)
+* [ActiveRecord Scopes]({{ site.baseurl }}/active_record_scopes)
 * [State And Event Metadata]({{ site.baseurl }}/metadata)
 * [Callback Arguments]({{ site.baseurl }}/callback_arguments)
 * [Full API Documentation]({{ site.baseurl }}/docs)

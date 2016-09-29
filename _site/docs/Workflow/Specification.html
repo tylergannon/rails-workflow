@@ -116,12 +116,50 @@
 <div class="tags">
   
 
-</div>
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Specification/StateTagHelpers.html" title="Workflow::Specification::StateTagHelpers (module)">StateTagHelpers</a></span>, <span class='object_link'><a href="Specification/TaggedWith.html" title="Workflow::Specification::TaggedWith (module)">TaggedWith</a></span>
+    
+  
+    
+  
+</p>
+
 
 
 
   <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
   <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#events-instance_method" title="#events (instance method)">#<strong>events</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The event objects defined for this specification.</p>
+</div></span>
+  
+</li>
+
     
       <li class="public ">
   <span class="summary_signature">
@@ -210,7 +248,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#states-instance_method" title="#states (instance method)">#<strong>states</strong>  &#x21d2; Hash </a>
+      <a href="#states-instance_method" title="#states (instance method)">#<strong>states</strong>  &#x21d2; Array </a>
     
 
     
@@ -229,7 +267,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>The state objects defined for this specification, keyed by name.</p>
+    <span class="summary_desc"><div class='inline'><p>The state objects defined for this specification.</p>
 </div></span>
   
 </li>
@@ -366,7 +404,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#state-instance_method" title="#state (instance method)">#<strong>state</strong>(name, meta: {}) { ... } &#x21d2; nil </a>
+      <a href="#state-instance_method" title="#state (instance method)">#<strong>state</strong>(name, tags: [], **meta) { ... } &#x21d2; nil </a>
     
 
     
@@ -486,16 +524,16 @@
       <pre class="lines">
 
 
-56
-57
-58
-59
-60
-61
-62</pre>
+65
+66
+67
+68
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_meta'>meta</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_specification'>specification</span><span class='rparen'>)</span>
   <span class='ivar'>@states</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -517,7 +555,62 @@
       
       <span id=""></span>
       <div class="method_details first">
-  <h3 class="signature first" id="initial_state-instance_method">
+  <h3 class="signature first" id="events-instance_method">
+  
+    #<strong>events</strong>  &#x21d2; <tt>Array</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The event objects defined for this specification</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+17
+18
+19</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 17</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_events'>events</span>
+  <span class='ivar'>@events</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="initial_state-instance_method">
   
     #<strong>initial_state</strong>  &#x21d2; <tt><span class='object_link'><a href="State.html" title="Workflow::State (class)">State</a></span></tt>  <span class="extras">(readonly)</span>
   
@@ -554,12 +647,12 @@
       <pre class="lines">
 
 
-17
-18
-19</pre>
+21
+22
+23</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 17</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initial_state'>initial_state</span>
   <span class='ivar'>@initial_state</span>
@@ -609,12 +702,12 @@
       <pre class="lines">
 
 
-21
-22
-23</pre>
+25
+26
+27</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 25</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_meta'>meta</span>
   <span class='ivar'>@meta</span>
@@ -664,12 +757,12 @@
       <pre class="lines">
 
 
-25
-26
-27</pre>
+29
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 25</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_named_arguments'>named_arguments</span>
   <span class='ivar'>@named_arguments</span>
@@ -684,7 +777,7 @@
       <div class="method_details ">
   <h3 class="signature " id="states-instance_method">
   
-    #<strong>states</strong>  &#x21d2; <tt>Hash</tt>  <span class="extras">(readonly)</span>
+    #<strong>states</strong>  &#x21d2; <tt>Array</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -692,7 +785,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>The state objects defined for this specification, keyed by name</p>
+    <p>The state objects defined for this specification</p>
 
 
   </div>
@@ -705,7 +798,7 @@
     <li>
       
       
-        <span class='type'>(<tt>Hash</tt>)</span>
+        <span class='type'>(<tt>Array</tt>)</span>
       
       
       
@@ -798,12 +891,12 @@ in the reverse direction.</p>
       <pre class="lines">
 
 
-112
-113
-114</pre>
+122
+123
+124</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_define_revert_events!'>define_revert_events!</span>
   <span class='ivar'>@define_revert_events</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -850,12 +943,12 @@ in the reverse direction.</p>
       <pre class="lines">
 
 
-120
-121
-122</pre>
+130
+131
+132</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 130</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_define_revert_events?'>define_revert_events?</span>
   <span class='ivar'>@define_revert_events</span>
@@ -925,12 +1018,12 @@ the event transit method call.</p>
       <pre class="lines">
 
 
-85
-86
-87</pre>
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 95</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_event_args'>event_args</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='rparen'>)</span>
   <span class='ivar'>@named_arguments</span> <span class='op'>=</span> <span class='id identifier rubyid_names'>names</span>
@@ -1001,12 +1094,12 @@ the event transit method call.</p>
       <pre class="lines">
 
 
-47
-48
-49</pre>
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_find_state'>find_state</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='rbrace'>}</span>
@@ -1019,7 +1112,7 @@ the event transit method call.</p>
       <div class="method_details ">
   <h3 class="signature " id="state-instance_method">
   
-    #<strong>state</strong>(name, meta: {}) { ... } &#x21d2; <tt>nil</tt> 
+    #<strong>state</strong>(name, tags: [], **meta) { ... } &#x21d2; <tt>nil</tt> 
   
 
   
@@ -1066,6 +1159,21 @@ the event transit method call.</p>
       
     </li>
   
+    <li>
+      
+        <span class='name'>tags</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Tags to apply to the <span class='object_link'><a href="State.html" title="Workflow::State (class)">Workflow::State</a></span> object</p>
+</div>
+      
+    </li>
+  
 </ul>
 
 <p class="tag_title">Yields:</p>
@@ -1105,20 +1213,20 @@ the event transit method call.</p>
       <pre class="lines">
 
 
-70
-71
-72
-73
-74
-75
-76</pre>
+80
+81
+82
+83
+84
+85
+86</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 70</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 80</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_state'>state</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_events'>events</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_state'>state</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>tags:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_meta'>meta</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_events'>events</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='id identifier rubyid_new_state'>new_state</span> <span class='op'>=</span> <span class='const'>Workflow</span><span class='op'>::</span><span class='const'>State</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='ivar'>@states</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='label'>meta:</span> <span class='id identifier rubyid_meta'>meta</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_new_state'>new_state</span> <span class='op'>=</span> <span class='const'>Workflow</span><span class='op'>::</span><span class='const'>State</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='ivar'>@states</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='label'>tags:</span> <span class='id identifier rubyid_tags'>tags</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_meta'>meta</span><span class='rparen'>)</span>
   <span class='ivar'>@initial_state</span> <span class='op'>||=</span> <span class='id identifier rubyid_new_state'>new_state</span>
   <span class='ivar'>@states</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_new_state'>new_state</span>
   <span class='id identifier rubyid_new_state'>new_state</span><span class='period'>.</span><span class='id identifier rubyid_instance_eval'>instance_eval</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_events'>events</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
@@ -1143,12 +1251,12 @@ the event transit method call.</p>
       <pre class="lines">
 
 
-116
-117
-118</pre>
+126
+127
+128</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/specification.rb', line 126</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unique_event_names'>unique_event_names</span>
   <span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:events</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
@@ -1163,7 +1271,7 @@ the event transit method call.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Sep 27 05:03:39 2016 by
+  Generated on Thu Sep 29 13:23:31 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.5 (ruby-2.3.1).
 </div>

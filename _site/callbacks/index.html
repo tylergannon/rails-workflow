@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Callbacks For State Transitions</title>
+  <title>Rails Workflow</title>
   <meta name="description" content="Rails Workflow began as a fork of the Workflow gem by Vladimir Dobriakov. It is a nearly total rewrite but maintains the same core architecture. It is releas...">
 
   
@@ -59,7 +59,7 @@
           
         
           
-          <a class="page-link" href="/rails-workflow/callbacks/">Callbacks For State Transitions</a>
+        
           
         
           
@@ -96,7 +96,7 @@
   <article class="post">
 
     <header class="post-header">
-      <h1 class="post-title">Callbacks For State Transitions</h1>
+      <h1 class="post-title"></h1>
     </header>
 
     <div class="post-content">
@@ -121,7 +121,7 @@
 
 <p>You can also do the same thing with a block:</p>
 
-<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Arcticle</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+<div class="language-ruby highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Article</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
   <span class="n">before_transition</span> <span class="k">do</span>
     <span class="nb">self</span><span class="p">.</span><span class="nf">transition_requested_by</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">first</span>
   <span class="k">end</span>

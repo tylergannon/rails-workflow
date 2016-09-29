@@ -1,8 +1,6 @@
 ---
 layout: page
-title: Callbacks For State Transitions
 permalink: /callbacks/
-toc: true
 ---
 
 # Callback Registration
@@ -27,7 +25,7 @@ end
 You can also do the same thing with a block:
 
 ```ruby
-class Arcticle < ApplicationRecord
+class Article < ApplicationRecord
   before_transition do
     self.transition_requested_by = User.first
   end

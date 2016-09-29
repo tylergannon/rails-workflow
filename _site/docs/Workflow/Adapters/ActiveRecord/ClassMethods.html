@@ -87,16 +87,29 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>This module will automatically generate ActiveRecord scopes based on workflow states.
-The name of each generated scope will be something like <code>with_&lt;state_name&gt;_state</code></p>
+    <p>Scopes for the ActiveRecord entity class.</p>
+
+<p>Two scopes for each <span class='object_link'><a href="../../State.html" title="Workflow::State (class)">State</a></span> specified plus some general ones:</p>
 
 <p>Examples:</p>
 
-<p>Article.with_pending_state # =&gt; ActiveRecord::Relation
-Payment.without_refunded_state # =&gt; ActiveRecord::Relation
-<code>
-Example above just adds</code>where(:state_column_name =&gt; &#39;pending&#39;)<code>or
-</code>where.not(:state_column_name =&gt; &#39;pending&#39;)` to AR query and returns
+<pre class="code ruby"><code class="ruby"><span class='kw'>class</span> <span class='const'>Article</span> <span class='op'>&lt;</span> <span class='const'>ApplicationRecord</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'>Workflow</span>
+  <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:pending</span><span class='comma'>,</span> <span class='label'>tags:</span> <span class='symbol'>:some_tag</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_on'>on</span> <span class='symbol'>:submit</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:submitted</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_state'>state</span> <span class='symbol'>:submitted</span>
+<span class='kw'>end</span>
+<span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_with_pending_state'>with_pending_state</span> <span class='comment'># =&gt; ActiveRecord::Relation
+</span><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_without_pending_state'>without_pending_state</span> <span class='comment'># =&gt; ActiveRecord::Relation
+</span><span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_state_tagged_with'>state_tagged_with</span><span class='lparen'>(</span><span class='symbol'>:some_tag</span><span class='comma'>,</span> <span class='symbol'>:another_tag</span><span class='rparen'>)</span>
+<span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_state_not_tagged_with'>state_not_tagged_with</span><span class='lparen'>(</span><span class='symbol'>:some_tag</span><span class='rparen'>)</span>
+<span class='const'>Article</span><span class='period'>.</span><span class='id identifier rubyid_in_terminal_state'>in_terminal_state</span>
+
+</code></pre>
+
+<p>Example above just adds <code>where(:state_column_name =&gt; &#39;pending&#39;)</code> or
+<code>where.not(:state_column_name =&gt; &#39;pending&#39;)</code> to AR query and returns
 ActiveRecord::Relation.</p>
 
 
@@ -119,6 +132,121 @@ ActiveRecord::Relation.</p>
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#in_terminal_state-instance_method" title="#in_terminal_state (instance method)">#<strong>in_terminal_state</strong>  &#x21d2; ActiveRecord::Relation </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Find objects that are in a terminal state - no available event transitions.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#not_in_terminal_state-instance_method" title="#not_in_terminal_state (instance method)">#<strong>not_in_terminal_state</strong>  &#x21d2; ActiveRecord::Relation </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Find objects that are not in a terminal state.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#state_not_tagged_with-instance_method" title="#state_not_tagged_with (instance method)">#<strong>state_not_tagged_with</strong>(*tags)  &#x21d2; ActiveRecord::Relation </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Locate objects that are not in a state tagged with the given tag(s).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#state_tagged_with-instance_method" title="#state_tagged_with (instance method)">#<strong>state_tagged_with</strong>(*tags)  &#x21d2; ActiveRecord::Relation </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Locate objects that are in a state tagged with the given tag(s).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#with_state-instance_method" title="#with_state (instance method)">#<strong>with_state</strong>(*states)  &#x21d2; ActiveRecord::Relation </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Find objects in the given state(s).</p>
+</div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -175,7 +303,366 @@ ActiveRecord::Relation.</p>
 
     
       <div class="method_details first">
-  <h3 class="signature first" id="workflow-instance_method">
+  <h3 class="signature first" id="in_terminal_state-instance_method">
+  
+    #<strong>in_terminal_state</strong>  &#x21d2; <tt>ActiveRecord::Relation</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Find objects that are in a terminal state - no available
+event transitions</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ActiveRecord::Relation</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>ActiveRecord query object meeting the criteria</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+81
+82
+83</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 81</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_in_terminal_state'>in_terminal_state</span>
+  <span class='id identifier rubyid_with_state'>with_state</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:terminal?</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="not_in_terminal_state-instance_method">
+  
+    #<strong>not_in_terminal_state</strong>  &#x21d2; <tt>ActiveRecord::Relation</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Find objects that are not in a terminal state</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ActiveRecord::Relation</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>ActiveRecord query object meeting the criteria</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_not_in_terminal_state'>not_in_terminal_state</span>
+  <span class='id identifier rubyid_with_state'>with_state</span><span class='lparen'>(</span><span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:terminal?</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="state_not_tagged_with-instance_method">
+  
+    #<strong>state_not_tagged_with</strong>(*tags)  &#x21d2; <tt>ActiveRecord::Relation</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Locate objects that are not in a state tagged with the given tag(s)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>tags</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>List of tags the objects (and their states) should not have</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ActiveRecord::Relation</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>ActiveRecord query object meeting the criteria</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 103</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_state_not_tagged_with'>state_not_tagged_with</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_with_state'>with_state</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_not_tagged_with'>not_tagged_with</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="state_tagged_with-instance_method">
+  
+    #<strong>state_tagged_with</strong>(*tags)  &#x21d2; <tt>ActiveRecord::Relation</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Locate objects that are in a state tagged with the given tag(s)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>tags</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>List of tags that apply</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ActiveRecord::Relation</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>ActiveRecord query object meeting the criteria</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+95
+96
+97</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 95</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_state_tagged_with'>state_tagged_with</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_with_state'>with_state</span> <span class='id identifier rubyid_workflow_spec'>workflow_spec</span><span class='period'>.</span><span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_tagged_with'>tagged_with</span><span class='lparen'>(</span><span class='id identifier rubyid_tags'>tags</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="with_state-instance_method">
+  
+    #<strong>with_state</strong>(*states)  &#x21d2; <tt>ActiveRecord::Relation</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Find objects in the given state(s)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>states</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Symbol, String or <span class='object_link'><a href="../../State.html" title="Workflow::State (class)">State</a></span> objects</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ActiveRecord::Relation</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>ActiveRecord query object meeting the criteria</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 111</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_with_state'>with_state</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_states'>states</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_states'>states</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_states'>states</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span>
+  <span class='id identifier rubyid_states'>states</span><span class='period'>.</span><span class='id identifier rubyid_map!'>map!</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_state'>state</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Workflow</span><span class='op'>::</span><span class='const'>State</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>workflow_state:</span> <span class='id identifier rubyid_states'>states</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="workflow-instance_method">
   
     #<strong>workflow</strong>(&amp;specification)  &#x21d2; <tt>Object</tt> 
   
@@ -189,13 +676,13 @@ ActiveRecord::Relation.</p>
       <pre class="lines">
 
 
-61
-62
-63
-64</pre>
+73
+74
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_workflow'>workflow</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_specification'>specification</span><span class='rparen'>)</span>
   <span class='kw'>super</span>
@@ -269,13 +756,13 @@ ActiveRecord::Relation.</p>
       <pre class="lines">
 
 
-56
-57
-58
-59</pre>
+68
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/adapters/active_record.rb', line 68</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_workflow_column'>workflow_column</span><span class='lparen'>(</span><span class='id identifier rubyid_column_name'>column_name</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@workflow_column</span> <span class='op'>=</span> <span class='id identifier rubyid_column_name'>column_name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='kw'>if</span> <span class='id identifier rubyid_column_name'>column_name</span>
@@ -291,7 +778,7 @@ ActiveRecord::Relation.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Sep 27 05:03:38 2016 by
+  Generated on Thu Sep 29 13:23:29 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.5 (ruby-2.3.1).
 </div>
