@@ -17,6 +17,16 @@ RSpec.describe Workflow::State do
 
     subject { workflow_class.new }
 
+    let(:workflow_spec) { workflow_class.workflow_spec }
+
+    it 'can find states by tag' do
+      expect(workflow_spec.states.tagged_with(:baz).map(&:name)).to eq [:completed]
+    end
+
+    it 'can find events by tag' do
+      expect(workflow_spec.events.tagged_with(:foo).map(&:name)).to eq [:complete]
+    end
+
     it 'knows its state is initial' do
       expect(subject.current_state).to be_initial
     end

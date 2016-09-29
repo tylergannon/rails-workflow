@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-RSpec.describe 'Active Record Scopes', type: :active_record_examples do
+RSpec.describe Workflow::Adapters::ActiveRecord, type: :active_record_examples do
   include_context 'ActiveRecord Setup'
   class Article < ActiveRecord::Base
     include Workflow
 
     workflow do
-      state :new do
+      state :new, tags: :some_tag do
         on :accept, to: :accepted
       end
       state :accepted
@@ -24,6 +24,29 @@ RSpec.describe 'Active Record Scopes', type: :active_record_examples do
         t.string :workflow_state
         t.datetime :created_at
         t.datetime :updated_at
+      end
+    end
+  end
+
+  describe 'tagged_with scopes' do
+    before do
+      Article.create workflow_state: 'new', title: 'Yeah'
+      Article.create workflow_state: 'accepted'
+    end
+
+    describe '.state_tagged_with' do
+      subject { Article.state_tagged_with(:some_tag) }
+      it 'should load just one record' do
+        expect(subject.length).to eq 1
+        expect(subject.first.title).to eq 'Yeah'
+      end
+    end
+
+    describe '.state_tagged_with' do
+      subject { Article.state_not_tagged_with(:some_tag) }
+      it 'should load just one record' do
+        expect(subject.length).to eq 1
+        expect(subject.first.title).not_to eq 'Yeah'
       end
     end
   end

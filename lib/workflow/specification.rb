@@ -8,9 +8,13 @@ module Workflow
   class Specification
     include ActiveSupport::Callbacks
 
-    # The state objects defined for this specification, keyed by name
-    # @return [Hash]
+    # The state objects defined for this specification
+    # @return [Array]
     attr_reader :states
+
+    # The event objects defined for this specification
+    # @return [Array]
+    attr_reader :events
 
     # State object to be given to newly created objects under this workflow.
     # @return [State]
@@ -40,8 +44,10 @@ module Workflow
       end
     end
 
+    set_callback(:spec_definition, :after, :add_tagged_with_to_states_and_events)
     set_callback(:spec_definition, :after, :define_tag_methods)
     set_callback(:spec_definition, :after, :define_event_tag_methods)
+    set_callback(:spec_definition, :after, :collect_events)
 
     # Find the state with the given name.
     #
@@ -137,6 +143,18 @@ module Workflow
       end
     end
 
+    module TaggedWith
+      def tagged_with(*tags)
+        tags = [tags].flatten
+        select { |item| (item.tags & tags).any? }
+      end
+
+      def not_tagged_with(*tags)
+        tags = [tags].flatten
+        reject { |item| (item.tags & tags).any? }
+      end
+    end
+
     def define_tag_methods
       tags = states.map(&:tags).flatten.uniq
       tag_method_module = build_tag_method_module(tags, true)
@@ -145,13 +163,21 @@ module Workflow
       end
     end
 
+    def collect_events
+      @events = states.map(&:events).flatten
+    end
+
     def define_event_tag_methods
-      events = states.map(&:events).flatten
-      tags   = events.map(&:tags).flatten
+      tags = events.map(&:tags).flatten
       tag_method_module = build_tag_method_module(tags, false)
       events.each do |event|
         event.send :extend, tag_method_module
       end
+    end
+
+    def add_tagged_with_to_states_and_events
+      states.send :extend, TaggedWith
+      events.send :extend, TaggedWith
     end
 
     def build_tag_method_module(tags, include_state_helpers)

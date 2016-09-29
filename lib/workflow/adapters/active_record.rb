@@ -63,6 +63,18 @@ module Workflow
           workflow_spec.states.each { |state| define_scopes(state) }
         end
 
+        def state_tagged_with(*tags)
+          states = workflow_spec.states.tagged_with(tags)
+          states.map! { |state| state.name.to_s }
+          where(workflow_state: states)
+        end
+
+        def state_not_tagged_with(*tags)
+          states = workflow_spec.states.tagged_with(tags)
+          states.map! { |state| state.name.to_s }
+          where.not(workflow_state: states)
+        end
+
         private
 
         def superclass_workflow
