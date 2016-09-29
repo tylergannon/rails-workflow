@@ -117,8 +117,8 @@ end
 
 anArticle.submit! current_user
 ```
-See [Callback Arguments](/callback_arguments) for more on how to pass information to
-your callbacks.
+See [Callback Arguments]({{ site.baseurl }}/callback_arguments) for more on
+how to pass information to your callbacks.
 
 
 # Around Callbacks
