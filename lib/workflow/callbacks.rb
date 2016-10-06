@@ -23,47 +23,8 @@ module Workflow
     end
 
     module ClassMethods
-      def ensure_after_transitions(name = nil, **opts, &block)
-        ensure_procs = [name, block].compact.map do |exe|
-          Callback.build(exe)
-        end
-
-        prepend_around_transition(**opts) do |obj, callbacks|
-          begin
-            callbacks.call
-          ensure
-            ensure_procs.each { |l| l.callback.call obj, -> {} }
-          end
-        end
-      end
 
       EMPTY_LAMBDA = -> {}
-
-      def on_error(error_class = Exception, **opts, &block)
-        error_procs  = build_lambdas([opts.delete(:rescue), block])
-        ensure_procs = build_lambdas(opts.delete(:ensure))
-
-        prepend_around_transition(**opts, &on_error_proc(error_class, error_procs, ensure_procs))
-      end
-
-      private def on_error_proc(error_class, error_procs, ensure_procs)
-        proc do |_obj, callbacks|
-          begin
-            callbacks.call
-          rescue error_class => ex
-            instance_exec(ex, &block) if block_given?
-            error_procs.each { |l| l.callback.call self, EMPTY_LAMBDA }
-          ensure
-            ensure_procs.each { |l| l.callback.call self, EMPTY_LAMBDA }
-          end
-        end
-      end
-
-      private def build_lambdas(*names)
-        [names].flatten.compact.map do |name|
-          Callback.build name
-        end
-      end
 
       ##
       # @!method before_transition

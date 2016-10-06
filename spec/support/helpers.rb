@@ -1,9 +1,18 @@
+class BasicWorkflowClass
+  attr_accessor :messages
+  include Workflow
+  def initialize
+    self.messages = []
+  end
+end
+
 RSpec.shared_context 'Shared Helpers', shared_context: :metadata do
-  def new_workflow_class(superklass = Object, &block)
-    k = Class.new(superklass)
-    k.class_eval do
-      include Workflow
-      workflow(&block)
+  def new_workflow_class(superklass = BasicWorkflowClass, &block)
+    k = Class.new(superklass) do
+      include Workflow unless included_modules.include?(Workflow)
+    end
+    if block_given?
+      k.class_eval { workflow(&block) }
     end
     k
   end

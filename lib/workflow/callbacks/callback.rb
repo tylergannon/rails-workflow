@@ -17,8 +17,10 @@ module Workflow
         @callback = invert_lambda(@callback) if inverted
       end
 
+      EMPTY_LAMBDA = -> {}
+
       def call(target)
-        callback.call(target, -> {})
+        callback.call(target, EMPTY_LAMBDA)
       end
 
       def self.inverted(expression)

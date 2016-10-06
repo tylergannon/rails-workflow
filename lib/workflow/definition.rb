@@ -67,6 +67,7 @@ module Workflow
       def workflow(&specification)
         @workflow_spec = Specification.new({}, &specification)
         HelperMethodConfigurator.new(@workflow_spec, self).configure!
+        TagMethodConfigurator.new(@workflow_spec, self).configure!
       end
     end
   end

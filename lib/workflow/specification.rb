@@ -7,6 +7,7 @@ module Workflow
   # Metadata object describing available states and state transitions.
   class Specification
     include ActiveSupport::Callbacks
+    include ActiveSupport::Rescuable::ClassMethods
 
     # The state objects defined for this specification
     # @return [Array]
@@ -28,6 +29,10 @@ module Workflow
     # @return [Array]
     attr_reader :named_arguments
 
+    attr_accessor :rescue_handlers
+
+    attr_accessor :always_handlers
+
     define_callbacks :spec_definition
 
     set_callback(:spec_definition, :after) do |spec|
@@ -44,9 +49,6 @@ module Workflow
       end
     end
 
-    set_callback(:spec_definition, :after, :add_tagged_with_to_states_and_events)
-    set_callback(:spec_definition, :after, :define_tag_methods)
-    set_callback(:spec_definition, :after, :define_event_tag_methods)
     set_callback(:spec_definition, :after, :collect_events)
 
     # Find the state with the given name.
@@ -67,6 +69,13 @@ module Workflow
       states.map(&:name)
     end
 
+    def always(*names, &block)
+      names.each do |name|
+        always_handlers << Workflow::Callbacks::Callback.build(name)
+      end
+      always_handlers << Workflow::Callbacks::Callback.build(block) if block_given?
+    end
+
     # @api private
     #
     # @param [Hash] meta Metadata
@@ -75,6 +84,8 @@ module Workflow
     def initialize(meta = {}, &specification)
       @states = []
       @meta = meta
+      @rescue_handlers = []
+      @always_handlers = []
       run_callbacks :spec_definition do
         instance_eval(&specification)
       end
@@ -143,64 +154,8 @@ module Workflow
 
     private
 
-    module StateTagHelpers
-      def initial?
-        all_states.index(self).zero?
-      end
-
-      def terminal?
-        events.empty?
-      end
-    end
-
-    module TaggedWith
-      def tagged_with(*tags)
-        tags = [tags].flatten
-        select { |item| (item.tags & tags).any? }
-      end
-
-      def not_tagged_with(*tags)
-        tags = [tags].flatten
-        reject { |item| (item.tags & tags).any? }
-      end
-    end
-
-    def define_tag_methods
-      tags = states.map(&:tags).flatten.uniq
-      tag_method_module = build_tag_method_module(tags, true)
-      states.each do |state|
-        state.send :extend, tag_method_module
-      end
-    end
-
     def collect_events
       @events = states.map(&:events).flatten
-    end
-
-    def define_event_tag_methods
-      tags = events.map(&:tags).flatten
-      tag_method_module = build_tag_method_module(tags, false)
-      events.each do |event|
-        event.send :extend, tag_method_module
-      end
-    end
-
-    def add_tagged_with_to_states_and_events
-      states.send :extend, TaggedWith
-      events.send :extend, TaggedWith
-    end
-
-    def build_tag_method_module(tags, include_state_helpers)
-      tag_method_module = Module.new
-      tag_method_module.send :include, StateTagHelpers if include_state_helpers
-      tag_method_module.class_eval do
-        tags.each do |tag|
-          define_method "#{tag}?" do
-            self.tags.include?(tag)
-          end
-        end
-      end
-      tag_method_module
     end
   end
 end
