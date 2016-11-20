@@ -11,8 +11,17 @@ Workflow is a tool for describing and managing state transitions in Ruby objects
 
 * Use of [ActiveSupport::Callbacks](http://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html)
 to enable a more flexible application of callbacks.
-* Slightly terser syntax for event definition.
-* Cleaner support for using conditional ActiveRecord validations to validate state transitions.
+* Terser DSL for defining states and transitions, for enhanced readability.
+* Flexible and powerful syntax for defining callbacks on state transitions
+* Tighter integration with ActiveModel validations
+  * Use Rails-native validations to describe conditions for allowing state transitions.
+* Tighter integration with ActiveRecord
+* Callback syntax patterned after ActiveRecord and ActionController callbacks
+* Add `around` callbacks to wrap transitions
+  * Allows wrapping transitions into an ActiveRecord transaction.
+* Better metadata management
+  * Instance attributes for metadata keys
+  * Tagging for entity states to allow arbitrary grouping of states.
 
 
 ## Installation
