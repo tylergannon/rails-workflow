@@ -13,8 +13,17 @@ rewrite but maintains the same core architecture.  It is released under the [MIT
 
 * Use of [ActiveSupport::Callbacks](http://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html)
 to enable a more flexible application of callbacks.
-* Slightly terser syntax for event definition.
-* A clean way to use ActiveRecord Conditional Validation for validating whether an object is fit for the requested state transition.
+* Terser DSL for defining states and transitions, for enhanced readability.
+* Flexible and powerful syntax for defining callbacks on state transitions
+* Tighter integration with ActiveModel validations
+  * Use Rails-native validations to describe conditions for allowing state transitions.
+* Tighter integration with ActiveRecord
+* Callback syntax patterned after ActiveRecord and ActionController callbacks
+* Add `around` callbacks to wrap transitions
+  * Allows wrapping transitions into an ActiveRecord transaction.
+* Better metadata management
+  * Instance attributes for metadata keys
+  * Tagging for entity states to allow arbitrary grouping of states.
 
 # Documentation Topics
 
