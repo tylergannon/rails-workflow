@@ -216,6 +216,37 @@ other states.</p>
 
   
     <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#beyond%3F-class_method" title="beyond? (class method)">.<strong>beyond?</strong>(other)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
       Instance Method Summary
       <small><a href="#" class="summary_toggle">collapse</a></small>
     </h2>
@@ -271,7 +302,7 @@ other states.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(name, sequence, tags: [], **meta)  &#x21d2; State </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(name, all_states, tags: [], **meta)  &#x21d2; State </a>
     
 
     
@@ -339,6 +370,28 @@ other states.</p>
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_s-instance_method" title="#to_s (instance method)">#<strong>to_s</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -349,7 +402,7 @@ other states.</p>
     <div class="method_details first">
   <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>initialize</strong>(name, sequence, tags: [], **meta)  &#x21d2; <tt><span class='object_link'><a href="" title="Workflow::State (class)">State</a></span></tt> 
+    #<strong>initialize</strong>(name, all_states, tags: [], **meta)  &#x21d2; <tt><span class='object_link'><a href="" title="Workflow::State (class)">State</a></span></tt> 
   
 
   
@@ -387,15 +440,15 @@ other states.</p>
   
     <li>
       
-        <span class='name'>sequence</span>
+        <span class='name'>all_states</span>
       
       
-        <span class='type'>(<tt>Fixnum</tt>)</span>
+        <span class='type'>(<tt>Array</tt>)</span>
       
       
       
         &mdash;
-        <div class='inline'><p>Sort location among states on this workflow.</p>
+        <div class='inline'><p>All states defined for this workflow, used for sorting.</p>
 </div>
       
     </li>
@@ -444,9 +497,9 @@ other states.</p>
     <td>
       <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 22</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_sequence'>sequence</span><span class='comma'>,</span> <span class='label'>tags:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_meta'>meta</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_all_states'>all_states</span><span class='comma'>,</span> <span class='label'>tags:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_meta'>meta</span><span class='rparen'>)</span>
   <span class='ivar'>@name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
-  <span class='ivar'>@sequence</span> <span class='op'>=</span> <span class='id identifier rubyid_sequence'>sequence</span>
+  <span class='ivar'>@all_states</span> <span class='op'>=</span> <span class='id identifier rubyid_all_states'>all_states</span>
   <span class='ivar'>@events</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='ivar'>@tags</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_tags'>tags</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
   <span class='kw'>unless</span> <span class='ivar'>@tags</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_t'>t</span><span class='op'>|</span> <span class='id identifier rubyid_t'>t</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span> <span class='const'>Symbol</span> <span class='rbrace'>}</span>
@@ -625,6 +678,64 @@ other states.</p>
   </div>
 
 
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="beyond?-class_method">
+  
+    .<strong>beyond?</strong>(other)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+97
+98
+99</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 97</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_beyond?'>beyond?</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
+  <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_current_state'>current_state</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_other'>other</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
 
@@ -660,7 +771,7 @@ in which they were defined.</p>
       
       
         &mdash;
-        <div class='inline'><p>state to be compared against.</p>
+        <div class='inline'><p>state or Symbol name to be compared against.</p>
 </div>
       
     </li>
@@ -680,19 +791,6 @@ in which they were defined.</p>
     </li>
   
 </ul>
-<p class="tag_title">Raises:</p>
-<ul class="raise">
-  
-    <li>
-      
-      
-        <span class='type'>(<tt><span class='object_link'><a href="Errors/StateComparisonError.html" title="Workflow::Errors::StateComparisonError (class)">Errors::StateComparisonError</a></span></tt>)</span>
-      
-      
-      
-    </li>
-  
-</ul>
 
 </div><table class="source_code">
   <tr>
@@ -700,17 +798,25 @@ in which they were defined.</p>
       <pre class="lines">
 
 
-116
-117
-118
-119</pre>
+126
+127
+128
+129
+130
+131
+132
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 116</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 126</span>
 
 <span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>StateComparisonError</span><span class='comma'>,</span> <span class='id identifier rubyid_other'>other</span> <span class='kw'>unless</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>State</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_sequence'>sequence</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:sequence</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_all_states'>all_states</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='id identifier rubyid_other'>other</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>Errors</span><span class='op'>::</span><span class='const'>StateComparisonError</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_state'>state</span>
+    <span class='id identifier rubyid_other'>other</span> <span class='op'>=</span> <span class='id identifier rubyid_state'>state</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_all_states'>all_states</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_all_states'>all_states</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -835,12 +941,12 @@ in which they were defined.</p>
       <pre class="lines">
 
 
-107
-108
-109</pre>
+113
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 107</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;State name=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> events(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_events'>events</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'>)=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_events'>events</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -1021,14 +1127,44 @@ Must be omitted if a block is provided.</p>
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    #<strong>to_s</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/workflow/state.rb', line 117</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 29 13:23:30 2016 by
+  Generated on Sun Nov 20 12:07:15 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.5 (ruby-2.3.1).
+  0.9.5 (ruby-2.4.0).
 </div>
 
     </div>

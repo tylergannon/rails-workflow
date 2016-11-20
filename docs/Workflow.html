@@ -91,7 +91,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/workflow.rb<span class="defines">,<br />
-  lib/workflow/state.rb,<br /> lib/workflow/event.rb,<br /> lib/workflow/errors.rb,<br /> lib/workflow/version.rb,<br /> lib/workflow/callbacks.rb,<br /> lib/workflow/definition.rb,<br /> lib/workflow/transitions.rb,<br /> lib/workflow/specification.rb,<br /> lib/workflow/configuration.rb,<br /> lib/workflow/adapters/remodel.rb,<br /> lib/workflow/adapters/adapter.rb,<br /> lib/workflow/callbacks/callback.rb,<br /> lib/workflow/transition_context.rb,<br /> lib/workflow/adapters/active_record.rb,<br /> lib/workflow/callbacks/proc_callback.rb,<br /> lib/workflow/callbacks/method_callback.rb,<br /> lib/workflow/callbacks/string_callback.rb,<br /> lib/workflow/helper_method_configurator.rb,<br /> lib/workflow/callbacks/transition_callback.rb,<br /> lib/workflow/adapters/active_record_validations.rb,<br /> lib/workflow/callbacks/transition_callbacks/proc_caller.rb,<br /> lib/workflow/callbacks/transition_callbacks/method_caller.rb</span>
+  lib/workflow/event.rb,<br /> lib/workflow/state.rb,<br /> lib/workflow/errors.rb,<br /> lib/workflow/rescue.rb,<br /> lib/workflow/version.rb,<br /> lib/workflow/callbacks.rb,<br /> lib/workflow/definition.rb,<br /> lib/workflow/transitions.rb,<br /> lib/workflow/configuration.rb,<br /> lib/workflow/specification.rb,<br /> lib/workflow/adapters/adapter.rb,<br /> lib/workflow/adapters/remodel.rb,<br /> lib/workflow/transition_context.rb,<br /> lib/workflow/callbacks/callback.rb,<br /> lib/workflow/adapters/active_record.rb,<br /> lib/workflow/callbacks/proc_callback.rb,<br /> lib/workflow/tag_method_configurator.rb,<br /> lib/workflow/callbacks/method_callback.rb,<br /> lib/workflow/callbacks/string_callback.rb,<br /> lib/workflow/helper_method_configurator.rb,<br /> lib/workflow/callbacks/transition_callback.rb,<br /> lib/workflow/adapters/active_record_validations.rb,<br /> lib/workflow/callbacks/transition_callbacks/proc_caller.rb,<br /> lib/workflow/callbacks/transition_callbacks/method_caller.rb</span>
 </dd>
   </dl>
   
@@ -111,11 +111,11 @@
 <p class="children">
   
     
-      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Workflow/Adapters.html" title="Workflow::Adapters (module)">Adapters</a></span>, <span class='object_link'><a href="Workflow/Callbacks.html" title="Workflow::Callbacks (module)">Callbacks</a></span>, <span class='object_link'><a href="Workflow/Definition.html" title="Workflow::Definition (module)">Definition</a></span>, <span class='object_link'><a href="Workflow/Errors.html" title="Workflow::Errors (module)">Errors</a></span>, <span class='object_link'><a href="Workflow/Transitions.html" title="Workflow::Transitions (module)">Transitions</a></span>
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Workflow/Adapters.html" title="Workflow::Adapters (module)">Adapters</a></span>, <span class='object_link'><a href="Workflow/Callbacks.html" title="Workflow::Callbacks (module)">Callbacks</a></span>, <span class='object_link'><a href="Workflow/Definition.html" title="Workflow::Definition (module)">Definition</a></span>, <span class='object_link'><a href="Workflow/Errors.html" title="Workflow::Errors (module)">Errors</a></span>, <span class='object_link'><a href="Workflow/Rescue.html" title="Workflow::Rescue (module)">Rescue</a></span>, <span class='object_link'><a href="Workflow/Transitions.html" title="Workflow::Transitions (module)">Transitions</a></span>
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Workflow/Configuration.html" title="Workflow::Configuration (class)">Configuration</a></span>, <span class='object_link'><a href="Workflow/Event.html" title="Workflow::Event (class)">Event</a></span>, <span class='object_link'><a href="Workflow/HelperMethodConfigurator.html" title="Workflow::HelperMethodConfigurator (class)">HelperMethodConfigurator</a></span>, <span class='object_link'><a href="Workflow/Specification.html" title="Workflow::Specification (class)">Specification</a></span>, <span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span>, <span class='object_link'><a href="Workflow/TransitionContext.html" title="Workflow::TransitionContext (class)">TransitionContext</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Workflow/Configuration.html" title="Workflow::Configuration (class)">Configuration</a></span>, <span class='object_link'><a href="Workflow/Event.html" title="Workflow::Event (class)">Event</a></span>, <span class='object_link'><a href="Workflow/HelperMethodConfigurator.html" title="Workflow::HelperMethodConfigurator (class)">HelperMethodConfigurator</a></span>, <span class='object_link'><a href="Workflow/Specification.html" title="Workflow::Specification (class)">Specification</a></span>, <span class='object_link'><a href="Workflow/State.html" title="Workflow::State (class)">State</a></span>, <span class='object_link'><a href="Workflow/TagMethodConfigurator.html" title="Workflow::TagMethodConfigurator (class)">TagMethodConfigurator</a></span>, <span class='object_link'><a href="Workflow/TransitionContext.html" title="Workflow::TransitionContext (class)">TransitionContext</a></span>
     
   
 </p>
@@ -141,7 +141,7 @@
       <dt id="VERSION-constant" class="">VERSION =
         
       </dt>
-      <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.4.12</span><span class='tstring_end'>&#39;</span></span></pre></dd>
+      <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.4.16</span><span class='tstring_end'>&#39;</span></span></pre></dd>
     
   </dl>
 
@@ -308,13 +308,13 @@
       <pre class="lines">
 
 
-41
-42
-43
-44</pre>
+45
+46
+47
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_config'>config</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='const'>CONFIGURATION</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
@@ -330,9 +330,9 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 29 13:23:29 2016 by
+  Generated on Sun Nov 20 12:07:14 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.5 (ruby-2.3.1).
+  0.9.5 (ruby-2.4.0).
 </div>
 
     </div>

@@ -125,6 +125,16 @@
   <p class="children"><span class='object_link'><a href="MethodCallback.html" title="Workflow::Callbacks::MethodCallback (class)">MethodCallback</a></span>, <span class='object_link'><a href="ProcCallback.html" title="Workflow::Callbacks::ProcCallback (class)">ProcCallback</a></span>, <span class='object_link'><a href="StringCallback.html" title="Workflow::Callbacks::StringCallback (class)">StringCallback</a></span></p>
 </div>
 
+  <h2>Constant Summary</h2>
+  <dl class="constants">
+    
+      <dt id="EMPTY_LAMBDA-constant" class="">EMPTY_LAMBDA =
+        
+      </dt>
+      <dd><pre class="code"><span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span><span class='rbrace'>}</span></pre></dd>
+    
+  </dl>
+
 
 
 
@@ -462,8 +472,6 @@
       <pre class="lines">
 
 
-28
-29
 30
 31
 32
@@ -471,10 +479,12 @@
 34
 35
 36
-37</pre>
+37
+38
+39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/callbacks/callback.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/callbacks/callback.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_build'>build</span><span class='lparen'>(</span><span class='id identifier rubyid_expression'>expression</span><span class='comma'>,</span> <span class='id identifier rubyid_inverted'>inverted</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
   <span class='kw'>case</span> <span class='id identifier rubyid_expression'>expression</span>
@@ -506,12 +516,12 @@
       <pre class="lines">
 
 
-24
-25
-26</pre>
+26
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/callbacks/callback.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/callbacks/callback.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_inverted'>inverted</span><span class='lparen'>(</span><span class='id identifier rubyid_expression'>expression</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_build'>build</span><span class='lparen'>(</span><span class='id identifier rubyid_expression'>expression</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
@@ -542,15 +552,15 @@
       <pre class="lines">
 
 
-20
-21
-22</pre>
+22
+23
+24</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/workflow/callbacks/callback.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'lib/workflow/callbacks/callback.rb', line 22</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_callback'>callback</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='comma'>,</span> <span class='tlambda'>-&gt;</span> <span class='tlambeg'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_callback'>callback</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_target'>target</span><span class='comma'>,</span> <span class='const'>EMPTY_LAMBDA</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -562,9 +572,9 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 29 13:23:31 2016 by
+  Generated on Sun Nov 20 12:07:15 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.5 (ruby-2.3.1).
+  0.9.5 (ruby-2.4.0).
 </div>
 
     </div>

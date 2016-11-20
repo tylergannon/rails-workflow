@@ -59,7 +59,33 @@
 
       <iframe id="search_frame" src="class_list.html"></iframe>
 
-      <div id="content"><div id='filecontents'><h1>Workflow For Rails Apps</h1>
+      <div id="content"><div id='filecontents'><h1>State Management for ActiveRecord Entities</h1>
+
+<p>For when your ActiveRecord entity passes through a number of states during the course of
+a defined workflow.  This is a rewrite of Vladimir Dobriakov&#39;s <a href="https://github.com/geekq/workflow">Workflow Gem</a>,
+rewritten to achieve:</p>
+
+<ul>
+<li>Flexible and powerful syntax for defining callbacks on state transitions</li>
+<li>Tighter integration with ActiveModel validations
+
+<ul>
+<li>Use Rails-native validations to describe conditions for allowing state transitions.</li>
+</ul></li>
+<li>Tighter integration with ActiveRecord</li>
+<li>Callback syntax patterned after ActiveRecord and ActionController callbacks</li>
+<li>Add <code>around</code> callbacks to wrap transitions
+
+<ul>
+<li>Allows wrapping transitions into an ActiveRecord transaction.</li>
+</ul></li>
+<li>Better metadata management
+
+<ul>
+<li>Instance attributes for metadata keys</li>
+<li>Tagging for entity states to allow arbitrary grouping of states.</li>
+</ul></li>
+</ul>
 
 <p><a href="https://tylergannon.github.io/rails-workflow/">https://tylergannon.github.io/rails-workflow/</a></p>
 
@@ -75,9 +101,9 @@ Licensed under MIT license, see the MIT-LICENSE file.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Sep 29 13:23:29 2016 by
+  Generated on Sun Nov 20 12:07:13 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.5 (ruby-2.3.1).
+  0.9.5 (ruby-2.4.0).
 </div>
 
     </div>
