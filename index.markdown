@@ -4,6 +4,7 @@ layout: default
 
 #  Rails Workflow
 
+https://github.com/tylergannon/rails-workflow
 
 Rails Workflow began as a fork of the [Workflow](https://github.com/geekq/workflow) gem by
 [Vladimir Dobriakov](http://www.mobile-web-consulting.de).  It is a nearly total
